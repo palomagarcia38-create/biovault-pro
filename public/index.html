@@ -6,9 +6,10 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Cyber-Biometric HUD v3.0</title>
+  <title>BioVault Pro • Cyber-Biometric 3D HUD v4.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script id="threeSdk" async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Orbitron:wght@600;700;800;900&display=swap');
     body {
@@ -92,6 +93,40 @@
     .bio-node,.metric-card { background:linear-gradient(145deg,rgba(12,27,54,.88),rgba(6,14,30,.95)); }
     .metric-card:hover,.metric-card.active-card { border-color:var(--neon-cyan);box-shadow:0 0 18px rgba(0,240,255,.16); }
     @media print { body { background:white !important; } .hud-corners::before,.hud-corners::after { display:none; } .panel-dark { backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:none; } }
+
+    /* v4: preserve the existing controls while adding the supplied 3D HUD. */
+    .cyber-panel,.panel-dark { background:linear-gradient(165deg,rgba(10,22,44,.84),rgba(4,11,24,.94)); border-color:rgba(0,240,255,.24); box-shadow:0 8px 32px #000a,inset 0 0 24px rgba(0,240,255,.04); }
+    .bio-node { background:linear-gradient(145deg,rgba(12,27,54,.9),rgba(6,14,30,.96)); border-color:rgba(56,189,248,.26); box-shadow:inset 0 1px 0 #ffffff0f; transition:all .22s cubic-bezier(.16,1,.3,1); position:relative; overflow:hidden; }
+    .bio-node:hover,.bio-node.active-node { border-color:var(--neon-cyan);box-shadow:0 0 22px #00f0ff4d,inset 0 0 14px #00f0ff24;transform:translateY(-2px); }
+    .bio-node.altered-node { border-color:#f59e0bb8;background:linear-gradient(145deg,#30140ed9,#120a12f5);box-shadow:0 0 18px #f59e0b33; }
+    .bio-node.altered-node.active-node {border-color:#fbbf24;box-shadow:0 0 26px #f59e0b73;}
+    .neon-btn {background:linear-gradient(90deg,#00f0ff,#0284c7);color:#020611;box-shadow:0 0 18px #00f0ff59;transition:box-shadow .2s ease;}
+    .neon-btn:hover {box-shadow:0 0 26px #00f0ff99;}
+    #holoStage {min-width:0;isolation:isolate;}
+    #canvas3dContainer {width:100%;height:360px;position:relative;touch-action:pan-y;cursor:grab;overflow:hidden;border-radius:12px;}
+    #canvas3dContainer:active {cursor:grabbing;}
+    #canvas3dContainer canvas {display:block;width:100%;height:100%;}
+    #canvas3dContainer:focus-visible {outline:2px solid #00f0ff;outline-offset:2px;}
+    #holoFallback svg {width:100%;max-width:185px;max-height:360px;}
+    .holo-mode,.holo-rotation {display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;}
+    .holo-mode button,.holo-rotation button,.holo-auto {border:1px solid #00f0ff40;border-radius:7px;background:#071329;color:#9eeef2;font:10px 'JetBrains Mono',monospace;padding:7px 8px;min-height:30px;}
+    .holo-mode button[aria-pressed=true] {background:#00f0ff20;border-color:#00f0ff;color:#d6fdff;}
+    .holo-auto {font-size:9px;margin-top:5px;max-width:100%;}
+    .holo-mode button:disabled {opacity:.4;}
+    .clinical-block {padding:14px;border-radius:12px;background:#030917e6;border:1px solid #00f0ff33;}
+    .clinical-block h4 {font:700 10px 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;color:#8eeaf3;margin:0 0 8px;}
+    .clinical-reference h4 {color:#c4b5fd;}
+    #detailWhyBox h4 {color:#fcd34d;}
+    .clinical-action {background:#08334459;border-color:#22d3ee4d;}
+    .clinical-action h4 {color:#6ee7b7;}
+    #detailCitation a {color:#9bdff0;text-decoration:underline;display:inline-block;margin:3px 10px 3px 0;}
+    .reference-ranges {display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:6px;margin:8px 0;}
+    .reference-range {border:1px solid #334155;padding:10px 8px;border-radius:9px;font-size:11px;background:#0c192b;}
+    .reference-range strong {display:block;color:#cbd5e1;font-size:10px;margin-bottom:5px;}
+    .reference-range[data-current=true] {border-color:#00f0ff;background:#00f0ff14;}
+    @media(max-width:480px) {#holoStage {padding-top:0;} #canvas3dContainer {height:290px;} .holo-rotation button {padding:6px;min-width:26px;} .metric-card .metric-title {font-size:9px;letter-spacing:0;} #activeReadingBadge {max-width:100%;} #bioMap>div:first-child>div {min-width:0;} .holo-auto {padding:6px 4px;font-size:8px;} }
+    @media(prefers-reduced-motion:reduce) {.bio-node {transition:none;} .bio-node:hover,.bio-node.active-node {transform:none;} }
+    @media print {.cyber-panel,.panel-dark {box-shadow:none;backdrop-filter:none;} }
   </style>
 </head>
 <body class="pb-20">
@@ -101,20 +136,20 @@
     <div class="panel-dark cyber-panel hud-corners rounded-2xl p-3.5 space-y-3">
       <div class="flex items-start justify-between gap-2">
         <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-black text-slate-950 text-sm shadow-lg shadow-sky-500/25">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-indigo-600 flex items-center justify-center font-black text-slate-950 text-sm shadow-lg shadow-sky-500/25">
             BV
           </div>
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <h1 class="font-extrabold text-base text-white tracking-tight">BioVault Pro</h1>
+              <h1 class="hud-font font-extrabold text-sm sm:text-base text-white tracking-wider">BIOVAULT <span class="text-cyan-400">PRO</span></h1>
               <span class="text-[11px] px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 font-semibold">Omron HBF-514C</span>
               <span id="syncPill" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-medium">● Conectando...</span>
             </div>
-            <p class="text-[11px] text-slate-400 mt-0.5">Mapa corporal • Evolução e referências Omron</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Corpo 3D interativo • Composição e evolução</p>
           </div>
         </div>
         <button onclick="window.location.reload()" title="Atualizar App" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v3.0
+          ↻ v4.0
         </button>
       </div>
 
@@ -136,11 +171,11 @@
           <input type="number" id="heightCmInput" value="165" min="100" max="220" step="0.1" onchange="saveProfilePrefs(); recomputeAll()" aria-label="Altura em centímetros" class="w-14 bg-transparent text-white font-extrabold text-center outline-none mono" />
           <span class="text-slate-400">cm</span>
         </label>
-        <button onclick="openNewWeighingModal()" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-sky-500/20">
+        <button onclick="openNewWeighingModal()" class="neon-btn text-slate-950 hud-font font-extrabold text-[11px] px-3.5 py-2 rounded-xl shadow-lg shadow-sky-500/20">
           + Nova Pesagem
         </button>
 
-        <button id="btnOpenReport" onclick="openReportModal()" class="bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-xs px-3.5 py-2 rounded-xl">
+        <button id="btnOpenReport" onclick="openReportModal()" class="bg-purple-500/15 hover:bg-purple-500/25 border border-purple-400/40 text-purple-200 mono font-bold text-[11px] px-3.5 py-2 rounded-xl">
           Gerar Laudo PDF
         </button>
       </div>
@@ -160,10 +195,10 @@
   <main id="dashboardMain" class="max-w-4xl mx-auto px-3 space-y-3">
     <p id="filterEmpty" class="hidden panel-dark cyber-panel hud-corners rounded-2xl p-4 text-sm text-slate-300">Nenhuma pesagem em jejum neste histórico. Desmarque “Só jejum” para ver as demais.</p>
     <section id="bioMap" class="panel-dark cyber-panel hud-corners scanner-grid rounded-2xl p-3.5 sm:p-4 space-y-3.5">
-      <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-500/15 pb-2">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
-          <h2 class="font-bold text-sm text-white">Mapa Biométrico Interativo</h2>
+          <h2 class="hud-font font-bold text-xs sm:text-sm text-cyan-100 uppercase tracking-wider">Holograma corporal 3D</h2>
         </div>
         <span id="activeReadingBadge" class="text-[11px] text-slate-400 mono">--/--/----</span>
       </div>
@@ -193,11 +228,17 @@
       </div>
 
       <!-- GRID CENTRAL -->
-      <div class="grid grid-cols-12 gap-2 sm:gap-3 items-center pt-1">
+      <div id="biometricGrid" class="grid grid-cols-12 gap-1.5 sm:gap-3 items-center pt-1">
         <div class="col-span-4 space-y-2.5" id="leftCardsColumn"></div>
 
-        <!-- SILHUETA ANATÔMICA CENTRAL -->
-        <div class="col-span-4 flex flex-col items-center justify-center relative py-2">
+        <!-- 3D INTERATIVO COM A VISUALIZAÇÃO ANTERIOR DISPONÍVEL EM 2D -->
+        <div id="holoStage" class="col-span-4 flex flex-col items-center justify-center relative py-2">
+          <div class="holo-mode no-print" role="group" aria-label="Tipo de visualização">
+            <button type="button" id="holoMode3d" data-holo-mode="3d" aria-pressed="false">3D</button>
+            <button type="button" id="holoMode2d" data-holo-mode="2d" aria-pressed="true">2D</button>
+          </div>
+          <div id="canvas3dContainer" class="hidden" tabindex="0" role="img" aria-label="Ilustração corporal 3D. Arraste na horizontal ou use as setas para girar."></div>
+          <div id="holoFallback" class="w-full flex justify-center" aria-label="Ilustração corporal em duas dimensões">
           <svg viewBox="0 0 220 430" class="w-full max-w-[185px] h-auto drop-shadow-[0_0_22px_rgba(14,165,233,0.22)]">
             <defs>
               <linearGradient id="muscleGrad" x1="0" y1="0" x2="0" y2="1">
@@ -241,6 +282,14 @@
             <path d="M86 306 L101 306 L98 382 L88 382 Z" fill="url(#muscleGrad)" opacity="0.9" />
             <path d="M119 306 L134 306 L132 382 L122 382 Z" fill="url(#muscleGrad)" opacity="0.9" />
           </svg>
+          </div>
+          <div id="holoRotationControls" class="holo-rotation hidden no-print" role="group" aria-label="Girar ilustração">
+            <button type="button" data-holo-turn="left" aria-label="Girar para a esquerda">↶</button>
+            <button type="button" data-holo-turn="reset" aria-label="Voltar à vista frontal">Frente</button>
+            <button type="button" data-holo-turn="right" aria-label="Girar para a direita">↷</button>
+          </div>
+          <button type="button" id="holoAutoRotate" class="holo-auto hidden no-print" aria-pressed="false">Ativar rotação automática</button>
+          <p id="holoStatus" class="text-[9px] mono text-cyan-200/70 text-center mt-2" role="status">Ilustração corporal</p>
         </div>
 
         <div class="col-span-4 space-y-2.5" id="rightCardsColumn"></div>
@@ -257,19 +306,21 @@
       </div>
     </section>
 
-    <section id="selectedMetricPanel" class="panel-dark cyber-panel hud-corners rounded-2xl p-4 space-y-2.5 border-l-4 border-l-sky-500">
-      <div class="flex items-center justify-between gap-2">
-        <span id="detailHeaderBadge" class="text-[10px] font-extrabold uppercase tracking-wider text-sky-400">Entenda o indicador • Toque em qualquer card acima</span>
-        <span id="detailStatusTag" class="text-[10px] px-2 py-1 rounded-full font-extrabold">--</span>
+    <section id="selectedMetricPanel" class="panel-dark cyber-panel rounded-2xl p-4 space-y-3 border-l-4 border-l-cyan-400">
+      <div class="flex items-start justify-between gap-2 border-b border-cyan-500/15 pb-2">
+        <div class="min-w-0">
+          <span id="detailHeaderBadge" class="text-[9px] mono font-bold uppercase tracking-widest text-cyan-400">Base de referência • Toque nos indicadores para alternar</span>
+          <h3 id="detailMetricTitle" class="hud-font text-xs sm:text-sm font-extrabold text-white mt-1">--</h3>
+        </div>
+        <span id="detailStatusTag" class="text-[10px] px-2.5 py-1 rounded-md mono font-extrabold uppercase shrink-0">--</span>
       </div>
-      <h3 id="detailMetricTitle" class="text-sm font-extrabold text-white">--</h3>
-      <div class="space-y-2 text-xs text-slate-300 leading-relaxed">
-        <p id="detailWhatIs"></p>
-        <p id="detailWhyAltered" class="p-2.5 rounded-xl bg-[#07101f] border border-slate-800"></p>
-        <p id="detailActionPlan" class="text-sky-300 font-medium"></p>
+      <div class="clinical-grid grid grid-cols-1 gap-2.5 text-xs text-slate-200 leading-relaxed">
+        <div class="clinical-block"><h4>1. O que é e como é estimado</h4><div id="detailPhysiology"><p id="detailWhatIs"></p></div></div>
+        <div class="clinical-block clinical-reference"><h4>2. Referências por sexo e idade</h4><div id="detailRefRanges" class="reference-ranges"></div><p id="detailReferenceNote" class="text-[10px] text-slate-400"></p></div>
+        <div id="detailWhyBox" class="clinical-block"><h4>3. Interpretação e correlações</h4><p id="detailWhyAltered"></p><p id="detailClinicalEvidence" class="mt-2 text-slate-300"></p></div>
+        <div class="clinical-block clinical-action"><h4>4. Como acompanhar</h4><p id="detailActionPlan" class="text-cyan-100"></p><div id="detailCitation" class="text-[10px] mt-3 pt-2 border-t border-cyan-500/15"></div></div>
       </div>
-      <p class="text-[10px] text-slate-400">Estimativas da balança e faixas de referência para acompanhamento. Uma leitura isolada não determina causas nem diagnóstico.</p>
-      <a class="text-[11px] text-sky-400 underline" href="https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf" target="_blank" rel="noopener noreferrer">Manual e referências Omron HBF-514C</a>
+      <p class="text-[10px] text-slate-400">A bioimpedância produz estimativas. A ilustração 3D é esquemática: formas e cores não representam um exame por imagem, um mapa térmico real nem a localização individual de gordura. Os resultados não determinam causas ou diagnósticos isoladamente.</p>
     </section>
 
     <!-- ABAS COMPLEMENTARES: EVOLUÇÃO, METAS E ALERTAS -->
@@ -347,7 +398,7 @@
 <label class="block text-[11px] text-slate-400">Cintura (cm) *<input type="number" step=".1" min="1" max="300" id="mWaist" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
 <label class="block text-[11px] text-slate-400">Quadril (cm) *<input type="number" step=".1" min="1" max="300" id="mHip" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label></div>
         <p id="saveStatus" class="text-xs text-amber-300" role="status" aria-live="polite"></p>
-        <button type="submit" id="btnSaveWeighing" class="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs">Salvar pesagem</button>
+        <button type="submit" id="btnSaveWeighing" class="w-full py-3 rounded-xl neon-btn text-slate-950 hud-font font-extrabold text-xs">Salvar pesagem</button>
       </form>
     </div>
   </div>
@@ -404,6 +455,242 @@
       appId: "1:362561231892:web:f80f17728c8f2ab8e51b01",
       measurementId: "G-0NWF6LW0YS"
     };
+// Optional visualization. A failed CDN or GPU never prevents measurements from loading.
+const holo = {renderer:null,scene:null,camera:null,body:null,materials:null,parts:null,
+  target:.28,dragging:false,auto:false,mode:'3d',failed:false,reduced:false,
+  frameVisible:true,resizeObserver:null,intersectionObserver:null,previousTime:0};
+const clampHolo = (v,lo,hi) => Math.max(lo,Math.min(hi,v));
+function holoAppearance(record, analyses = analyze(record)) {
+  const fatHigh = ['ALTO','MUITO ALTO'].includes(analyses.fat.status);
+  const fatLow = analyses.fat.status === 'BAIXO';
+  const visceralHigh = analyses.visceral.altered;
+  const centralHigh = analyses.whr.altered;
+  const fat = validNumber(record.fat) ? number(record.fat) : 27;
+  // Illustrative proportions only: no anatomical or segmental reconstruction is possible.
+  const volume = clampHolo(1+(fat-27)*.012,.80,1.45);
+  return {sex:profile(record).sex,fatHigh,fatLow,visceralHigh,centralHigh,volume,
+    abdomenColor:fatHigh||centralHigh ? 0xf59e0b : 0x0ea5e9,
+    visceralColor:visceralHigh ? 0xff2a5f : analyses.visceral.neutral ? 0x94a3b8 : 0x10b981,
+    thighColor:fatHigh ? 0xf59e0b : 0x0ea5e9};
+}
+function setHoloMode(mode) {
+  if (!['2d','3d'].includes(mode)) return;
+  holo.mode=mode;
+  const enabled=mode==='3d' && !!holo.renderer && !holo.failed;
+  $('canvas3dContainer').classList.toggle('hidden',!enabled);
+  $('holoFallback').classList.toggle('hidden',enabled);
+  $('holoRotationControls').classList.toggle('hidden',!enabled);
+  $('holoAutoRotate').classList.toggle('hidden',!enabled);
+  $('holoMode3d').setAttribute('aria-pressed',String(enabled));
+  $('holoMode2d').setAttribute('aria-pressed',String(!enabled));
+  $('holoStatus').textContent=enabled ? 'Arraste na horizontal • Ilustração estimada' : 'Ilustração 2D • As demais funções continuam disponíveis';
+  updateHoloLoop();
+  if(enabled) resizeHolo();
+}
+function resizeHolo() {
+  const el=$('canvas3dContainer');if(!holo.renderer||el.classList.contains('hidden'))return;
+  const width=el.clientWidth,height=el.clientHeight;if(width<1||height<1)return;
+  const aspect=width/height;
+  holo.camera.aspect=aspect;
+  // Fit the complete silhouette, including arms, in narrow mobile columns.
+  const halfFov=Math.tan(34*Math.PI/360);
+  const distance=Math.max(2.55/(2*halfFov),1.03/(2*halfFov*aspect));
+  holo.camera.position.set(0,1.0,distance);
+  holo.camera.lookAt(0,1.0,0);
+  holo.camera.updateProjectionMatrix();
+  holo.renderer.setSize(width,height,false);
+  drawHolo();
+}
+function drawHolo() {
+  if(!holo.renderer||holo.failed||!holo.body)return;
+  holo.body.rotation.y=holo.target;
+  holo.renderer.render(holo.scene,holo.camera);
+}
+function updateHoloLoop() {
+  if(!holo.renderer)return;
+  const visible=holo.mode==='3d' && !!currentReading && !document.hidden && holo.frameVisible && !holo.failed;
+  if(!visible || holo.reduced || !holo.auto) {holo.renderer.setAnimationLoop(null);if(visible)drawHolo();return;}
+  holo.previousTime=0;
+  holo.renderer.setAnimationLoop(time=>{
+    if(!holo.previousTime)holo.previousTime=time;
+    const dt=Math.min((time-holo.previousTime)/1000,.1);holo.previousTime=time;
+    if(!holo.dragging)holo.target+=dt*.26;
+    holo.parts.scan.position.y=.93+Math.sin(time*.0019)*1.02;
+    const pulse=1+Math.sin(time*.0042)*.06;
+    holo.parts.core.scale.setScalar(pulse);holo.parts.halo.scale.setScalar(pulse);
+    drawHolo();
+  });
+}
+function rotateHolo(direction) {
+  if(!holo.renderer)return;
+  holo.target=direction==='reset'?.0:holo.target+(direction==='left'?-.4:.4);
+  drawHolo();
+}
+function disableHolo(message='Ilustração 2D • 3D indisponível neste dispositivo') {
+  holo.failed=true;
+  if(holo.renderer)holo.renderer.setAnimationLoop(null);
+  setHoloMode('2d');$('holoStatus').textContent=message;
+}
+function initHolo3D() {
+  if(holo.renderer)return !holo.failed;
+  const T=window.THREE;
+  if(!T || holo.failed)return false;
+  try {
+    const container=$('canvas3dContainer');
+    const renderer=new T.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'});
+    holo.renderer=renderer;renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+    renderer.setClearColor(0x020611,0);container.appendChild(renderer.domElement);
+    const scene=new T.Scene(),body=new T.Group();holo.scene=scene;holo.body=body;
+    holo.camera=new T.PerspectiveCamera(34,1,.1,100);scene.add(body);
+    scene.add(new T.AmbientLight(0x416bba,1.1));
+    const key=new T.DirectionalLight(0x00f0ff,2.1);key.position.set(2.5,4,3.5);scene.add(key);
+    const rim=new T.DirectionalLight(0x8b5cf6,1.6);rim.position.set(-3,2,-2);scene.add(rim);
+    const base=new T.MeshPhysicalMaterial({color:0x0ea5e9,emissive:0x0369a1,emissiveIntensity:.45,roughness:.25,metalness:.15,transparent:true,opacity:.8,clearcoat:1});
+    const abdomen=base.clone(),thigh=base.clone();
+    const wire=new T.MeshBasicMaterial({color:0x38bdf8,wireframe:true,transparent:true,opacity:.11});
+    holo.materials={base,abdomen,thigh,wire};
+    const limb=(rt,rb,h,x,y,z,mat,rx=0,rz=0)=>{
+      const geo=new T.CylinderGeometry(rt,rb,h,20,6),mesh=new T.Mesh(geo,mat);
+      mesh.position.set(x,y,z);mesh.rotation.set(rx,0,rz);mesh.add(new T.Mesh(geo,wire));body.add(mesh);return mesh;
+    };
+    const joint=(r,x,y,z,mat,sx=1,sy=1,sz=1)=>{
+      const geo=new T.SphereGeometry(r,20,16),mesh=new T.Mesh(geo,mat);
+      mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);mesh.add(new T.Mesh(geo,wire));body.add(mesh);return mesh;
+    };
+    joint(.175,0,1.88,.02,base,.92,1.15,.98);limb(.072,.082,.14,0,1.68,0,base);
+    const chest=joint(.23,0,1.48,0,base,1.12,.72,.72);
+    const torso=limb(.21,.165,.32,0,1.32,0,base);
+    const waist=limb(.165,.18,.28,0,1.04,0,abdomen);
+    const pelvis=joint(.195,0,.86,0,abdomen,1.14,.66,.8);
+    const shoulders=[],arms=[],thighs=[];
+    for(const side of [-1,1]) {
+      shoulders.push(joint(.082,side*.27,1.5,0,base));
+      arms.push(limb(.070,.056,.32,side*.31,1.31,0,base,0,side*-.14));
+      arms.push(joint(.054,side*.34,1.14,.02,base));
+      arms.push(limb(.052,.04,.30,side*.37,.97,.05,base,-.18,side*-.08));
+      arms.push(joint(.044,side*.39,.80,.08,base,.7,1.2,.5));
+      thighs.push(limb(.105,.078,.44,side*.11,.62,0,thigh,0,side*-.03));
+      joint(.072,side*.12,.39,.01,base);limb(.072,.05,.42,side*.12,.17,-.01,base);
+      joint(.052,side*.12,-.05,.05,base,.85,.55,1.6);
+    }
+    for(const part of arms)part.userData.baseX=part.position.x;
+    const core=new T.Mesh(new T.SphereGeometry(.075,20,16),new T.MeshBasicMaterial({color:0x10b981,transparent:true,opacity:.85,depthTest:false}));
+    core.position.set(0,1.04,.04);core.renderOrder=2;body.add(core);
+    const halo=new T.Mesh(new T.SphereGeometry(.14,20,16),new T.MeshBasicMaterial({color:0x10b981,transparent:true,opacity:.2,depthWrite:false}));
+    halo.position.copy(core.position);body.add(halo);
+    const ring=(inner,outer,y,opacity,parent=scene)=>{
+      const mesh=new T.Mesh(new T.RingGeometry(inner,outer,48),new T.MeshBasicMaterial({color:0x00f0ff,side:T.DoubleSide,transparent:true,opacity}));
+      mesh.rotation.x=Math.PI/2;mesh.position.y=y;parent.add(mesh);return mesh;
+    };
+    const waistRing=ring(.23,.242,1.04,.65,body);ring(.42,.5,-.11,.48);
+    const scan=ring(.01,.45,1.0,.18);
+    holo.parts={chest,torso,waist,pelvis,shoulders,arms,thighs,core,halo,scan,waistRing};
+    let previousX=0;
+    container.addEventListener('pointerdown',event=>{if(event.button!==0)return;holo.dragging=true;previousX=event.clientX;container.setPointerCapture?.(event.pointerId);});
+    container.addEventListener('pointermove',event=>{if(!holo.dragging)return;holo.target+=(event.clientX-previousX)*.014;previousX=event.clientX;drawHolo();});
+    const stop=()=>{holo.dragging=false;};
+    container.addEventListener('pointerup',stop);container.addEventListener('pointercancel',stop);container.addEventListener('lostpointercapture',stop);
+    container.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home'].includes(event.key))return;event.preventDefault();rotateHolo(event.key==='Home'?'reset':event.key==='ArrowLeft'?'left':'right');});
+    renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();disableHolo();});
+    renderer.domElement.addEventListener('webglcontextrestored',()=>{holo.failed=false;setHoloMode('3d');updateHolo3DState(currentReading);});
+    if(typeof ResizeObserver!=='undefined'){holo.resizeObserver=new ResizeObserver(resizeHolo);holo.resizeObserver.observe(container);}
+    if(typeof IntersectionObserver!=='undefined'){holo.intersectionObserver=new IntersectionObserver(entries=>{holo.frameVisible=entries[0]?.isIntersecting??true;updateHoloLoop();});holo.intersectionObserver.observe(container);}
+    window.addEventListener('resize',resizeHolo);
+    return true;
+  } catch {disableHolo();return false;}
+}
+function updateHolo3DState(record) {
+  if(!record){updateHoloLoop();return;}
+  if(!initHolo3D())return;
+  const s=holoAppearance(record),p=holo.parts,m=holo.materials;
+  p.chest.scale.set((s.sex==='F'?1.02:1.22)*Math.min(s.volume,1.2),s.sex==='F'?.72:.76,.74*Math.min(s.volume,1.2));
+  p.torso.scale.set(Math.min(s.volume,1.25),1,Math.min(s.volume,1.3));
+  p.pelvis.scale.set((s.sex==='F'?1.22:1.05)*s.volume,s.sex==='F'?.68:.64,.8*s.volume);
+  p.waist.scale.set(s.volume,1,s.volume);
+  p.waistRing.scale.set(s.volume,s.volume,1);
+  p.shoulders.forEach((part,i)=>{part.position.x=(i===0?-1:1)*(s.sex==='F'?.25:.29)*Math.min(s.volume,1.2);});
+  p.arms.forEach(part=>{part.position.x=part.userData.baseX*Math.min(s.volume,1.2);});
+  p.thighs.forEach(part=>part.scale.set(Math.min(s.volume,1.25),1,Math.min(s.volume,1.25)));
+  m.abdomen.color.setHex(s.abdomenColor);m.abdomen.emissive.setHex(s.fatHigh||s.centralHigh?0x9a3412:0x0369a1);m.abdomen.emissiveIntensity=.55;
+  m.thigh.color.setHex(s.thighColor);m.thigh.emissive.setHex(s.fatHigh?0x92400e:0x0369a1);
+  // Normal visceral stays green even if total body fat is high.
+  p.core.material.color.setHex(s.visceralColor);p.halo.material.color.setHex(s.visceralColor);
+  p.halo.material.opacity=s.visceralHigh?.34:.18;
+  if(holo.mode==='3d')setHoloMode('3d');else drawHolo();
+}
+function disposeHolo() {
+  if(!holo.renderer)return;
+  holo.renderer.setAnimationLoop(null);holo.resizeObserver?.disconnect();holo.intersectionObserver?.disconnect();
+  const geometries=new Set(),materials=new Set();
+  holo.scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])materials.add(m);});
+  for(const g of geometries)g.dispose();for(const m of materials)m.dispose();
+  holo.renderer.dispose();holo.renderer=null;
+}
+function initializeHoloControls() {
+  holo.reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
+  $('holoAutoRotate').disabled=holo.reduced;
+  if(holo.reduced)$('holoAutoRotate').title='As animações estão reduzidas nas preferências deste dispositivo.';
+  $('holoAutoRotate').addEventListener('click',()=>{holo.auto=!holo.auto;$('holoAutoRotate').setAttribute('aria-pressed',String(holo.auto));$('holoAutoRotate').textContent=holo.auto?'Pausar rotação automática':'Ativar rotação automática';updateHoloLoop();});
+  $('threeSdk')?.addEventListener('load',()=>updateHolo3DState(currentReading));
+  $('threeSdk')?.addEventListener('error',()=>disableHolo());
+  document.addEventListener('visibilitychange',updateHoloLoop);
+  window.addEventListener('pagehide',event=>{if(!event.persisted)disposeHolo();});
+}
+
+const clinicalSources={
+  omron:['Manual Omron HBF-514C — método e faixas','https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf'],
+  bia:['Kyle et al., 2004 — princípios e limites da bioimpedância','https://pubmed.ncbi.nlm.nih.gov/15380917/'],
+  bmi:['OMS — IMC e avaliação de adiposidade','https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight'],
+  waist:['OMS — cintura e relação cintura–quadril','https://www.who.int/publications/i/item/9789241501491'],
+  muscle:['EWGSOP2 — avaliação de força e músculo','https://pubmed.ncbi.nlm.nih.gov/30312372/']
+};
+function clinicalEvidence(key,record,info) {
+  const a=analyze(record);
+  switch(key) {
+    case 'fat':return {text:info.status==='BAIXO'?'Percentual abaixo da referência não mede diretamente gordura essencial nem confirma deficiência hormonal. A avaliação depende do contexto nutricional, sintomas e evolução.':'Percentual de gordura e IMC descrevem aspectos diferentes. Um IMC na faixa normal pode coexistir com gordura estimada elevada; isso justifica contextualizar os resultados e não estabelece um diagnóstico metabólico.',sources:['omron','bia','bmi']};
+    case 'muscle':return {text:'O percentual da balança não mede força ou capacidade funcional. A confirmação de sarcopenia envolve força reduzida e avaliação adicional da quantidade ou qualidade muscular; esse diagnóstico não pode ser feito com o percentual Omron isolado.',sources:['omron','muscle']};
+    case 'visceral':return {text:'O nível é relativo, não uma medida direta em cm². Mesmo na faixa normal, não demonstra ausência de gordura no fígado, resistência à insulina ou risco cardiovascular. Observe cintura, tendência das medidas e avaliação clínica quando indicada.',sources:['omron','waist']};
+    case 'bmi':return {text:`Neste registro: gordura ${fmt(record.fat)}% (${a.fat.status.toLowerCase()}) e músculo ${fmt(record.muscle)}% (${a.muscle.status.toLowerCase()}). O cruzamento ajuda a contextualizar o IMC, mas não permite atribuir automaticamente um valor alto à hipertrofia ou à gordura. A cintura complementa a avaliação.`,sources:['bmi','waist','bia']};
+    case 'bodyAge':return {text:'A idade corporal é uma comparação calculada pelo aparelho. Ela não é um marcador validado de longevidade individual e não há uma conversão fixa entre perder determinado percentual de gordura e reduzir anos no visor.',sources:['omron','bia']};
+    case 'whr':return {text:'A relação depende de duas medidas: pode variar por mudança na cintura, no quadril ou na técnica. Os pontos de corte são referências populacionais; a circunferência da cintura e o contexto clínico também importam.',sources:['waist']};
+    case 'weight':return {text:'A bioimpedância depende de equações e pressupostos sobre água corporal. Alterações importantes de hidratação podem afetar as estimativas de composição; comparar medidas padronizadas ajuda a reduzir esse viés.',sources:['bia','omron']};
+    default:return {text:'Metabolismo em repouso e gasto energético diário total são conceitos distintos. A estimativa do visor não determina uma ingestão mínima segura, uma dieta ou uma causa para dificuldade de emagrecimento.',sources:['omron']};
+  }
+}
+function clinicalRanges(key,record,info) {
+  const p=profile(record),current=info.status;
+  let ranges=[],note='';
+  const row=(label,value,status=label)=>({label,value,current:current===status});
+  if(key==='fat'||key==='muscle') {
+    const r=reference(key,p.sex,p.age);
+    if(r)ranges=[row('Baixo',`< ${fmt(r[0])}%`,'BAIXO'),row('Normal',`${fmt(r[0])} a ${fmt(r[1]-.1)}%`,'NORMAL'),row('Alto',`${fmt(r[1])} a ${fmt(r[2]-.1)}%`,'ALTO'),row('Muito alto',`≥ ${fmt(r[2])}%`,'MUITO ALTO')];
+    note=r?`Omron HBF-514C • ${p.sex==='F'?'Feminino':'Masculino'} • ${fmt(p.age,0)} anos. Faixas para leituras com uma casa decimal. Músculo alto descreve a proporção estimada e não confirma força ou função.`:`Sem classificação Omron disponível para a idade informada. Gordura: 20–79 anos; músculo: 18–80 anos.`;
+  }else if(key==='bmi') {
+    ranges=[row('Baixo peso','< 18,5','BAIXO PESO'),row('Normal','18,5 a < 25','NORMAL'),row('Sobrepeso','25 a < 30','SOBREPESO'),row('Obesidade','≥ 30',current.startsWith('OBESIDADE')?current:'OBESIDADE')];note='IMC em kg/m². Pontos de corte para adultos; o cálculo completo define a faixa antes do arredondamento.';
+  }else if(key==='visceral') {
+    ranges=[row('Normal','1 a 9','NORMAL'),row('Alto','10 a 14','ALTO'),row('Muito alto','15 a 30','MUITO ALTO')];note='Níveis relativos do aparelho. Não equivalem a uma área individual medida por tomografia.';
+  }else if(key==='whr') {
+    const cut=p.sex==='F'?'.85':'.90';ranges=[row('Abaixo do corte',`< 0,${cut.slice(1)}`,'ABAIXO DO CORTE'),row('No corte ou acima',`≥ 0,${cut.slice(1)}`,'ACIMA DA REFERÊNCIA')];note=`Referência para ${p.sex==='F'?'mulheres':'homens'}. Calcule a razão antes de arredondar. Considere o protocolo e a população.`;
+  }else if(key==='bodyAge') {
+    ranges=[row('Idade informada',`${fmt(p.age,0)} anos`),row('Idade do visor',`${fmt(record.bodyAge,0)} anos`)];note='Comparação produzida pela Omron. Não há faixas clínicas de normalidade nem garantia de reversão em anos.';
+  }else if(key==='weight') {
+    const fat=number(record.weight)*number(record.fat)/100;ranges=[row('Peso registrado',`${fmt(record.weight)} kg`),row('Gordura estimada',`${fmt(fat)} kg`),row('Livre de gordura',`${fmt(number(record.weight)-fat)} kg`)];note='Massa livre de gordura inclui músculos, água, ossos e órgãos. Os compartimentos são estimados.';
+  }else {
+    ranges=[row('Repouso estimado',`${fmt(record.rm,0)} kcal/dia`)];note='Sem faixa universal de normalidade. Não representa todo o gasto diário nem uma meta calórica.';
+  }
+  return {ranges,note};
+}
+function renderClinicalReference(key,record,info) {
+  if(!record)return;
+  const e=clinicalEvidence(key,record,info),r=clinicalRanges(key,record,info);
+  $('detailClinicalEvidence').textContent=e.text;
+  $('detailRefRanges').innerHTML=r.ranges.map(entry=>`<div class="reference-range" data-current="${entry.current}"><strong>${escapeHTML(entry.label)}</strong><span>${escapeHTML(entry.value)}</span></div>`).join('');
+  $('detailReferenceNote').textContent=r.note;
+  $('detailCitation').innerHTML='<span class="block text-slate-400">Fontes e aprofundamento:</span>'+e.sources.map(key=>{const[label,url]=clinicalSources[key];return `<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`;}).join('');
+  $('detailWhyBox').style.borderColor=info.altered?'#f59e0b66':'#00f0ff33';
+}
+
+
 // BioVault Pro: real records, stable selection and recoverable synchronization.
 const $ = id => document.getElementById(id);
 const CACHE_KEY = 'biovault_local_readings';
@@ -574,7 +861,7 @@ function recomputeAll() {
     currentAnalyses = {}; $('alertCountBadge').textContent = '0';
     $('subView-alerts').textContent = all.length ? 'Nenhuma pesagem atende ao filtro.' : 'Nenhuma pesagem registrada.';
     $('goalsSummaryText').textContent = 'Selecione uma pesagem para acompanhar as metas.';
-    renderEvolutionChart(list); setSyncStatus(); return;
+    renderEvolutionChart(list); updateHolo3DState(null); setSyncStatus(); return;
   }
   const cur = currentReading, previous = list.find(r => r.id === $('compareSelect').value) || list[0];
   currentAnalyses = analyze(cur);
@@ -600,12 +887,13 @@ function recomputeAll() {
   };
   const card = key => {
     const [title,value,sub] = definitions[key], info = a[key];
-    return `<button type="button" data-metric="${key}" aria-pressed="${key===selectedMetricKey}" class="metric-card ${info.altered?'alert-card':''} ${key===selectedMetricKey?'active-card':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400">${title}${info.altered?' ⚠':''}</span><span class="metric-value block text-sm sm:text-base font-extrabold text-white mono mt-1">${value}</span><span class="block text-[9px] sm:text-[10px] font-extrabold uppercase mt-1 ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="block text-[9px] text-slate-400 mt-1">${sub}</span></button>`;
+    return `<button type="button" data-metric="${key}" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400">${title}${info.altered?' ⚠':''}</span><span class="metric-value block text-sm sm:text-base font-extrabold text-white mono mt-1">${value}</span><span class="block text-[9px] sm:text-[10px] font-extrabold uppercase mt-1 ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="block text-[9px] text-slate-400 mt-1">${sub}</span></button>`;
   };
   $('leftCardsColumn').innerHTML = ['weight','fat','visceral','rm'].map(card).join('');
   $('rightCardsColumn').innerHTML = ['bmi','muscle','bodyAge','whr'].map(card).join('');
   $('svgVisceralCore').setAttribute('r',String(validNumber(cur.visceral) ? Math.min(18,5+cur.visceral*.8) : 5));
   $('svgVisceralCore').setAttribute('fill',a.visceral.altered ? '#ff2a5f' : '#10b981');
+  updateHolo3DState(cur);
   selectMetricDetail(selectedMetricKey,false); renderClinicalAlerts(altered); updateGoalsBox(); renderEvolutionChart(list); setSyncStatus();
 }
 function toggleCompareMode() {
@@ -620,10 +908,11 @@ function selectMetricDetail(key, shouldScroll = true) {
   $('detailWhatIs').textContent = `O que é: ${info.whatIs}`;
   $('detailWhyAltered').textContent = `Como interpretar: ${info.why}`;
   $('detailActionPlan').textContent = `Como acompanhar: ${info.action}`;
+  renderClinicalReference(key,currentReading,info);
   $('detailStatusTag').textContent = info.status;
   $('detailStatusTag').className = `text-[10px] px-2 py-1 rounded-full font-extrabold ${info.altered?'bg-amber-500/20 text-amber-300':'bg-sky-500/15 text-sky-300'}`;
   $('selectedMetricPanel').style.borderLeftColor = info.altered ? '#f59e0b' : '#00f0ff';
-  document.querySelectorAll('.metric-card').forEach(el => { const active = el.dataset.metric===key; el.classList.toggle('active-card',active); el.setAttribute('aria-pressed',String(active)); });
+  document.querySelectorAll('.metric-card').forEach(el => { const active = el.dataset.metric===key; el.classList.toggle('active-card',active); el.classList.toggle('active-node',active); el.setAttribute('aria-pressed',String(active)); });
   if (shouldScroll) $('selectedMetricPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function renderClinicalAlerts(keys) {
@@ -764,6 +1053,8 @@ async function connectCloud() {
 }
 Object.assign(window,{saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
 document.addEventListener('click',event=>{
+  const mode=event.target.closest('[data-holo-mode]');if(mode)setHoloMode(mode.dataset.holoMode);
+  const turn=event.target.closest('[data-holo-turn]');if(turn)rotateHolo(turn.dataset.holoTurn);
   const metric=event.target.closest('[data-metric]');if(metric)selectMetricDetail(metric.dataset.metric);
   const selected=event.target.closest('[data-reading-id]');if(selected)selectHistoryReading(selected.dataset.readingId);
   const remove=event.target.closest('[data-delete-id]');if(remove)void deleteReading(remove.dataset.deleteId);
@@ -773,6 +1064,7 @@ for (const id of ['gFatSlider','gMuscSlider','gViscSlider']) $(id).addEventListe
 window.addEventListener('online',()=>{void connectCloud();void flushPending();});
 window.addEventListener('offline',()=>{serverSeen=false;setSyncStatus();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){void connectCloud();void flushPending();}});
+initializeHoloControls();
 loadProfilePrefs();
 const cached=readJSON(CACHE_KEY,[]);
 if (Array.isArray(cached)) readings=cached.map(r=>normalize(r)).filter(Boolean).map(r=>({...r,_sync:r._sync||(r.id.startsWith('loc_')?'pending':'synced')}));
