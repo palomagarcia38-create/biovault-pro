@@ -8,7 +8,7 @@ const legacyMarkup=name=>JSON.parse(fs.readFileSync(path.join(__dirname,'fixture
 const html=fs.readFileSync(path.join(projectRoot,'public/index.html'),'utf8');
 let source=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
 source=source.replace("import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js')","window.__appModule()").replace("import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js')","window.__fireModule()");
-source+=`\nwindow.__inspect={analyze,profile,calcBmiValue,classifyBmi,reference,validDate,holoAppearance,clinicalRanges,estimateRestingEnergy,chartPeriodReadings,getKnowledge:()=>clinicalKnowledge,getMetricCharts:()=>metricCharts,getHolo:()=>holo,getSelected:()=>currentReading,getReadings:()=>readings,getChart:()=>chartInst};`;
+source+=`\nwindow.__inspect={analyze,profile,calcBmiValue,classifyBmi,reference,validDate,holoAppearance,clinicalRanges,estimateRestingEnergy,chartPeriodReadings,buildCsv,buildBackup,validateBackup,getKnowledge:()=>clinicalKnowledge,getMetricCharts:()=>metricCharts,getHolo:()=>holo,getSelected:()=>currentReading,getReadings:()=>readings,getChart:()=>chartInst};`;
 const tick=()=>new Promise(r=>setTimeout(r,30));
 const sample=(id,date,protocol='Em jejum',more={})=>({id,date,weight:64,height:165,fat:28,muscle:29,visceral:6,bodyAge:28,rm:1450,waist:74,hip:98,sex:'F',age:28,protocol,_sync:'synced',...more});
 const rows=[sample('a','2026-10-01','Em jejum',{weight:60}),sample('b','2026-10-02','Hidratado',{weight:70}),sample('c','2026-10-03','Em jejum',{weight:80,fat:39,muscle:24,visceral:15,bodyAge:45,waist:90,hip:100})];
@@ -52,7 +52,7 @@ async function setup(data=[],cloud=null,opts={}){
 }
 async function fill(w,values={}){
   w.openNewWeighingModal();
-  const inputs={mDate:'2026-11-19',mWeight:'65',mHeight:'165',mFat:'28',mMuscle:'29',mVisc:'6',mBodyAge:'28',mRm:'1450',mWaist:'74.5',mHip:'98.5',...values};
+  const inputs={mPersonName:'Paloma',mAge:'28',mSex:'F',mDate:'2026-11-19',mWeight:'65',mHeight:'165',mFat:'28',mMuscle:'29',mVisc:'6',mBodyAge:'28',mRm:'1450',mWaist:'74.5',mHip:'98.5',...values};
   for(const[id,value]of Object.entries(inputs))w.document.getElementById(id).value=value;
   await w.saveWeighing({preventDefault(){}});await tick();
 }
@@ -66,8 +66,10 @@ async function run(name,test){await test();results.push(name);console.log('PASS'
   const {w,dom,errors}=await setup(rows);w.document.getElementById('onlyFastingChk').checked=true;w.recomputeAll();w.selectHistoryReading('a');assert.match(text(w,'activeReadingBadge'),/01\/10\/2026/);w.switchSubView('goals');w.document.getElementById('gFatSlider').value=25;w.updateGoalsBox();assert.match(text(w,'goalsSummaryText'),/atual 28.0%/);
   w.openReportModal();assert.match(text(w,'repSynthesis'),/selecionada de 01\/10\/2026/);assert.match(text(w,'repTableRows'),/60.0 kg/);w.closeReportModal();w.selectHistoryReading('c');w.document.getElementById('compareSelect').value='a';w.toggleCompareMode();assert.match(text(w,'leftCardsColumn'),/\+20.0 kg/);w.selectMetricDetail('weight');assert.match(text(w,'detailMetricTitle'),/Peso corporal/);w.open=(url)=>w.__shared=url;w.shareWhatsApp();assert.match(decodeURIComponent(w.__shared),/80.0 kg/);assert.deepEqual(errors,[]);dom.window.close();
  });
- await run('filtered deletion never removes another record; empty filtered and final states',async()=>{
-  const {w,dom,errors}=await setup(rows);w.document.getElementById('onlyFastingChk').checked=true;w.recomputeAll();await w.deleteReading('c');let data=records(w);assert.equal(data.find(r=>r.id==='c')._deleted,true);assert.equal(data.find(r=>r.id==='b').weight,70);assert.equal(data.find(r=>r.id==='a').weight,60);await w.deleteReading('a');assert(visible(w,'filterEmpty'));assert(!visible(w,'bioMap'));w.document.getElementById('onlyFastingChk').checked=false;w.recomputeAll();assert.match(text(w,'activeReadingBadge'),/02\/10\/2026/);await w.deleteReading('b');assert(visible(w,'emptyStateBox'));assert.deepEqual(errors,[]);dom.window.close();
+ await run('deletion remains stable by ID after protocol filtering is removed',async()=>{
+
+ const {w,dom,errors}=await setup(rows);await w.deleteReading('c');assert.equal(records(w).find(r=>r.id==='c')._deleted,true);await w.deleteReading('a');assert(visible(w,'bioMap'));assert.match(text(w,'activeReadingBadge'),/02\/10\/2026/);assert.equal(records(w).find(r=>r.id==='b').weight,70);await w.deleteReading('b');assert(visible(w,'emptyStateBox'));assert.deepEqual(errors,[]);dom.window.close();
+
  });
  await run('Omron age and sex boundaries, low-fat advice and full-precision RCQ/BMI',async()=>{
   const {w,dom,errors}=await setup([sample('a','2026-11-01','Em jejum',{sex:'M',age:28,fat:25,muscle:44.1,weight:68.06,waist:89.96,hip:100})]);let a=w.__inspect.analyze(w.__inspect.getSelected());assert.equal(a.fat.status,'MUITO ALTO');assert.equal(a.muscle.status,'MUITO ALTO');assert.equal(a.whr.altered,false);assert.equal(a.bmi.status,'NORMAL');
@@ -75,8 +77,10 @@ async function run(name,test){await test();results.push(name);console.log('PASS'
   for(const[age,sex,min,max]of [[28,'F',21,33],[45,'F',23,34],[65,'F',24,36],[28,'M',8,20],[45,'M',11,22],[65,'M',13,25]]){assert.equal(w.__inspect.analyze(sample('x','2026-01-01','Em jejum',{sex,age,fat:min})).fat.status,'NORMAL');assert.equal(w.__inspect.analyze(sample('x','2026-01-01','Em jejum',{sex,age,fat:max})).fat.status,'ALTO');}
   assert.equal(w.__inspect.analyze(sample('x','2026-01-01','Em jejum',{age:19})).fat.status,'SEM REFERÊNCIA');assert.deepEqual(errors,[]);dom.window.close();
  });
- await run('no fasting measurements: no silent substitution, report disabled',async()=>{
-  const {w,dom,errors}=await setup([rows[1]]);w.document.getElementById('onlyFastingChk').checked=true;w.recomputeAll();assert(visible(w,'filterEmpty'));assert(!visible(w,'bioMap'));assert(w.document.getElementById('btnOpenReport').disabled);assert.equal(text(w,'histCountBadge'),'0');assert.deepEqual(errors,[]);dom.window.close();
+ await run('old protocols no longer filter history charts or reports and remain preserved in the data',async()=>{
+
+ const {w,dom,errors}=await setup(rows);w.document.getElementById('onlyFastingChk').checked=true;w.recomputeAll();assert.equal(text(w,'histCountBadge'),'3');assert(!w.document.getElementById('onlyFastingChk').hasAttribute('onchange'));assert(w.document.getElementById('onlyFastingChk').closest('[hidden]'));assert(visible(w,'bioMap'));assert(!w.document.getElementById('btnOpenReport').disabled);assert.equal(records(w)[1].protocol,'Hidratado');w.switchSubView('chart');assert.equal(w.__inspect.getChart().config.data.labels.length,3);assert.deepEqual(errors,[]);dom.window.close();
+
  });
  await run('pending local survives empty cloud and syncs once with a stable document ID',async()=>{
   const {w,dom,errors}=await setup([sample('loc_pending','2026-11-01','Em jejum',{_sync:'pending'})],{records:[]});await tick();assert.equal(records(w)[0].id,'loc_pending');assert.equal(records(w)[0]._sync,'synced');assert.equal(w.__cloud.writes.length,1);assert.equal(w.__cloud.writes[0].id,'loc_pending');assert.deepEqual(errors,[]);dom.window.close();
@@ -109,11 +113,15 @@ async function run(name,test){await test();results.push(name);console.log('PASS'
   state=w.__inspect.holoAppearance({...sampleFat,fat:15});assert.equal(state.fatLow,true);assert.equal(state.fatHigh,false);assert.equal(state.abdomenColor,0x0ea5e9);
   state=w.__inspect.holoAppearance({...sampleFat,visceral:15});assert.equal(state.visceralColor,0xff2a5f);assert.deepEqual(errors,[]);dom.window.close();
  });
- await run('missing Three.js keeps 2D, history, explanation and report usable',async()=>{
-  const {w,dom,errors}=await setup(rows);assert(visible(w,'holoPortrait'));assert(!visible(w,'canvas3dContainer'));w.document.getElementById('holoMode3d').click();assert(visible(w,'holoFallback'));w.selectHistoryReading('a');w.selectMetricDetail('muscle');assert(text(w,'detailClinicalEvidence').includes('força'));w.openReportModal();assert(visible(w,'reportModal'));assert.deepEqual(errors,[]);dom.window.close();
+ await run('only the hologram is offered and no Three.js resource is requested',async()=>{
+
+ const {w,dom,errors}=await setup(rows);assert(visible(w,'holoPortrait'));assert(!visible(w,'holoFallback'));assert(!visible(w,'canvas3dContainer'));assert(w.document.getElementById('holoMode3d').closest('[hidden]'));assert(w.document.getElementById('holoMode2d').closest('[hidden]'));assert(!w.document.querySelector('script[src*="three"]'));w.selectHistoryReading('a');w.selectMetricDetail('muscle');assert(text(w,'detailClinicalEvidence').includes('força'));w.openReportModal();assert(visible(w,'reportModal'));assert.deepEqual(errors,[]);dom.window.close();
+
  });
- await run('GPU initialization failure is isolated from the app and preserves data',async()=>{
-  const {w,dom,errors}=await setup(rows,null,{gpuFail:true});assert(visible(w,'holoFallback'));assert(!visible(w,'canvas3dContainer'));assert.equal(records(w).length,3);w.openReportModal();assert(visible(w,'reportModal'));assert.deepEqual(errors,[]);dom.window.close();
+ await run('GPU capability is never needed for the hologram',async()=>{
+
+ const {w,dom,errors}=await setup(rows,null,{gpuFail:true});assert(visible(w,'holoPortrait'));assert.equal(w.__inspect.getHolo().renderer,null);assert.equal(records(w).length,3);w.openReportModal();assert(visible(w,'reportModal'));assert.deepEqual(errors,[]);dom.window.close();
+
  });
  await run('structured ranges use selected record sex and age; evidence has source links',async()=>{
   const {w,dom,errors}=await setup([sample('f','2026-11-20','Em jejum',{age:45,fat:40})]);w.selectMetricDetail('fat');assert.match(text(w,'detailRefRanges'),/23.0 a 33.9%/);assert.match(text(w,'detailReferenceNote'),/45 anos/);assert(w.document.querySelectorAll('#detailCitation a').length>=2);for(const a of w.document.querySelectorAll('#detailCitation a'))assert.equal(new URL(a.href).protocol,'https:');
@@ -122,17 +130,15 @@ async function run(name,test){await test();results.push(name);console.log('PASS'
  await run('visualization, content, chart and PDF navigation never change cloud measurements',async()=>{
   const {w,dom,errors}=await setup(rows,{records:rows});w.document.getElementById('holoMode2d').click();w.selectMetricDetail('bmi');w.switchSubView('history');w.selectHistoryReading('a');w.switchSubView('chart');w.openReportModal();await tick();assert.equal(w.__cloud.writes.length,0);assert.equal(w.__cloud.deletions.length,0);assert.equal(records(w).length,3);assert.deepEqual(errors,[]);dom.window.close();
  });
- await run('real Three.js geometry, stable model reuse, rotation, 2D switch and resource disposal',async()=>{
-  const {w,dom,errors}=await setup([sample('f','2026-11-20','Em jejum',{fat:45,visceral:8})],null,{engine:true});
-  w.document.getElementById('holoMode3d').click();const h=w.__inspect.getHolo();assert(h.body);assert(h.body.children.length>20);assert(visible(w,'canvas3dContainer'));assert(!visible(w,'holoFallback'));assert.equal(h.parts.core.material.color.getHex(),0x10b981);assert.equal(h.materials.abdomen.color.getHex(),0xf59e0b);assert(h.renderer.renders>0);
-  const before=h.target;w.document.querySelector('[data-holo-turn="right"]').click();assert(h.target>before);w.document.getElementById('canvas3dContainer').dispatchEvent(new w.KeyboardEvent('keydown',{key:'Home'}));assert.equal(h.target,0);
-  const model=h.body;w.recomputeAll();assert.equal(h.body,model);assert.equal(w.document.querySelectorAll('#canvas3dContainer canvas').length,1);
-  w.document.getElementById('holoMode2d').click();assert(visible(w,'holoFallback'));assert(!visible(w,'canvas3dContainer'));w.document.getElementById('holoMode3d').click();assert(visible(w,'canvas3dContainer'));
-  const renderer=h.renderer;w.dispatchEvent(new w.Event('pagehide'));assert.equal(renderer.disposed,true);assert.equal(h.renderer,null);assert.deepEqual(errors,[]);dom.window.close();
+ await run('retired view controls cannot initialize a renderer or alter measurement data',async()=>{
+
+ const {w,dom,errors}=await setup(rows,{records:rows},{engine:true});w.document.getElementById('holoMode3d').click();w.document.getElementById('holoMode2d').click();assert.equal(w.__inspect.getHolo().renderer,null);assert.equal(w.__inspect.getHolo().mode,'portrait');assert(visible(w,'holoPortrait'));assert(!visible(w,'holoFallback'));assert.equal(w.__cloud.writes.length,0);assert.deepEqual(errors,[]);dom.window.close();
+
  });
- await run('software 3D projects the actual model and supports rotation when WebGL fails',async()=>{
-  const {w,dom,errors}=await setup([sample('f','2026-11-20','Em jejum',{fat:45,visceral:8})],null,{engine:true,software:true});
-  w.document.getElementById('holoMode3d').click();const h=w.__inspect.getHolo();assert.equal(h.software,true);assert(visible(w,'canvas3dContainer'));assert(w.__drawnTriangles>100);const before=w.__drawnTriangles;w.document.querySelector('[data-holo-turn="right"]').click();assert(w.__drawnTriangles>before);assert.equal(h.parts.core.material.color.getHex(),0x10b981);w.document.getElementById('holoMode2d').click();assert(visible(w,'holoFallback'));assert.deepEqual(errors,[]);dom.window.close();
+ await run('the removed software 3D path is not invoked on devices without GPU',async()=>{
+
+ const {w,dom,errors}=await setup(rows,null,{engine:true,software:true});assert.equal(w.__drawnTriangles,0);assert.equal(w.__inspect.getHolo().renderer,null);assert(visible(w,'holoPortrait'));assert.deepEqual(errors,[]);dom.window.close();
+
  });
  await run('Portuguese cloud fields render without rewriting or losing the original fields',async()=>{
   const pt={id:'pt1',date:'2026-11-20',peso:64.5,gordura:28.5,musculo:29.1,visceral:7,idadeBio:30,cintura:75.5,quadril:98.5,basal:1460};
@@ -159,8 +165,10 @@ async function run(name,test){await test();results.push(name);console.log('PASS'
  await run('quick chart reuses the chart canvas and restores tabs without losing goals',async()=>{
   const {w,dom,errors}=await setup(rows);w.switchSubView('goals');w.document.getElementById('gFatSlider').value='26';w.updateGoalsBox();const canvas=w.document.getElementById('bioChart');w.openQuickPanel('chart');assert(w.document.getElementById('quickPanelBody').contains(canvas));assert.equal(w.__inspect.getChart().config.data.datasets.length,3);w.closeQuickPanel();assert(!w.document.getElementById('quickPanelBody').contains(canvas));assert(visible(w,'subView-goals'));assert.equal(w.document.getElementById('gFatSlider').value,'26');assert.deepEqual(errors,[]);dom.window.close();
  });
- await run('front/back and visual scan preserve rotation, smooth torso and independent visceral color',async()=>{
-  const {w,dom,errors}=await setup([sample('f','2026-11-20','Em jejum',{fat:45,visceral:8})],null,{engine:true});const h=w.__inspect.getHolo();assert(h.parts.sculptedTorso.geometry.attributes.color);w.document.querySelector('[data-holo-turn="back"]').click();assert.equal(h.target,Math.PI);w.document.querySelector('[data-holo-turn="reset"]').click();assert.equal(h.target,0);w.toggleHoloScan();assert.equal(h.parts.scan.visible,true);assert.equal(h.scanActive,true);w.toggleHoloScan();assert.equal(h.parts.scan.visible,false);assert.equal(h.renderer.loop,null);assert.equal(h.parts.core.material.color.getHex(),0x10b981);const previous=new JSDOM(legacyMarkup('biovault-v4-before-v42.html'),{runScripts:'outside-only'});for(const el of previous.window.document.querySelectorAll('[id]'))assert(w.document.getElementById(el.id),el.id);previous.window.close();assert.deepEqual(errors,[]);dom.window.close();
+ await run('hologram keeps normal visceral independent from elevated total fat',async()=>{
+
+ const {w,dom,errors}=await setup([sample('f','2026-11-20','Em jejum',{fat:45,visceral:8})]);assert.equal(w.document.getElementById('portraitVisceralCore').style.color,'rgb(16, 185, 129)');assert.equal(w.__inspect.getHolo().renderer,null);assert.deepEqual(errors,[]);dom.window.close();
+
  });
  await run('holographic artwork follows total-fat bands and keeps visceral color independent',async()=>{
   const high=sample('high','2026-11-20','Em jejum',{fat:45,visceral:8});
@@ -178,10 +186,10 @@ async function run(name,test){await test();results.push(name);console.log('PASS'
   w.document.getElementById('inspectReadingButton').click();assert(text(w,'detailMetricTitle').length>0);
   assert.equal(w.__cloud.writes.length,0);assert.equal(w.__cloud.deletions.length,0);assert.deepEqual(errors,[]);dom.window.close();
  });
- await run('artwork failure retains the original 2D view and every v4.2 element',async()=>{
-  const {w,dom,errors}=await setup(rows);w.document.getElementById('holoArtWarm').dispatchEvent(new w.Event('error'));assert(visible(w,'holoFallback'));assert(!visible(w,'holoPortrait'));
-  const previous=new JSDOM(legacyMarkup('biovault-v42-before-reference.html'),{runScripts:'outside-only'});
-  for(const el of previous.window.document.querySelectorAll('[id]'))assert(w.document.getElementById(el.id),el.id);previous.window.close();w.openReportModal();assert(visible(w,'reportModal'));assert.deepEqual(errors,[]);dom.window.close();
+ await run('artwork failure reports unavailability without bringing back removed views or losing records',async()=>{
+
+ const {w,dom,errors}=await setup(rows);w.document.getElementById('holoArtWarm').dispatchEvent(new w.Event('error'));assert.match(text(w,'holoStatus'),/indisponível/);assert(!visible(w,'holoFallback'));assert(!visible(w,'canvas3dContainer'));assert.equal(records(w).length,3);w.openReportModal();assert(visible(w,'reportModal'));assert.deepEqual(errors,[]);dom.window.close();
+
  });
  await run('very high muscle is explained as a reserve to preserve, with correct individual thresholds',async()=>{
   const {w,dom,errors}=await setup([sample('f','2026-11-20','Em jejum',{muscle:40,fat:28})]);
@@ -214,11 +222,32 @@ async function run(name,test){await test();results.push(name);console.log('PASS'
  });
  await run('low fat and normal visceral remain independently explained and original v4.3 controls survive',async()=>{
   const {w,dom,errors}=await setup([sample('f','2026-11-20','Em jejum',{fat:15,muscle:40,visceral:8,waist:90,hip:100})]);let a=w.__inspect.analyze(w.__inspect.getSelected());assert.match(a.muscle.action,/não busque emagrecer/);assert.match(a.visceral.contextEvidence,/RCQ.*acima/);assert.equal(a.visceral.altered,false);
-  const previous=new JSDOM(legacyMarkup('biovault-v43-before-v44.html'),{runScripts:'outside-only'});for(const el of previous.window.document.querySelectorAll('[id]'))assert(w.document.getElementById(el.id),el.id);previous.window.close();assert.deepEqual(errors,[]);dom.window.close();
+  const previous=new JSDOM(legacyMarkup('biovault-v43-before-v44.html'),{runScripts:'outside-only'});for(const el of previous.window.document.querySelectorAll('[id]'))if(el.id!=='threeSdk')assert(w.document.getElementById(el.id),el.id);previous.window.close();assert.deepEqual(errors,[]);dom.window.close();
  });
  await run('body age outside the Omron display range is retained without an invalid clinical alert',async()=>{
  const data=[sample('outside','2026-11-20','Em jejum',{bodyAge:89})];const {w,dom,errors}=await setup(data,{records:data});
  const a=w.__inspect.analyze(w.__inspect.getSelected());assert.equal(a.bodyAge.status,'SEM REFERÊNCIA');assert.equal(a.bodyAge.altered,false);w.selectMetricDetail('bodyAge');assert.match(text(w,'detailWhyAltered'),/fora da faixa.*18–80/);assert.equal(records(w)[0].bodyAge,89);assert.equal(w.__cloud.writes.length,0);assert.equal(w.__cloud.deletions.length,0);assert.deepEqual(errors,[]);dom.window.close();
+ });
+ await run('person profile is required and remembered while measurements remain separate snapshots',async()=>{
+ const {w,dom,errors}=await setup();w.openNewWeighingModal();assert.equal(w.document.getElementById('mPersonName').value,'');assert.equal(w.document.getElementById('mAge').value,'');assert.equal(w.document.getElementById('mHeight').value,'');await fill(w,{mPersonName:'  Paloma   Garcia  ',mHeight:'170',mAge:'29'});const first=records(w)[0];assert.equal(first.personName,'Paloma Garcia');assert.equal(first.age,29);assert.equal(first.height,170);assert.equal(first.protocol,undefined);const prefs=JSON.parse(w.localStorage.getItem('biovault_prefs'));assert.equal(prefs.name,'Paloma Garcia');assert.equal(prefs.personId,first.personId);w.openNewWeighingModal();assert.equal(w.document.getElementById('mPersonName').value,'Paloma Garcia');assert.equal(w.document.getElementById('mHeight').value,'170');assert.equal(w.document.getElementById('mWeight').value,'');assert.equal(w.document.getElementById('mFat').value,'');assert.deepEqual(errors,[]);dom.window.close();
+ });
+ await run('missing optional data stays absent and is never classified or graphed as zero',async()=>{
+ const {w,dom,errors}=await setup();await fill(w,{mFat:'',mMuscle:'',mVisc:'',mBodyAge:'',mWaist:'',mHip:'',mRm:''});const r=records(w)[0];assert(r);for(const key of ['fat','muscle','visceral','bodyAge','waist','hip'])assert.equal(r[key],null);const a=w.__inspect.analyze(r);assert.equal(a.fat.status,'SEM REFERÊNCIA');assert.equal(a.muscle.status,'SEM REFERÊNCIA');assert.equal(a.visceral.status,'SEM REFERÊNCIA');assert.equal(a.bodyAge.status,'SEM REFERÊNCIA');assert.equal(a.whr.status,'SEM DADOS');w.openQuickPanel('chart');assert.equal(w.__inspect.getMetricCharts().length,3);assert.deepEqual(errors,[]);dom.window.close();
+ });
+ await run('editing keeps the same ID and prior version without rewriting other records',async()=>{
+ const {w,dom,errors}=await setup(rows,{records:rows});w.editReading('b');assert.equal(w.document.getElementById('mWeight').value,'70');w.document.getElementById('mPersonName').value='Paloma';w.document.getElementById('mWeight').value='71.5';await w.saveWeighing({preventDefault(){}});await tick();const r=records(w).find(x=>x.id==='b');assert.equal(r.weight,71.5);assert.equal(r.revisions[0].previous.weight,70);assert.equal(r.protocol,'Hidratado');assert.equal(records(w).length,3);assert.equal(records(w).find(x=>x.id==='a').weight,60);assert.equal(w.__cloud.writes.length,1);assert.equal(w.__cloud.writes[0].id,'b');assert.equal(w.__cloud.deletions.length,0);w.openReportModal();assert.equal(text(w,'repPersonName'),'Paloma');assert.deepEqual(errors,[]);dom.window.close();
+ });
+ await run('CSV escapes spreadsheet formulas and backup retains original records and revisions',async()=>{
+ const data=[sample('csv','2026-11-20','Final do dia',{personName:'=HYPERLINK("bad")',waist:null,hip:null,revisions:[{previous:{weight:60}}]})];const {w,dom,errors}=await setup(data);const csv=w.__inspect.buildCsv();assert(csv.startsWith('\ufeff'));assert(csv.includes("'=HYPERLINK"));assert(csv.includes('Gordura (%)'));assert(!csv.includes('NaN'));const backup=w.__inspect.buildBackup();assert.equal(backup.measurements[0].protocol,'Final do dia');assert.equal(backup.measurements[0].revisions[0].previous.weight,60);assert.equal(backup.format,'biovault-backup');assert.deepEqual(errors,[]);dom.window.close();
+ });
+ await run('backup import requires a preview and adds only new IDs without overwriting or resurrecting deleted records',async()=>{
+ const data=[...rows,sample('deleted','2026-10-04','Em jejum',{_deleted:true,_sync:'deleting'})];const {w,dom,errors}=await setup(data);const added=sample('new_import','2026-11-20','Final do dia',{weight:66,personName:'Paloma'});const payload={format:'biovault-backup',schema:1,measurements:[{...rows[0],weight:99},added,sample('deleted','2026-10-04')]};await w.previewBackupFile({size:1000,text:async()=>JSON.stringify(payload)});assert(visible(w,'importBackupModal'));assert.equal(records(w).length,4);assert.match(text(w,'importBackupSummary'),/1 medição/);w.confirmImportBackup();assert.equal(records(w).length,5);assert.equal(records(w).find(r=>r.id==='a').weight,60);assert.equal(records(w).find(r=>r.id==='deleted')._deleted,true);assert.equal(records(w).find(r=>r.id==='new_import')._sync,'pending');assert(!visible(w,'importBackupModal'));assert.deepEqual(errors,[]);dom.window.close();
+ });
+ await run('invalid or oversized backups cannot cause partial imports',async()=>{
+ const {w,dom,errors}=await setup(rows);const payload={format:'biovault-backup',schema:1,measurements:[sample('valid','2026-11-20'),sample('bad/id','2026-11-20')]};await w.previewBackupFile({size:1000,text:async()=>JSON.stringify(payload)});assert(w.document.getElementById('confirmImportButton').disabled);w.confirmImportBackup();assert.equal(records(w).length,3);await w.previewBackupFile({size:6000000,text:async()=>{throw Error('must not read');}});assert.match(text(w,'importBackupSummary'),/5 MB/);assert.equal(records(w).length,3);assert.deepEqual(errors,[]);dom.window.close();
+ });
+ await run('profile names are rendered as text and cannot inject markup into history or reports',async()=>{
+ const {w,dom,errors}=await setup();await fill(w,{mPersonName:'<img src=x onerror=alert(1)>'});assert.equal(w.document.querySelector('#personContext img'),null);assert.equal(w.document.querySelector('#subView-history img'),null);w.openReportModal();assert.equal(w.document.querySelector('#repPersonName img'),null);assert.match(text(w,'repPersonName'),/img src/);assert.deepEqual(errors,[]);dom.window.close();
  });
  console.log(JSON.stringify({passed:results.length,tests:results},null,2));
  fs.writeFileSync(__dirname+'/results.json',JSON.stringify({passed:results.length,tests:results},null,2));

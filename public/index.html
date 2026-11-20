@@ -6,11 +6,10 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Holographic HUD v4.4.1</title>
+  <title>BioVault Pro • Holographic HUD v4.5</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script id="threeSdk" async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Orbitron:wght@600;700;800;900&display=swap');
     body {
@@ -429,6 +428,32 @@ html {scrollbar-gutter:stable;}
 }
 @media print {#metricDetailModal {display:none!important;}}
 
+
+
+[hidden] {display:none!important;}
+#personContext {display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:6px 12px;margin:8px 36px 0;color:#a5eef2;}
+#personContext strong {font-size:13px;}#personContext span {font-size:10px;color:#85a6b8;}
+.person-name-control {display:flex;flex-direction:column;gap:4px;font-size:11px;color:#95b6c8;flex:1 1 180px;}
+.person-name-control input,.person-field input,.person-field select {width:100%;min-width:0;box-sizing:border-box;border:1px solid #275164;border-radius:9px;background:#040d1c;padding:11px;color:#e8faff;font:inherit;}
+.person-name-control input:focus,.person-field input:focus,.person-field select:focus {outline:2px solid #36d1e5;outline-offset:2px;}
+.measurement-section {border:1px solid #1c3c50;border-radius:12px;padding:13px;display:flex;flex-direction:column;gap:12px;min-width:0;}
+.measurement-section legend {padding:0 7px;font-weight:700;color:#91e6ed;font-size:13px;}
+.person-field {display:flex;flex-direction:column;gap:6px;font-size:12px;color:#aec6d4;}
+.person-form-grid {display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-hint {font-size:11px;line-height:1.6;color:#8eaabb;}
+.data-tools {display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid #183444;margin-top:14px;padding-top:13px;font-size:11px;}
+.data-tools button {border:1px solid #285267;border-radius:8px;padding:9px 10px;color:#b3e9ef;background:#092031;min-height:40px;}
+.data-tools p {flex-basis:100%;color:#7e9baa;line-height:1.5;}
+.report-person {font-weight:700;color:#b1f6f5;margin:7px 0;}
+#filterEmpty {display:none!important;}
+#newWeighingModal>div {overscroll-behavior:contain;}
+[data-edit-id] {border:1px solid #285267;border-radius:8px;padding:8px 10px;color:#a8e8ef;background:#0a2434;min-height:40px;}
+#holoStage>.holo-mode {display:none!important;}
+#weighingForm .grid-cols-3 {grid-template-columns:1fr 1fr;}#weighingForm .grid-cols-3>label:first-child {grid-column:1/-1;}
+#weighingForm input,#weighingForm select {font-size:14px;min-height:44px;}
+@media(max-width:440px){#personContext {margin-top:5px;}#personContext strong {font-size:12px;}#newWeighingModal>div {padding:14px;}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;}}
+
   </style>
 </head>
 <body class="pb-20">
@@ -447,17 +472,19 @@ html {scrollbar-gutter:stable;}
               <span class="model-label">OMRON HBF-514C</span>
               <span id="syncPill" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-medium">● Conectando...</span>
             </div>
-            <p class="brand-description text-[11px] text-slate-400 mt-0.5">Corpo 3D interativo • Composição e evolução</p>
+            <p class="brand-description text-[11px] text-slate-400 mt-0.5">Holograma • Composição e evolução</p>
           </div>
         </div>
         <button onclick="window.location.reload()" title="Atualizar App" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v4.4.1
+          ↻ v4.5
         </button>
       </div>
 
       <!-- CONTROLES SUPERIORES -->
+      <div id="personContext"><strong id="personContextName">Seu acompanhamento</strong><span id="personContextMeta">Comece pelo seu nome e sua altura</span></div>
       <details id="profileDrawer"><summary><i class="fa-solid fa-sliders" aria-hidden="true"></i> Perfil e ferramentas <i class="fa-solid fa-angle-down" aria-hidden="true"></i></summary>
       <div id="profileControls" class="flex flex-wrap items-center gap-2">
+        <label class="person-name-control">Seu nome<input id="profileNameInput" type="text" maxlength="80" autocomplete="name" placeholder="Como você se chama?" onchange="saveProfilePrefs(); renderPersonContext()" /></label>
         <select id="sexSelect" onchange="saveProfilePrefs(); recomputeAll()" class="bg-[#081222] border border-slate-700/80 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 outline-none">
           <option value="F" selected>Sexo: Feminino (Ref. Omron)</option>
           <option value="M">Sexo: Masculino (Ref. Omron)</option>
@@ -484,6 +511,7 @@ html {scrollbar-gutter:stable;}
           Gerar Laudo PDF
         </button>
       </div>
+<div class="data-tools"><span>Seus registros</span><button type="button" onclick="exportCsv()">Exportar CSV</button><button type="button" onclick="exportBackup()">Baixar backup</button><button type="button" onclick="document.getElementById('backupFileInput').click()">Restaurar backup</button><input type="file" id="backupFileInput" accept=".json,application/json" hidden /><p>PDF e gráficos continuam disponíveis. Na restauração, você revisa os registros antes de adicionar.</p></div>
       </details>
     </div>
   </header>
@@ -493,13 +521,13 @@ html {scrollbar-gutter:stable;}
     <section class="panel-dark cyber-panel hud-corners rounded-2xl p-6 text-center space-y-3">
       <div class="text-3xl" aria-hidden="true">⚖️</div>
       <h2 class="text-base font-extrabold text-white">Nenhuma pesagem registrada ainda</h2>
-      <p class="text-xs text-slate-400 max-w-md mx-auto">Confirme sua altura no topo e registre uma leitura real da Omron HBF-514C. Nenhum exemplo é incluído no seu histórico.</p>
-      <button onclick="openNewWeighingModal()" class="bg-sky-500 text-slate-950 font-extrabold text-xs px-5 py-3 rounded-xl">+ Registrar Primeira Pesagem</button>
+      <p class="text-xs text-slate-400 max-w-md mx-auto">Comece pelo seu nome, idade e altura. No mesmo formulário, registre o peso e os dados que você tem da balança. Seu perfil ficará lembrado para as próximas medições.</p>
+      <button onclick="openNewWeighingModal()" class="bg-sky-500 text-slate-950 font-extrabold text-xs px-5 py-3 rounded-xl">+ Meu perfil e primeira medição</button>
     </section>
   </div>
   <!-- MAPA BIOMÉTRICO INTERATIVO -->
   <main id="dashboardMain" class="max-w-7xl mx-auto px-3 space-y-3">
-    <p id="filterEmpty" class="hidden panel-dark cyber-panel hud-corners rounded-2xl p-4 text-sm text-slate-300">Nenhuma pesagem em jejum neste histórico. Desmarque “Só jejum” para ver as demais.</p>
+    <p id="filterEmpty" class="hidden panel-dark cyber-panel hud-corners rounded-2xl p-4 text-sm text-slate-300">Nenhuma medição para exibir.</p>
     <section id="bioMap" class="panel-dark cyber-panel hud-corners scanner-grid rounded-2xl p-3.5 sm:p-4 space-y-3.5">
       <div class="map-heading flex flex-wrap items-center justify-between gap-2 border-b border-cyan-500/15 pb-2">
         <div class="flex items-center gap-2">
@@ -517,7 +545,7 @@ html {scrollbar-gutter:stable;}
         <!-- 3D INTERATIVO COM A VISUALIZAÇÃO ANTERIOR DISPONÍVEL EM 2D -->
         <div id="holoStage" data-view="portrait" class="hud-body-console col-span-4 flex flex-col items-center justify-center relative py-2">
           <div class="holo-console-title"><span class="holo-dot"></span> HOLO-BODY 3D <span class="text-slate-400 text-[9px]">ILUSTRAÇÃO</span></div>
-          <div class="holo-mode no-print" role="group" aria-label="Tipo de visualização">
+          <div class="holo-mode no-print" hidden inert role="group" aria-label="Tipo de visualização">
             <button type="button" id="holoModePortrait" data-holo-mode="portrait" aria-pressed="true">Holo</button>
             <button type="button" id="holoMode3d" data-holo-mode="3d" aria-pressed="false">3D</button>
             <button type="button" id="holoMode2d" data-holo-mode="2d" aria-pressed="false">2D</button>
@@ -635,8 +663,8 @@ html {scrollbar-gutter:stable;}
           <button onclick="switchSubView('goals')" id="subBtn-goals" class="px-3 py-2 rounded-lg text-slate-400 font-semibold">Metas</button>
           <button onclick="switchSubView('history')" id="subBtn-history" class="px-3 py-2 rounded-lg text-slate-400 font-semibold">Histórico (<span id="histCountBadge">0</span>)</button>
         </div>
-        <label class="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer">
-          <input type="checkbox" id="onlyFastingChk" onchange="recomputeAll()" class="accent-sky-500" />
+        <label hidden inert class="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer">
+          <input type="checkbox" id="onlyFastingChk" disabled class="accent-sky-500" />
           <span>Só jejum</span>
         </label>
       </div>
@@ -672,14 +700,14 @@ html {scrollbar-gutter:stable;}
   </main>
 
   <!-- MODAL: + NOVA PESAGEM -->
-  <div id="newWeighingModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 no-print">
+  <div id="newWeighingModal" role="dialog" aria-modal="true" aria-labelledby="weighingModalTitle" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 no-print">
     <div class="panel-dark cyber-panel hud-corners rounded-2xl w-full max-w-lg p-4 space-y-3 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
-        <h3 class="font-extrabold text-sm text-white">Nova Pesagem • Omron HBF-514C</h3>
-        <button onclick="closeNewWeighingModal()" class="text-slate-400 hover:text-white text-sm font-bold px-2">✕</button>
+        <h3 id="weighingModalTitle" class="font-extrabold text-sm text-white">Seu perfil e nova medição</h3>
+        <button onclick="closeNewWeighingModal()" aria-label="Fechar medição" class="text-slate-400 hover:text-white text-sm font-bold px-2">✕</button>
       </div>
 
-      <div class="flex flex-wrap gap-1.5 text-[11px]">
+      <div hidden inert class="flex flex-wrap gap-1.5 text-[11px]">
         <button type="button" onclick="pickProto('Em jejum')" class="proto-opt px-2.5 py-1.5 rounded-lg border border-sky-500 bg-sky-500/15 text-sky-300 font-bold">☀️ Em jejum</button>
         <button type="button" onclick="pickProto('Hidratado')" class="proto-opt px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 font-bold">💧 Hidratado</button>
         <button type="button" onclick="pickProto('Pós-treino')" class="proto-opt px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 font-bold">🏋️ Pós-treino</button>
@@ -687,6 +715,13 @@ html {scrollbar-gutter:stable;}
       </div>
 
       <form id="weighingForm" onsubmit="saveWeighing(event)" class="space-y-3 text-xs">
+<fieldset class="measurement-section"><legend>1. Quem está se acompanhando?</legend>
+<label class="person-field">Seu nome<input id="mPersonName" type="text" maxlength="80" autocomplete="name" placeholder="Ex.: Paloma" required /></label>
+<div class="person-form-grid"><label class="person-field">Idade (anos)<input id="mAge" type="number" min="18" max="120" step="1" required oninput="autoCalcModalBmi()" /></label>
+<label class="person-field">Sexo de referência<select id="mSex" required><option value="">Selecione</option><option value="F">Feminino</option><option value="M">Masculino</option></select></label></div>
+<p class="form-hint">Seu nome e seus dados ficam lembrados. A idade e o sexo de referência são usados nas faixas do manual.</p>
+</fieldset><fieldset class="measurement-section"><legend>2. Sua nova medição</legend>
+<p class="form-hint">Omron HBF-514C • Digite os valores do visor. Além de peso e altura, preencha apenas os dados que você tiver.</p>
         <div class="grid grid-cols-3 gap-2">
           <label class="block text-[11px] text-slate-400">Data<input type="date" id="mDate" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-slate-700 text-white" /></label>
           <label class="block text-[11px] text-slate-400">Peso (kg) *<input type="number" step=".1" min="1" max="150" id="mWeight" oninput="autoCalcModalBmi()" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-sky-500/50 font-bold mono text-white" /></label>
@@ -696,14 +731,15 @@ html {scrollbar-gutter:stable;}
           <span class="text-[11px] text-sky-300">IMC calculado automaticamente:</span>
           <div class="flex items-center gap-2"><input type="number" id="mBmi" readonly aria-label="IMC calculado" class="w-16 bg-transparent text-right font-extrabold mono text-white" /><span id="mBmiBadge" class="text-[10px] px-2 py-1 rounded-md">--</span></div>
         </div>
-        <div class="grid grid-cols-2 gap-2.5"><label class="block text-[11px] text-slate-400">Gordura Corporal (%) *<input type="number" step=".1" min="1" max="60" id="mFat" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
-<label class="block text-[11px] text-slate-400">Músculo Esquelético (%) *<input type="number" step=".1" min="1" max="60" id="mMuscle" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
-<label class="block text-[11px] text-slate-400">Gordura Visceral (1–30) *<input type="number" step="1" min="1" max="30" id="mVisc" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
-<label class="block text-[11px] text-slate-400">Idade Corporal (anos) *<input type="number" step="1" min="1" max="120" id="mBodyAge" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+        <div class="grid grid-cols-2 gap-2.5"><label class="block text-[11px] text-slate-400">Gordura Corporal (%)<input type="number" step=".1" min="1" max="60" id="mFat" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Músculo Esquelético (%)<input type="number" step=".1" min="1" max="60" id="mMuscle" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Gordura Visceral (1–30)<input type="number" step="1" min="1" max="30" id="mVisc" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Idade Corporal (anos)<input type="number" step="1" min="1" max="120" id="mBodyAge" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
 <label class="block text-[11px] text-slate-400">Metabolismo em repouso (kcal, opcional)<input type="number" step="1" min="1" max="10000" id="mRm" placeholder="Do visor ou cálculo automático" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
-<label class="block text-[11px] text-slate-400">Cintura (cm) *<input type="number" step=".1" min="1" max="300" id="mWaist" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
-<label class="block text-[11px] text-slate-400">Quadril (cm) *<input type="number" step=".1" min="1" max="300" id="mHip" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label></div>
+<label class="block text-[11px] text-slate-400">Cintura (cm)<input type="number" step=".1" min="1" max="300" id="mWaist" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Quadril (cm)<input type="number" step=".1" min="1" max="300" id="mHip" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label></div>
         <p class="text-[10px] text-slate-400">Se o metabolismo ficar vazio, uma estimativa por equação será identificada como calculada no aplicativo e no relatório.</p>
+        </fieldset>
         <p id="saveStatus" class="text-xs text-amber-300" role="status" aria-live="polite"></p>
         <button type="submit" id="btnSaveWeighing" class="w-full py-3 rounded-xl neon-btn text-slate-950 hud-font font-extrabold text-xs">Salvar pesagem</button>
       </form>
@@ -717,6 +753,7 @@ html {scrollbar-gutter:stable;}
         <div>
           <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400">Relatório • Omron HBF-514C</span>
           <h3 class="font-extrabold text-base text-white">Relatório de Bioimpedância e Evolução</h3>
+          <p id="repPersonName" class="report-person"></p>
           <p class="text-xs text-slate-400">Idade: <span id="repAgeSpan">--</span> anos • Altura: <span id="repHeightSpan">--</span> cm</p>
         </div>
         <button onclick="closeReportModal()" class="text-slate-400 hover:text-white font-bold no-print">✕</button>
@@ -784,7 +821,7 @@ html {scrollbar-gutter:stable;}
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.4.1</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.5</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>INÍCIO</span></button>
@@ -793,6 +830,7 @@ html {scrollbar-gutter:stable;}
     <button type="button" data-app-nav="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i><span>FERRAMENTAS</span></button>
   </nav>
 
+<div id="importBackupModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 no-print" role="dialog" aria-modal="true" aria-labelledby="importBackupTitle"><div class="panel-dark cyber-panel rounded-2xl p-5 w-full max-w-lg space-y-4"><div class="flex justify-between gap-4"><h2 id="importBackupTitle">Revisar restauração do backup</h2><button id="closeImportButton" type="button" onclick="closeImportBackup()" aria-label="Fechar restauração">✕</button></div><p id="importBackupSummary" role="status"></p><button id="confirmImportButton" type="button" class="neon-btn rounded-xl p-3 w-full" onclick="confirmImportBackup()" disabled>Adicionar registros revisados</button></div></div>
   <script type="module">
     const firebaseConfig = {
       apiKey: "AIzaSyBUJkLOV2b-P_Pq8dsp7rCGLV5bb-Jxgkg",
@@ -945,7 +983,7 @@ function toggleHoloScan() {
 function historyTelemetryTable(list) {
   return `<div class="history-table-wrap"><table class="history-telemetry"><thead><tr><th>Data</th><th>Peso</th><th>IMC</th><th>Gordura</th><th>Visceral</th><th>Músculo</th><th>RCQ</th><th>Idade corporal</th><th>Ações</th></tr></thead><tbody>${[...list].reverse().map(r=>{
     const ratio=r.hip>0?r.waist/r.hip:NaN;
-    return `<tr data-selected="${r.id===selectedReadingId}"><td>${dateLabel(r.date)}</td><td>${fmt(r.weight)} kg</td><td>${fmt(calcBmiValue(r.weight,profile(r).height))}</td><td>${fmt(r.fat)}%</td><td>${fmt(r.visceral,0)}</td><td>${fmt(r.muscle)}%</td><td>${fmt(ratio,2)}</td><td>${fmt(r.bodyAge,0)} anos</td><td><button type="button" data-reading-id="${escapeHTML(r.id)}">Selecionar</button> <button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}">Excluir</button></td></tr>`;
+    return `<tr data-selected="${r.id===selectedReadingId}"><td>${dateLabel(r.date)}<br><small>${escapeHTML(recordPersonName(r))}</small></td><td>${fmt(r.weight)} kg</td><td>${fmt(calcBmiValue(r.weight,profile(r).height))}</td><td>${fmt(r.fat)}%</td><td>${fmt(r.visceral,0)}</td><td>${fmt(r.muscle)}%</td><td>${fmt(ratio,2)}</td><td>${fmt(r.bodyAge,0)} anos</td><td><button type="button" data-reading-id="${escapeHTML(r.id)}">Selecionar</button> <button type="button" data-edit-id="${escapeHTML(r.id)}">Editar</button> <button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}">Excluir</button></td></tr>`;
   }).join('')}</tbody></table></div>`;
 }
 
@@ -1015,24 +1053,9 @@ function navigateApp(destination) {
   if(destination==='settings'){$('profileDrawer').open=true;$('profileDrawer').scrollIntoView({behavior:'smooth',block:'start'});}
 }
 function setHoloMode(mode) {
-  if (!['portrait','2d','3d'].includes(mode)) return;
-  if(mode==='3d')initHolo3D();
-  holo.mode=mode;
-  const enabled=mode==='3d' && !!holo.renderer && !holo.failed;
-  const portrait=mode==='portrait';
-  $('holoPortrait').classList.toggle('hidden',!portrait);
-  $('holoStage').dataset.view=portrait?'portrait':enabled?'3d':'2d';
-  $('canvas3dContainer').classList.toggle('hidden',!enabled);
-  $('holoFallback').classList.toggle('hidden',enabled||portrait);
-  $('holoRotationControls').classList.toggle('hidden',!enabled);
-  $('holoAutoRotate').classList.toggle('hidden',!enabled);
-  $('holoScanBeam').classList.toggle('hidden',!enabled);
-  $('holoMode3d').setAttribute('aria-pressed',String(enabled));
-  $('holoMode2d').setAttribute('aria-pressed',String(!enabled&&!portrait));
-  $('holoModePortrait').setAttribute('aria-pressed',String(portrait));
-  $('holoStatus').textContent=portrait ? 'Ilustração • Cores dos indicadores' : enabled ? 'Arraste para girar • Ilustração 3D' : 'Ilustração 2D • Visualização simplificada';
-  updateHoloLoop();
-  if(enabled) resizeHolo();
+  holo.mode='portrait';$('holoStage').dataset.view='portrait';$('holoPortrait').classList.remove('hidden');
+  for(const id of ['canvas3dContainer','holoFallback','holoRotationControls','holoAutoRotate','holoScanBeam'])$(id).classList.add('hidden');
+  $('holoStatus').textContent='Holograma ilustrativo • Cores dos indicadores';
 }
 function resizeHolo() {
   const el=$('canvas3dContainer');if(!holo.renderer||el.classList.contains('hidden'))return;
@@ -1157,36 +1180,7 @@ function initHolo3D() {
     return true;
   } catch {disableHolo();return false;}
 }
-function updateHolo3DState(record) {
-  if(!record){updateHoloLoop();return;}
-  updatePortraitState(record);
-  if(!initHolo3D())return;
-  const s=holoAppearance(record),p=holo.parts,m=holo.materials;
-  const smooth=p.sculptedTorso.geometry,positions=smooth.attributes.position,colors=smooth.attributes.color,original=smooth.userData.basePositions;
-  const cool=new window.THREE.Color(0x00f0ff),warm=new window.THREE.Color(0xf97316),vertexColor=new window.THREE.Color();
-  for(let i=0;i<positions.count;i++){
-    const y=original[i*3+1];
-    const hip=y<1.0?(s.sex==='F'?1.15:1.0):y>1.3?(s.sex==='M'?1.12:1.02):1;
-    positions.setXYZ(i,original[i*3]*s.volume*hip,y,original[i*3+2]*s.volume*.86);
-    const heat=(s.fatHigh||s.centralHigh)?Math.max(0,1-Math.abs(y-1.02)/.28):0;
-    vertexColor.copy(cool).lerp(warm,heat);colors.setXYZ(i,vertexColor.r,vertexColor.g,vertexColor.b);
-  }
-  positions.needsUpdate=true;colors.needsUpdate=true;smooth.computeVertexNormals();
-  p.chest.scale.set((s.sex==='F'?1.02:1.22)*Math.min(s.volume,1.2),s.sex==='F'?.72:.76,.74*Math.min(s.volume,1.2));
-  p.torso.scale.set(Math.min(s.volume,1.25),1,Math.min(s.volume,1.3));
-  p.pelvis.scale.set((s.sex==='F'?1.22:1.05)*s.volume,s.sex==='F'?.68:.64,.8*s.volume);
-  p.waist.scale.set(s.volume,1,s.volume);
-  p.waistRing.scale.set(s.volume,s.volume,1);
-  p.shoulders.forEach((part,i)=>{part.position.x=(i===0?-1:1)*(s.sex==='F'?.25:.29)*Math.min(s.volume,1.2);});
-  p.arms.forEach(part=>{part.position.x=part.userData.baseX*Math.min(s.volume,1.2);});
-  p.thighs.forEach(part=>part.scale.set(Math.min(s.volume,1.25),1,Math.min(s.volume,1.25)));
-  m.abdomen.color.setHex(s.abdomenColor);m.abdomen.emissive.setHex(s.fatHigh||s.centralHigh?0x9a3412:0x0369a1);m.abdomen.emissiveIntensity=.55;
-  m.thigh.color.setHex(s.thighColor);m.thigh.emissive.setHex(s.fatHigh?0x92400e:0x0369a1);
-  // Normal visceral stays green even if total body fat is high.
-  p.core.material.color.setHex(s.visceralColor);p.halo.material.color.setHex(s.visceralColor);
-  p.halo.material.opacity=s.visceralHigh?.34:.18;
-  if(holo.mode==='3d')setHoloMode('3d');else {setHoloMode(holo.mode);drawHolo();}
-}
+function updateHolo3DState(record) {if(record)updatePortraitState(record);setHoloMode('portrait');}
 function disposeHolo() {
   if(!holo.renderer)return;
   holo.renderer.setAnimationLoop(null);holo.resizeObserver?.disconnect();holo.intersectionObserver?.disconnect();
@@ -1196,20 +1190,8 @@ function disposeHolo() {
   holo.renderer.dispose();holo.renderer=null;
 }
 function initializeHoloControls() {
-  holo.reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
-  $('holoAutoRotate').disabled=holo.reduced;
-  $('holoScanBeam').disabled=holo.reduced;
-  if(holo.reduced)$('holoAutoRotate').title='As animações estão reduzidas nas preferências deste dispositivo.';
-  $('holoAutoRotate').addEventListener('click',()=>{holo.auto=!holo.auto;$('holoAutoRotate').setAttribute('aria-pressed',String(holo.auto));$('holoAutoRotate').textContent=holo.auto?'Pausar rotação automática':'Ativar rotação automática';updateHoloLoop();});
-  $('threeSdk')?.addEventListener('load',()=>updateHolo3DState(currentReading));
-  $('threeSdk')?.addEventListener('error',()=>disableHolo());
-  document.addEventListener('visibilitychange',updateHoloLoop);
-  window.addEventListener('pagehide',event=>{if(!event.persisted)disposeHolo();});
-  setHoloMode('portrait');
-  window.addEventListener('resize',scheduleBiometricLinks);
-  for(const id of ['holoArtCool','holoArtWarm'])$(id).addEventListener('error',()=>{
-    if(holo.mode==='portrait')setHoloMode('2d');
-  });
+  setHoloMode('portrait');window.addEventListener('resize',scheduleBiometricLinks);
+  for(const id of ['holoArtCool','holoArtWarm'])$(id).addEventListener('error',()=>{$('holoStatus').textContent='Holograma indisponível no momento. Seus indicadores continuam disponíveis.';});
   document.fonts?.ready.then(scheduleBiometricLinks);
 }
 
@@ -1392,6 +1374,7 @@ let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
 let currentAnalyses = {}, currentReading = null, chartInst = null;
 let db = null, fire = null, unsubscribe = null, connecting = false, serverSeen = false;
 let storageBlocked = false, saving = false;
+let editingReadingId=null,profilePersonId=null,importPreview=null;
 const inFlight = new Set();
 const number = v => v === '' || v == null ? NaN : Number(v);
 const validNumber = v => Number.isFinite(number(v));
@@ -1423,7 +1406,6 @@ function normalize(r, id) {
   const item = { ...r, id: String(id || r.id || ('bv_' + crypto.randomUUID())) };
   const aliases={weight:'peso',fat:'gordura',muscle:'musculo',bodyAge:'idadeBio',waist:'cintura',hip:'quadril',rm:'basal',height:'altura',sex:'sexo',date:'data'};
   for(const [canonical,alias] of Object.entries(aliases))if(item[canonical]==null&&item[alias]!=null)item[canonical]=item[alias];
-  if(!item.protocol)item.protocol='Não informado';
   for (const key of ['weight','height','bmi','fat','muscle','visceral','bodyAge','rm','waist','hip','age']) {
     if (validNumber(item[key])) item[key] = number(item[key]);
   }
@@ -1431,7 +1413,7 @@ function normalize(r, id) {
 }
 function renderable(r) { return validDate(r.date) && validNumber(r.weight) && r.weight > 0 && !r._deleted; }
 function allVisible() { return readings.filter(renderable).sort((a,b) => a.date.localeCompare(b.date) || String(a.createdAt || '').localeCompare(String(b.createdAt || '')) || a.id.localeCompare(b.id)); }
-function visibleReadings() { const list = allVisible(); return $('onlyFastingChk').checked ? list.filter(r => r.protocol === 'Em jejum') : list; }
+function visibleReadings() { return allVisible(); }
 function profile(r = {}) {
   return { sex: ['F','M'].includes(r.sex) ? r.sex : $('sexSelect').value,
     age: validNumber(r.age) ? r.age : number($('realAgeInput').value),
@@ -1445,6 +1427,8 @@ function setSyncStatus() {
 }
 function loadProfilePrefs() {
   const p = readJSON(PREFS_KEY, {}) || {};
+  profilePersonId=typeof p.personId==='string'?p.personId:null;
+  $('profileNameInput').value=cleanPersonName(p.name);
   try {
     if(p.sex==null)p.sex=localStorage.getItem('bv_sex');
     if(p.age==null)p.age=localStorage.getItem('bv_age');
@@ -1453,6 +1437,7 @@ function loadProfilePrefs() {
   if (['F','M'].includes(p.sex)) $('sexSelect').value = p.sex;
   if (validNumber(p.age) && p.age >= 18 && p.age <= 120) $('realAgeInput').value = p.age;
   if (validNumber(p.height) && p.height >= 100 && p.height <= 220) $('heightCmInput').value = p.height;
+  renderPersonContext();
   const goals = readJSON(GOALS_KEY, {}) || {};
   for (const [k,id] of Object.entries({fat:'gFatSlider',muscle:'gMuscSlider',visceral:'gViscSlider'})) {
     if (validNumber(goals[k])) $(id).value = goals[k];
@@ -1462,7 +1447,9 @@ function saveProfilePrefs() {
   if (!$('realAgeInput').checkValidity() || !$('heightCmInput').checkValidity()) {
     notify('Confira a idade (18–120 anos) e a altura (100–220 cm).'); return false;
   }
-  return writeJSON(PREFS_KEY, {sex:$('sexSelect').value, age:number($('realAgeInput').value), height:number($('heightCmInput').value)});
+  profilePersonId=profilePersonId||'person_'+crypto.randomUUID();
+  const ok=writeJSON(PREFS_KEY, {name:cleanPersonName($('profileNameInput').value),personId:profilePersonId,sex:$('sexSelect').value, age:number($('realAgeInput').value), height:number($('heightCmInput').value)});
+  renderPersonContext();return ok;
 }
 function calcBmiValue(weight, height) {
   const w = number(weight), h = number(height) / 100;
@@ -1546,6 +1533,7 @@ function populateCompareDropdown(list = visibleReadings()) {
   $('compareSelect').disabled = !list.length;
 }
 function recomputeAll() {
+  renderPersonContext();
   const all = allVisible(), list = visibleReadings();
   $('emptyStateBox').classList.toggle('hidden', !!all.length);
   $('dashboardMain').classList.toggle('hidden', !all.length);
@@ -1566,7 +1554,7 @@ function recomputeAll() {
   const cur = currentReading, previous = list.find(r => r.id === $('compareSelect').value) || list[0];
   currentAnalyses = analyze(cur);
   const a = currentAnalyses, altered = Object.keys(a).filter(k => a[k].altered);
-  $('activeReadingBadge').textContent = `${dateLabel(cur.date)} • ${cur.protocol || 'Protocolo não informado'}`;
+  $('activeReadingBadge').textContent = `${dateLabel(cur.date)} • ${recordPersonName(cur)}`;
   $('phenotypeTitle').textContent = altered.length ? `${altered.length} indicador(es) em atenção` : 'Indicadores nas faixas avaliadas';
   $('phenotypeDesc').textContent = altered.length ? 'Toque nos cards destacados ou nos alertas para entender cada resultado.' : 'Veja as referências e as limitações ao tocar nos indicadores.';
   $('inspectionDock').dataset.alert=String(altered.length>0);
@@ -1629,7 +1617,7 @@ function renderClinicalAlerts(keys) {
 }
 function renderHistoryList(list) {
   $('histCountBadge').textContent = list.length;
-  const cards = [...list].reverse().map(r => `<div class="bg-[#07101f] border ${r.id===selectedReadingId?'border-sky-500':'border-slate-800'} rounded-xl p-2.5 flex items-center justify-between gap-2"><button type="button" data-reading-id="${escapeHTML(r.id)}" class="text-left flex-1 min-w-0"><span class="block font-bold text-white mono">${dateLabel(r.date)} • ${fmt(r.weight)} kg (IMC ${fmt(calcBmiValue(r.weight,profile(r).height))})</span><span class="block text-[11px] text-slate-400">Gordura: ${fmt(r.fat)}% • Músculo: ${fmt(r.muscle)}% • Visceral: ${fmt(r.visceral,0)} • ${escapeHTML(r.protocol || 'Não informado')}${r._sync==='pending'?' • Pendente de sincronização':''}</span></button><button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}" class="px-2.5 py-2 rounded-lg bg-rose-500/15 text-rose-400 font-bold text-[11px]">Excluir</button></div>`).join('') || '<p class="text-slate-400">Nenhuma pesagem neste filtro.</p>';
+  const cards = [...list].reverse().map(r => `<div class="bg-[#07101f] border ${r.id===selectedReadingId?'border-sky-500':'border-slate-800'} rounded-xl p-2.5 flex items-center justify-between gap-2"><button type="button" data-reading-id="${escapeHTML(r.id)}" class="text-left flex-1 min-w-0"><span class="block font-bold text-white mono">${dateLabel(r.date)} • ${fmt(r.weight)} kg (IMC ${fmt(calcBmiValue(r.weight,profile(r).height))})</span><span class="block text-[11px] text-slate-400">Gordura: ${fmt(r.fat)}% • Músculo: ${fmt(r.muscle)}% • Visceral: ${fmt(r.visceral,0)} • ${escapeHTML(recordPersonName(r))}${r._sync==='pending'?' • Pendente de sincronização':''}</span></button><button type="button" data-edit-id="${escapeHTML(r.id)}">Editar</button> <button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}" class="px-2.5 py-2 rounded-lg bg-rose-500/15 text-rose-400 font-bold text-[11px]">Excluir</button></div>`).join('') || '<p class="text-slate-400">Nenhuma pesagem neste filtro.</p>';
   $('subView-history').innerHTML='<div class="history-cards">'+cards+'</div>'+historyTelemetryTable(list);
 }
 
@@ -1670,53 +1658,58 @@ function switchSubView(tab) {
   for (const k of ['alerts','chart','goals','history']) { $('subView-'+k).classList.toggle('hidden',k!==tab); $('subBtn-'+k).className=`px-3 py-2 rounded-lg ${k===tab?'bg-sky-500/20 text-sky-300 font-bold':'text-slate-400 font-semibold'}`; $('subBtn-'+k).setAttribute('aria-selected',String(k===tab)); }
   renderEvolutionChart(); updateGoalsBox();
 }
-function autoCalcModalBmi() { const bmi=calcBmiValue($('mWeight').value,$('mHeight').value); $('mBmi').value=Number.isFinite(bmi)?bmi.toFixed(1):''; $('mBmiBadge').textContent=Number.isFinite(bmi)?classifyBmi(bmi,number($('realAgeInput').value)).label:'—'; }
+function autoCalcModalBmi() { const bmi=calcBmiValue($('mWeight').value,$('mHeight').value); $('mBmi').value=Number.isFinite(bmi)?bmi.toFixed(1):''; $('mBmiBadge').textContent=Number.isFinite(bmi)?classifyBmi(bmi,number($('mAge').value)).label:'—'; }
 function openNewWeighingModal() {
-  closeMetricDetail();
-  if (saving) return;
-  $('weighingForm').reset(); $('mDate').value=localDate(); $('mHeight').value=$('heightCmInput').value;
-  $('saveStatus').textContent=''; pickProto('Em jejum'); autoCalcModalBmi();
-  $('newWeighingModal').classList.remove('hidden'); $('mWeight').focus();
+  closeMetricDetail();if(saving)return;editingReadingId=null;
+  $('weighingForm').reset();const prefs=readJSON(PREFS_KEY,{})||{};
+  $('weighingModalTitle').textContent='Seu perfil e nova medição';$('btnSaveWeighing').textContent='Salvar medição';
+  $('mDate').value=localDate();$('mPersonName').value=cleanPersonName(prefs.name||$('profileNameInput').value);
+  $('mAge').value=prefs.age??currentReading?.age??'';$('mSex').value=prefs.sex||currentReading?.sex||'';
+  $('mHeight').value=prefs.height??currentReading?.height??'';
+  $('saveStatus').textContent='';autoCalcModalBmi();$('newWeighingModal').classList.remove('hidden');
+  ($('mPersonName').value?$('mWeight'):$('mPersonName')).focus();
 }
-function closeNewWeighingModal() { if (!saving) $('newWeighingModal').classList.add('hidden'); }
+function closeNewWeighingModal() { if (!saving) {$('newWeighingModal').classList.add('hidden');editingReadingId=null;} }
 function pickProto(p) { if (!['Em jejum','Hidratado','Pós-treino','Final do dia'].includes(p)) return; selectedProto=p; document.querySelectorAll('.proto-opt').forEach(b=>{const active=b.textContent.includes(p);b.className=`proto-opt px-2.5 py-1.5 rounded-lg border font-bold ${active?'border-sky-500 bg-sky-500/15 text-sky-300':'border-slate-700 text-slate-400'}`;b.setAttribute('aria-pressed',String(active));}); }
 async function saveWeighing(event) {
-  event.preventDefault(); if (saving || !$('weighingForm').reportValidity()) return;
-  if (!saveProfilePrefs()) { $('saveStatus').textContent='Confira o perfil e o armazenamento do navegador antes de salvar.'; return; }
+  event.preventDefault();if(saving||!$('weighingForm').reportValidity())return;
+  const personName=cleanPersonName($('mPersonName').value);if(!personName){$('saveStatus').textContent='Como você se chama? Informe seu nome para identificar a medição.';return;}
+  const old=editingReadingId?readings.find(r=>r.id===editingReadingId&&!r._deleted):null;
+  if(editingReadingId&&(!old||inFlight.has(old.id))){$('saveStatus').textContent='Aguarde a sincronização ou reabra a medição antes de editar.';return;}
   const fields={weight:'mWeight',height:'mHeight',fat:'mFat',muscle:'mMuscle',visceral:'mVisc',bodyAge:'mBodyAge',rm:'mRm',waist:'mWaist',hip:'mHip'};
-  const item={id:'bv_'+crypto.randomUUID(),date:$('mDate').value,protocol:selectedProto,sex:$('sexSelect').value,age:number($('realAgeInput').value),createdAt:new Date().toISOString(),_sync:'pending'};
-  for (const [key,id] of Object.entries(fields)) item[key]=number($(id).value);
-  if($('mRm').value===''){item.rm=estimateRestingEnergy(item.weight,item.height,item.age,item.sex);item.rmMethod='harris-benedict-1984';}
-  else item.rmMethod='reported';
-  if (!validDate(item.date) || Object.keys(fields).some(k=>!Number.isFinite(item[k]) || item[k]<=0) || item.fat+item.muscle>100) { $('saveStatus').textContent='Confira a data e os valores. A soma de gordura e músculo não pode ultrapassar 100%.';return; }
-  saving=true; $('btnSaveWeighing').disabled=true; $('btnSaveWeighing').textContent='Salvando…';
-  try {
-    item.bmi=Number(calcBmiValue(item.weight,item.height).toFixed(1));
-    readings.push(item);
-    if (!persist()) {readings=readings.filter(r=>r.id!==item.id);$('saveStatus').textContent='A pesagem não foi salva. Os campos foram mantidos para você tentar novamente.';return;}
-    $('heightCmInput').value=item.height;saveProfilePrefs(); selectedReadingId=item.id;
-    // A backdated record remains selected after chronological sorting.
-    if ($('onlyFastingChk').checked && item.protocol!=='Em jejum') $('onlyFastingChk').checked=false;
-    recomputeAll(); $('newWeighingModal').classList.add('hidden');
-    notify('Pesagem salva neste navegador. Acompanhe a confirmação de sincronização no topo.');
-    void flushPending();
-  } finally {saving=false;$('btnSaveWeighing').disabled=false;$('btnSaveWeighing').textContent='Salvar pesagem';}
+  const item={...old,id:old?.id||'bv_'+crypto.randomUUID(),date:$('mDate').value,personName,personId:old?.personId||profilePersonId||'person_'+crypto.randomUUID(),sex:$('mSex').value,age:number($('mAge').value),equipment:old?.equipment||'Omron HBF-514C',entryMethod:'manual',createdAt:old?.createdAt||new Date().toISOString(),_sync:'pending',_revision:crypto.randomUUID()};
+  for(const [key,id]of Object.entries(fields))item[key]=$(id).value===''?null:number($(id).value);
+  if(item.rm==null){item.rm=estimateRestingEnergy(item.weight,item.height,item.age,item.sex);item.rmMethod='harris-benedict-1984';}else item.rmMethod='reported';
+  const optional=['fat','muscle','visceral','bodyAge','waist','hip'];
+  if(!validDate(item.date)||!validNumber(item.weight)||!validNumber(item.height)||item.weight<=0||item.height<=0||optional.some(k=>item[k]!=null&&(!validNumber(item[k])||item[k]<=0))||(validNumber(item.fat)&&validNumber(item.muscle)&&item.fat+item.muscle>100)){
+    $('saveStatus').textContent='Confira os valores. A soma de gordura e músculo não pode ultrapassar 100%.';return;
+  }
+  if(old){const previous={...old};delete previous.revisions;delete previous.ts;for(const key of Object.keys(previous))if(key.startsWith('_'))delete previous[key];item.revisions=[...(old.revisions||[]),{editedAt:new Date().toISOString(),previous}].slice(-20);item.updatedAt=new Date().toISOString();}
+  saving=true;$('btnSaveWeighing').disabled=true;$('btnSaveWeighing').textContent='Salvando…';
+  const before=readings;readings=old?readings.map(r=>r.id===old.id?item:r):[...readings,item];
+  try{
+    if(!persist()){readings=before;$('saveStatus').textContent='A medição não foi salva. Os campos foram mantidos para você tentar novamente.';return;}
+    profilePersonId=item.personId;$('profileNameInput').value=personName;$('heightCmInput').value=item.height;$('realAgeInput').value=item.age;$('sexSelect').value=item.sex;saveProfilePrefs();
+    selectedReadingId=item.id;editingReadingId=null;recomputeAll();$('newWeighingModal').classList.add('hidden');
+    notify(old?'Medição atualizada. A versão anterior foi preservada no backup.':'Medição salva para '+personName+'. Acompanhe a sincronização no topo.');void flushPending();
+  }finally{saving=false;$('btnSaveWeighing').disabled=false;$('btnSaveWeighing').textContent='Salvar medição';}
 }
 function openReportModal() {
   closeMetricDetail();
   recomputeAll(); const cur=currentReading; if (!cur) return;
   const list=visibleReadings(), first=list[0], a=analyze(cur), p=profile(cur);
+  $('repPersonName').textContent=recordPersonName(cur);
   $('repAgeSpan').textContent=fmt(p.age,0);$('repHeightSpan').textContent=fmt(p.height);
   const definitions=[['weight','Peso corporal','kg'],['bmi','IMC automático','kg/m²'],['fat','Gordura corporal','%'],['muscle','Músculo esquelético','%'],['visceral','Gordura visceral','nível'],['rm','Metabolismo em repouso','kcal/dia'],['bodyAge','Idade corporal','anos'],['waist','Cintura','cm'],['hip','Quadril','cm'],['whr','RCQ','']];
   const value=(r,key)=>key==='bmi'?calcBmiValue(r.weight,profile(r).height):key==='whr'?(r.hip>0?r.waist/r.hip:NaN):key==='rm'?readingBasal(r):number(r[key]);
   $('repTableRows').innerHTML=definitions.map(([key,label,unit])=>{const x=value(first,key),y=value(cur,key),d=y-x,info=a[key],digits=key==='whr'?2:['rm','bodyAge','visceral'].includes(key)?0:1;return `<tr><td class="py-2 font-bold text-white">${label}</td><td class="py-2 mono text-slate-400">${fmt(x,digits)} ${unit}</td><td class="py-2 mono font-bold text-white">${fmt(y,digits)} ${unit}</td><td class="py-2 mono text-sky-400">${d>0?'+':''}${fmt(d,digits)} ${['fat','muscle'].includes(key)?'p.p.':unit}</td><td class="py-2 font-bold ${info?.altered?'text-amber-300':info?.neutral?'text-sky-300':'text-emerald-400'}">${info?.status||'REGISTRADO'}</td></tr>`;}).join('');
-  $('repSynthesis').textContent=`Comparação entre ${dateLabel(first.date)} e a pesagem selecionada de ${dateLabel(cur.date)} (${cur.protocol||'protocolo não informado'}). Peso ${fmt(cur.weight)} kg; IMC ${fmt(calcBmiValue(cur.weight,p.height))} kg/m²; gordura ${fmt(cur.fat)}%; músculo ${fmt(cur.muscle)}%; visceral nível ${fmt(cur.visceral,0)}.${cur._sync==='pending'?' Registro pendente de sincronização.':''}${cur.height?'':' A altura desta pesagem antiga não estava registrada; o IMC usa a altura informada no topo.'}${cur.rmMethod==='harris-benedict-1984'?' Metabolismo em repouso calculado por Harris–Benedict revisada (1984); não é leitura do visor.':''}`;
+  $('repSynthesis').textContent=`Comparação entre ${dateLabel(first.date)} e a pesagem selecionada de ${dateLabel(cur.date)} • ${recordPersonName(cur)}. Peso ${fmt(cur.weight)} kg; IMC ${fmt(calcBmiValue(cur.weight,p.height))} kg/m²; gordura ${fmt(cur.fat)}%; músculo ${fmt(cur.muscle)}%; visceral nível ${fmt(cur.visceral,0)}.${cur._sync==='pending'?' Registro pendente de sincronização.':''}${cur.height?'':' A altura desta pesagem antiga não estava registrada; o IMC usa a altura informada no topo.'}${cur.rmMethod==='harris-benedict-1984'?' Metabolismo em repouso calculado por Harris–Benedict revisada (1984); não é leitura do visor.':''}`;
   $('reportModal').classList.remove('hidden');
 }
 function closeReportModal() { $('reportModal').classList.add('hidden'); }
 function shareWhatsApp() {
   if (!currentReading) return; const r=currentReading,p=profile(r);
-  const message=`BioVault Pro • Omron HBF-514C (${dateLabel(r.date)})\n• Peso: ${fmt(r.weight)} kg | Altura: ${fmt(p.height)} cm | IMC: ${fmt(calcBmiValue(r.weight,p.height))}\n• Gordura: ${fmt(r.fat)}% | Músculo: ${fmt(r.muscle)}%\n• Visceral: nível ${fmt(r.visceral,0)} | Idade corporal: ${fmt(r.bodyAge,0)} anos`;
+  const message=`${recordPersonName(r)} • BioVault Pro • Omron HBF-514C (${dateLabel(r.date)})\n• Peso: ${fmt(r.weight)} kg | Altura: ${fmt(p.height)} cm | IMC: ${fmt(calcBmiValue(r.weight,p.height))}\n• Gordura: ${fmt(r.fat)}% | Músculo: ${fmt(r.muscle)}%\n• Visceral: nível ${fmt(r.visceral,0)} | Idade corporal: ${fmt(r.bodyAge,0)} anos`;
   window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
 }
 async function flushPending() {
@@ -1734,7 +1727,7 @@ async function flushPending() {
       }
       const latest=readings.find(r=>r.id===item.id);
       if (deleting) readings=readings.filter(r=>r.id!==item.id);
-      else if (latest && latest._sync==='pending') latest._sync='synced';
+      else if (latest && latest._sync==='pending' && latest._revision===item._revision) latest._sync='synced';
       persist(); serverSeen=true; recomputeAll();
     } catch(error) {
       if (deleting && ['permission-denied','unauthenticated'].includes(error.code)) {
@@ -1744,7 +1737,7 @@ async function flushPending() {
     } finally {
       inFlight.delete(item.id);setSyncStatus();
       // If the user deleted while its creation was still uploading, delete after the create settles.
-      if (!deleting && readings.find(r=>r.id===item.id)?._sync==='deleting') void flushPending();
+      if (!deleting && (readings.find(r=>r.id===item.id)?._sync==='deleting'||(readings.find(r=>r.id===item.id)?._sync==='pending'&&readings.find(r=>r.id===item.id)?._revision!==item._revision))) void flushPending();
     }
   }
 }
@@ -1769,7 +1762,75 @@ async function connectCloud() {
   } catch {serverSeen=false;notify('Sem conexão com o Firebase. Novas pesagens ficam salvas neste navegador e aguardam sincronização.');}
   finally {connecting=false;setSyncStatus();}
 }
-Object.assign(window,{renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
+
+// One remembered person profile; each measurement retains its own profile snapshot.
+function cleanPersonName(value){return String(value||'').replace(/[\u0000-\u001f\u007f]/g,'').trim().replace(/\s+/g,' ').slice(0,80);}
+function recordPersonName(record){return cleanPersonName(record?.personName||record?.nome)||'Sem nome (registro anterior)';}
+function renderPersonContext(){
+  const name=cleanPersonName($('profileNameInput').value);
+  $('personContextName').textContent=name||'Seu acompanhamento';
+  $('personContextMeta').textContent=name?'Seu perfil • '+fmt($('heightCmInput').value)+' cm':'Comece pelo seu nome e sua altura';
+}
+function editReading(id){
+  const record=readings.find(r=>r.id===id&&!r._deleted);if(!record||inFlight.has(id)){notify('Aguarde a sincronização desta medição antes de editar.');return;}
+  if(quickPanelState)closeQuickPanel();
+  openNewWeighingModal();editingReadingId=id;
+  $('weighingModalTitle').textContent='Editar medição';
+  $('btnSaveWeighing').textContent='Salvar alterações';
+  $('mPersonName').value=cleanPersonName(record.personName||record.nome)||$('profileNameInput').value;
+  const p=profile(record);$('mSex').value=p.sex;$('mAge').value=p.age;
+  const fields={date:'mDate',weight:'mWeight',height:'mHeight',fat:'mFat',muscle:'mMuscle',visceral:'mVisc',bodyAge:'mBodyAge',rm:'mRm',waist:'mWaist',hip:'mHip'};
+  for(const [key,id]of Object.entries(fields))$(id).value=record[key]??(key==='height'?p.height:'');
+  if(record.rmMethod==='harris-benedict-1984')$('mRm').value='';
+  $('saveStatus').textContent='O registro mantém o mesmo identificador. A versão anterior fica no backup.';
+  autoCalcModalBmi();$('mWeight').focus();
+}
+function buildCsv(list=visibleReadings()){
+  const headers=['Nome','Data','Sexo de referência','Idade (anos)','Altura (cm)','Peso (kg)','Gordura (%)','Músculo (%)','Visceral (nível)','Idade corporal (anos)','Repouso (kcal/dia)','Origem do repouso','Cintura (cm)','Quadril (cm)','IMC (kg/m²)','RCQ','Equipamento','Identificador'];
+  const cell=value=>{let s=value==null?'':String(value);if(typeof value==='string'&&/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';};
+  const rows=list.map(r=>{const p=profile(r);return [recordPersonName(r),r.date,p.sex,p.age,p.height,r.weight,r.fat,r.muscle,r.visceral,r.bodyAge,readingBasal(r),r.rmMethod||'reported',r.waist,r.hip,Number.isFinite(calcBmiValue(r.weight,p.height))?Number(calcBmiValue(r.weight,p.height).toFixed(2)):null,r.waist>0&&r.hip>0?Number((r.waist/r.hip).toFixed(4)):null,r.equipment||'Omron HBF-514C',r.id];});
+  return '\ufeff'+[headers,...rows].map(row=>row.map(v=>typeof v==='number'&&!Number.isFinite(v)?'':cell(v)).join(';')).join('\r\n');
+}
+function buildBackup(){return {format:'biovault-backup',schema:1,exportedAt:new Date().toISOString(),profile:readJSON(PREFS_KEY,{}),measurements:readings};}
+function downloadFile(contents,type,name){
+  const url=URL.createObjectURL(new Blob([contents],{type}));const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function exportCsv(){downloadFile(buildCsv(),'text/csv;charset=utf-8','BioVault_medicoes_'+localDate()+'.csv');}
+function exportBackup(){downloadFile(JSON.stringify(buildBackup(),null,2),'application/json','BioVault_backup_'+localDate()+'.json');}
+function validateBackup(input){
+  if(!input||input.format!=='biovault-backup'||input.schema!==1||!Array.isArray(input.measurements)||input.measurements.length>5000)throw Error('Use um backup JSON exportado pelo BioVault (até 5.000 registros).');
+  const known=new Set(readings.map(r=>r.id));const added=[];let skipped=0;
+  for(const raw of input.measurements){
+    if(!raw||typeof raw!=='object'||Array.isArray(raw)||typeof raw.id!=='string'||!/^[a-zA-Z0-9_-]{1,150}$/.test(raw.id)||!validDate(raw.date)||!validNumber(raw.weight)||raw.weight<=0||raw.weight>150)throw Error('O arquivo contém uma medição inválida. Nada foi importado.');
+    const bounds={height:[100,220],age:[18,120],fat:[1,60],muscle:[1,60],visceral:[1,30],bodyAge:[1,120],rm:[1,10000],waist:[1,300],hip:[1,300]};
+    for(const [key,[lo,hi]]of Object.entries(bounds))if(raw[key]!=null&&(!validNumber(raw[key])||raw[key]<lo||raw[key]>hi))throw Error('Valor inválido no backup: '+key+'. Nada foi importado.');
+    if(validNumber(raw.fat)&&validNumber(raw.muscle)&&number(raw.fat)+number(raw.muscle)>100)throw Error('Composição inválida no backup. Nada foi importado.');
+    if(known.has(raw.id)||raw._deleted){skipped++;continue;}
+    const item=normalize(raw);for(const key of Object.keys(item))if(key.startsWith('_'))delete item[key];
+    item.personName=cleanPersonName(item.personName||item.nome);item._sync='pending';item._revision=crypto.randomUUID();
+    added.push(item);known.add(item.id);
+  }
+  return {records:added,skipped};
+}
+async function previewBackupFile(file){
+  importPreview=null;$('confirmImportButton').disabled=true;$('importBackupModal').classList.remove('hidden');
+  try{
+    if(!file||file.size>5*1024*1024)throw Error('Escolha um backup JSON de até 5 MB.');
+    importPreview=validateBackup(JSON.parse(await file.text()));
+    $('importBackupSummary').textContent=importPreview.records.length+' medição(ões) nova(s) para adicionar. '+importPreview.skipped+' registro(s) já existente(s) ou excluído(s) serão ignorados. Nenhum registro atual será substituído. O perfil atual será mantido.';
+    $('confirmImportButton').disabled=!importPreview.records.length;
+  }catch(error){$('importBackupSummary').textContent=error instanceof SyntaxError?'O arquivo não é um JSON válido. Nada foi importado.':error.message;}
+  $('backupFileInput').value='';$('closeImportButton').focus();
+}
+function closeImportBackup(){$('importBackupModal').classList.add('hidden');importPreview=null;}
+function confirmImportBackup(){
+  if(!importPreview?.records.length)return;
+  const before=readings;const added=importPreview.records;readings=[...readings,...added];
+  if(!persist()){readings=before;notify('A importação não foi aplicada. Os dados atuais foram mantidos.');return;}
+  selectedReadingId=added.at(-1).id;closeImportBackup();recomputeAll();notify(added.length+' medição(ões) adicionada(s). Acompanhe a sincronização no topo.');void flushPending();
+}
+
+Object.assign(window,{renderPersonContext,editReading,exportCsv,exportBackup,previewBackupFile,closeImportBackup,confirmImportBackup,renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
 document.addEventListener('click',event=>{
   if(event.target.closest('[data-metric-close]'))closeMetricDetail();
   if(event.target.closest('[data-metric-evolution]'))openMetricEvolution();
@@ -1778,14 +1839,16 @@ document.addEventListener('click',event=>{
   const turn=event.target.closest('[data-holo-turn]');if(turn)rotateHolo(turn.dataset.holoTurn);
   const metric=event.target.closest('[data-metric]');if(metric)selectMetricDetail(metric.dataset.metric);
   const selected=event.target.closest('[data-reading-id]');if(selected)selectHistoryReading(selected.dataset.readingId);
+  const edit=event.target.closest('[data-edit-id]');if(edit)editReading(edit.dataset.editId);
   const remove=event.target.closest('[data-delete-id]');if(remove)void deleteReading(remove.dataset.deleteId);
 });
-document.addEventListener('keydown',event=>{metricDialogKeyboard(event);if(event.key==='Escape'){closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();}});
+document.addEventListener('keydown',event=>{metricDialogKeyboard(event);if(event.key==='Escape'){closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();}});
 $('metricDetailModal').addEventListener('click',event=>{if(event.target===$('metricDetailModal'))closeMetricDetail();});
 for (const id of ['gFatSlider','gMuscSlider','gViscSlider']) $(id).addEventListener('change',saveGoals);
 window.addEventListener('online',()=>{void connectCloud();void flushPending();});
 window.addEventListener('offline',()=>{serverSeen=false;setSyncStatus();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){void connectCloud();void flushPending();}});
+$('backupFileInput').addEventListener('change',event=>void previewBackupFile(event.target.files[0]));
 initializeHoloControls();
 loadProfilePrefs();
 const cached=readJSON(CACHE_KEY,[]);
