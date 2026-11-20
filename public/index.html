@@ -2,15 +2,15 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#060d1a" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Omron HBF-514C</title>
+  <title>BioVault Pro • Cyber-Biometric HUD v3.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Orbitron:wght@600;700;800;900&display=swap');
     body {
       font-family: 'Inter', sans-serif;
       background-color: #050a14;
@@ -47,13 +47,57 @@
       body { background: #fff !important; color: #000 !important; }
       .panel-dark, .metric-card { background: #fff !important; border: 1px solid #cbd5e1 !important; color: #000 !important; }
     }
+
+    .hidden { display: none !important; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    button { touch-action: manipulation; }
+    input, select { min-width: 0; }
+    .metric-card { text-align: left; width: 100%; overflow-wrap: anywhere; }
+    .metric-card.alert-card { border-color: rgba(245,158,11,.55); background: rgba(30,20,12,.65); }
+    .metric-card.alert-card.active-card { border-color: #f59e0b; box-shadow: 0 0 18px #f59e0b40; }
+    .metric-card:focus-visible, button:focus-visible { outline: 2px solid #38bdf8; outline-offset: 3px; }
+    .report-table-wrap { overflow-x: auto; }
+    #reportModal th, #reportModal td { padding-right: 8px; }
+    #reportModal td:last-child { overflow-wrap: anywhere; }
+    #newWeighingModal, #reportModal { overscroll-behavior: contain; }
+    @media(max-width: 400px) {
+      .metric-card { padding: 8px; }
+      .metric-card .metric-title { font-size: 9px; letter-spacing: 0; white-space: normal; }
+      .metric-card .metric-value { font-size: 12px; }
+      #activeReadingBadge { max-width: 40%; text-align: right; font-size: 10px; }
+    }
+    @media(prefers-reduced-motion: reduce) { .visceral-glow { animation: none; } }
+    @page { size: A4; margin: 14mm; }
+    @media print {
+      body { padding: 0 !important; }
+      body > * { display: none !important; }
+      body > #reportModal:not(.hidden) { display: block !important; position: static !important; padding: 0 !important; background: white !important; }
+      #reportModal > div { max-width: none !important; max-height: none !important; width: 100% !important; overflow: visible !important; border: 0 !important; padding: 0 !important; }
+      #reportModal * { color: black !important; background: transparent !important; box-shadow: none !important; text-shadow: none !important; }
+      #reportModal .no-print { display: none !important; }
+      #reportModal tr { break-inside: avoid; }
+      #reportModal thead { display: table-header-group; }
+      .report-table-wrap { overflow: visible; }
+    }
+
+    :root { --neon-cyan:#00f0ff; --neon-blue:#3b82f6; --neon-purple:#8b5cf6; --neon-emerald:#10b981; --neon-amber:#f59e0b; --neon-crimson:#ff2a5f; color-scheme:dark; }
+    body { background-color:#020611; background-image:radial-gradient(circle at 50% 0%,rgba(0,240,255,.11) 0%,transparent 55%),radial-gradient(circle at 85% 30%,rgba(139,92,246,.08) 0%,transparent 45%),linear-gradient(180deg,#020611 0%,#040b1a 100%); min-height:100vh; }
+    .hud-font, h1 { font-family:'Orbitron',sans-serif; letter-spacing:.04em; }
+    .cyber-panel, .panel-dark { background:linear-gradient(165deg,rgba(10,22,44,.82),rgba(4,11,24,.92)); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid rgba(0,240,255,.22); box-shadow:0 8px 32px #000a,inset 0 0 24px rgba(0,240,255,.04); position:relative; }
+    .hud-corners::before,.hud-corners::after { content:'';position:absolute;width:14px;height:14px;pointer-events:none;opacity:.85; }
+    .hud-corners::before { top:-1px;left:-1px;border-top:2px solid var(--neon-cyan);border-left:2px solid var(--neon-cyan);border-top-left-radius:12px; }
+    .hud-corners::after { bottom:-1px;right:-1px;border-bottom:2px solid var(--neon-cyan);border-right:2px solid var(--neon-cyan);border-bottom-right-radius:12px; }
+    .holo-grid,.scanner-grid { background-image:linear-gradient(to right,rgba(0,240,255,.06) 1px,transparent 1px),linear-gradient(to bottom,rgba(0,240,255,.06) 1px,transparent 1px),linear-gradient(165deg,rgba(10,22,44,.82),rgba(4,11,24,.92));background-size:22px 22px,22px 22px,auto; }
+    .bio-node,.metric-card { background:linear-gradient(145deg,rgba(12,27,54,.88),rgba(6,14,30,.95)); }
+    .metric-card:hover,.metric-card.active-card { border-color:var(--neon-cyan);box-shadow:0 0 18px rgba(0,240,255,.16); }
+    @media print { body { background:white !important; } .hud-corners::before,.hud-corners::after { display:none; } .panel-dark { backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:none; } }
   </style>
 </head>
 <body class="pb-20">
 
   <!-- TOP HEADER -->
   <header class="max-w-4xl mx-auto px-3 pt-3 pb-2 no-print">
-    <div class="panel-dark rounded-2xl p-3.5 space-y-3">
+    <div class="panel-dark cyber-panel hud-corners rounded-2xl p-3.5 space-y-3">
       <div class="flex items-start justify-between gap-2">
         <div class="flex items-center gap-2.5">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-black text-slate-950 text-sm shadow-lg shadow-sky-500/25">
@@ -65,58 +109,73 @@
               <span class="text-[11px] px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 font-semibold">Omron HBF-514C</span>
               <span id="syncPill" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-medium">● Conectando...</span>
             </div>
-            <p class="text-[11px] text-slate-400 mt-0.5">Scanner Corporal 3D • Diagnóstico Cruzado & Evidências Clínicas</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Mapa corporal • Evolução e referências Omron</p>
           </div>
         </div>
-        <button onclick="window.location.reload(true)" title="Atualizar App" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v2.0
+        <button onclick="window.location.reload()" title="Atualizar App" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
+          ↻ v3.0
         </button>
       </div>
 
       <!-- CONTROLES SUPERIORES -->
       <div class="flex flex-wrap items-center gap-2">
-        <select id="sexSelect" onchange="recomputeAll()" class="bg-[#081222] border border-slate-700/80 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 outline-none">
+        <select id="sexSelect" onchange="saveProfilePrefs(); recomputeAll()" class="bg-[#081222] border border-slate-700/80 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 outline-none">
           <option value="F" selected>Sexo: Feminino (Ref. Omron)</option>
           <option value="M">Sexo: Masculino (Ref. Omron)</option>
         </select>
 
         <div class="flex items-center gap-1.5 bg-[#081222] border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs">
           <span class="text-slate-400">Idade Real:</span>
-          <input type="number" id="realAgeInput" value="28" min="15" max="95" onchange="recomputeAll()" class="w-10 bg-transparent text-white font-extrabold text-center outline-none mono" />
+          <input type="number" id="realAgeInput" value="28" min="18" max="120" onchange="saveProfilePrefs(); recomputeAll()" class="w-10 bg-transparent text-white font-extrabold text-center outline-none mono" />
           <span class="text-slate-400">anos</span>
         </div>
 
+        <label class="flex items-center gap-1 bg-[#081222] border border-sky-500/40 rounded-xl px-2.5 py-1.5 text-xs">
+          <span class="text-sky-400 font-semibold">Altura:</span>
+          <input type="number" id="heightCmInput" value="165" min="100" max="220" step="0.1" onchange="saveProfilePrefs(); recomputeAll()" aria-label="Altura em centímetros" class="w-14 bg-transparent text-white font-extrabold text-center outline-none mono" />
+          <span class="text-slate-400">cm</span>
+        </label>
         <button onclick="openNewWeighingModal()" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-sky-500/20">
           + Nova Pesagem
         </button>
 
-        <button onclick="openReportModal()" class="bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-xs px-3.5 py-2 rounded-xl">
+        <button id="btnOpenReport" onclick="openReportModal()" class="bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-xs px-3.5 py-2 rounded-xl">
           Gerar Laudo PDF
         </button>
       </div>
     </div>
   </header>
 
+  <div id="appStatus" class="max-w-4xl mx-auto px-3 py-2 text-xs text-amber-300 hidden no-print" role="status" aria-live="polite"></div>
+  <div id="emptyStateBox" class="hidden max-w-4xl mx-auto px-3 no-print">
+    <section class="panel-dark cyber-panel hud-corners rounded-2xl p-6 text-center space-y-3">
+      <div class="text-3xl" aria-hidden="true">⚖️</div>
+      <h2 class="text-base font-extrabold text-white">Nenhuma pesagem registrada ainda</h2>
+      <p class="text-xs text-slate-400 max-w-md mx-auto">Confirme sua altura no topo e registre uma leitura real da Omron HBF-514C. Nenhum exemplo é incluído no seu histórico.</p>
+      <button onclick="openNewWeighingModal()" class="bg-sky-500 text-slate-950 font-extrabold text-xs px-5 py-3 rounded-xl">+ Registrar Primeira Pesagem</button>
+    </section>
+  </div>
   <!-- MAPA BIOMÉTRICO INTERATIVO -->
-  <main class="max-w-4xl mx-auto px-3 space-y-3">
-    <section class="panel-dark scanner-grid rounded-2xl p-3.5 sm:p-4 space-y-3.5">
-      <div class="flex items-center justify-between">
+  <main id="dashboardMain" class="max-w-4xl mx-auto px-3 space-y-3">
+    <p id="filterEmpty" class="hidden panel-dark cyber-panel hud-corners rounded-2xl p-4 text-sm text-slate-300">Nenhuma pesagem em jejum neste histórico. Desmarque “Só jejum” para ver as demais.</p>
+    <section id="bioMap" class="panel-dark cyber-panel hud-corners scanner-grid rounded-2xl p-3.5 sm:p-4 space-y-3.5">
+      <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
           <h2 class="font-bold text-sm text-white">Mapa Biométrico Interativo</h2>
         </div>
-        <span id="activeReadingBadge" class="text-[11px] text-slate-400 mono">18/11/2026 • Em jejum</span>
+        <span id="activeReadingBadge" class="text-[11px] text-slate-400 mono">--/--/----</span>
       </div>
 
-      <!-- FENÓTIPO METABÓLICO DETECTADO -->
+      <!-- RESUMO DOS INDICADORES -->
       <div class="rounded-xl bg-[#07101f]/95 border border-slate-800 p-3 flex items-start justify-between gap-3">
         <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">FENÓTIPO METABÓLICO DETECTADO</span>
-          <h3 id="phenotypeTitle" class="text-sm font-extrabold text-sky-400 mt-0.5">Composição Corporal Saudável</h3>
-          <p id="phenotypeDesc" class="text-xs text-slate-300 mt-0.5">Equilíbrio adequado entre massa muscular esquelética e reservas adiposas.</p>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">RESUMO DOS INDICADORES</span>
+          <h3 id="phenotypeTitle" class="text-sm font-extrabold text-sky-400 mt-0.5">--</h3>
+          <p id="phenotypeDesc" class="text-xs text-slate-300 mt-0.5">--</p>
         </div>
         <span id="phenotypeBadge" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-bold shrink-0">
-          Equilibrado
+          --
         </span>
       </div>
 
@@ -193,27 +252,33 @@
           <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-amber-400 inline-block"></i> Subcutânea</span>
           <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-rose-500 inline-block"></i> Visceral</span>
         </div>
-        <span id="rcqBadge" class="mono font-bold text-slate-300">RCQ: 0.76 (Baixo Risco)</span>
+        <span id="rcqBadge" class="mono font-bold text-slate-300">RCQ: --</span>
       </div>
     </section>
 
-    <!-- ANÁLISE CLÍNICA DETALHADA -->
-    <section id="selectedMetricPanel" class="panel-dark rounded-2xl p-4 space-y-2">
-      <div class="flex items-center justify-between">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Análise Clínica Detalhada</span>
-        <span class="text-[11px] mono text-slate-400">Toque em qualquer card acima</span>
+    <section id="selectedMetricPanel" class="panel-dark cyber-panel hud-corners rounded-2xl p-4 space-y-2.5 border-l-4 border-l-sky-500">
+      <div class="flex items-center justify-between gap-2">
+        <span id="detailHeaderBadge" class="text-[10px] font-extrabold uppercase tracking-wider text-sky-400">Entenda o indicador • Toque em qualquer card acima</span>
+        <span id="detailStatusTag" class="text-[10px] px-2 py-1 rounded-full font-extrabold">--</span>
       </div>
-      <p id="detailMetricTitle" class="text-sm font-bold text-white">Gordura Corporal — 26.2% (Normal)</p>
-      <p id="detailMetricBody" class="text-xs text-slate-300 leading-relaxed"></p>
+      <h3 id="detailMetricTitle" class="text-sm font-extrabold text-white">--</h3>
+      <div class="space-y-2 text-xs text-slate-300 leading-relaxed">
+        <p id="detailWhatIs"></p>
+        <p id="detailWhyAltered" class="p-2.5 rounded-xl bg-[#07101f] border border-slate-800"></p>
+        <p id="detailActionPlan" class="text-sky-300 font-medium"></p>
+      </div>
+      <p class="text-[10px] text-slate-400">Estimativas da balança e faixas de referência para acompanhamento. Uma leitura isolada não determina causas nem diagnóstico.</p>
+      <a class="text-[11px] text-sky-400 underline" href="https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf" target="_blank" rel="noopener noreferrer">Manual e referências Omron HBF-514C</a>
     </section>
 
     <!-- ABAS COMPLEMENTARES: EVOLUÇÃO, METAS E ALERTAS -->
-    <section class="panel-dark rounded-2xl p-4 space-y-3 no-print">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <div class="flex gap-2 text-xs">
-          <button onclick="switchSubView('chart')" id="subBtn-chart" class="px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 font-bold">Evolução Mensal</button>
-          <button onclick="switchSubView('goals')" id="subBtn-goals" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Metas</button>
-          <button onclick="switchSubView('alerts')" id="subBtn-alerts" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Alertas Clínicos</button>
+    <section class="panel-dark cyber-panel hud-corners rounded-2xl p-4 space-y-3 no-print">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+        <div class="flex flex-wrap gap-1.5 text-xs">
+          <button onclick="switchSubView('alerts')" id="subBtn-alerts" class="px-3 py-2 rounded-lg bg-sky-500/20 text-sky-300 font-bold">Alertas (<span id="alertCountBadge">0</span>)</button>
+          <button onclick="switchSubView('chart')" id="subBtn-chart" class="px-3 py-2 rounded-lg text-slate-400 font-semibold">Evolução</button>
+          <button onclick="switchSubView('goals')" id="subBtn-goals" class="px-3 py-2 rounded-lg text-slate-400 font-semibold">Metas</button>
+          <button onclick="switchSubView('history')" id="subBtn-history" class="px-3 py-2 rounded-lg text-slate-400 font-semibold">Histórico (<span id="histCountBadge">0</span>)</button>
         </div>
         <label class="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer">
           <input type="checkbox" id="onlyFastingChk" onchange="recomputeAll()" class="accent-sky-500" />
@@ -221,7 +286,7 @@
         </label>
       </div>
 
-      <div id="subView-chart" class="h-48">
+      <div id="subView-chart" class="hidden h-48 relative"><p id="chartStatus" class="text-xs text-slate-400"></p>
         <canvas id="bioChart"></canvas>
       </div>
 
@@ -229,27 +294,28 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div class="bg-[#07101f] border border-slate-800 rounded-xl p-2.5">
             <div class="flex justify-between font-bold"><span>Meta Gordura %</span><span id="gFatLbl" class="text-sky-400 mono">22.0%</span></div>
-            <input type="range" min="14" max="38" step="0.5" value="22" id="gFatSlider" oninput="updateGoalsBox()" class="w-full accent-sky-500 mt-1" />
+            <input type="range" min="5" max="50" step="0.5" value="22" id="gFatSlider" oninput="updateGoalsBox()" class="w-full accent-sky-500 mt-1" />
           </div>
           <div class="bg-[#07101f] border border-slate-800 rounded-xl p-2.5">
             <div class="flex justify-between font-bold"><span>Meta Músculo %</span><span id="gMuscLbl" class="text-emerald-400 mono">34.0%</span></div>
-            <input type="range" min="24" max="44" step="0.5" value="34" id="gMuscSlider" oninput="updateGoalsBox()" class="w-full accent-emerald-500 mt-1" />
+            <input type="range" min="15" max="55" step="0.5" value="34" id="gMuscSlider" oninput="updateGoalsBox()" class="w-full accent-emerald-500 mt-1" />
           </div>
           <div class="bg-[#07101f] border border-slate-800 rounded-xl p-2.5">
             <div class="flex justify-between font-bold"><span>Meta Visceral</span><span id="gViscLbl" class="text-amber-400 mono">Nível 5</span></div>
-            <input type="range" min="1" max="12" step="1" value="5" id="gViscSlider" oninput="updateGoalsBox()" class="w-full accent-amber-500 mt-1" />
+            <input type="range" min="1" max="30" step="1" value="5" id="gViscSlider" oninput="updateGoalsBox()" class="w-full accent-amber-500 mt-1" />
           </div>
         </div>
         <div id="goalsSummaryText" class="bg-[#07101f] border border-slate-800 rounded-xl p-3 text-slate-300"></div>
       </div>
 
-      <div id="subView-alerts" class="hidden space-y-2 text-xs"></div>
+      <div id="subView-alerts" class="space-y-2 text-xs"></div>
+      <div id="subView-history" class="hidden space-y-2 text-xs"></div>
     </section>
   </main>
 
   <!-- MODAL: + NOVA PESAGEM -->
   <div id="newWeighingModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 no-print">
-    <div class="panel-dark rounded-2xl w-full max-w-lg p-4 space-y-3 max-h-[90vh] overflow-y-auto">
+    <div class="panel-dark cyber-panel hud-corners rounded-2xl w-full max-w-lg p-4 space-y-3 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
         <h3 class="font-extrabold text-sm text-white">Nova Pesagem • Omron HBF-514C</h3>
         <button onclick="closeNewWeighingModal()" class="text-slate-400 hover:text-white text-sm font-bold px-2">✕</button>
@@ -262,77 +328,42 @@
         <button type="button" onclick="pickProto('Final do dia')" class="proto-opt px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 font-bold">🌙 Final do dia</button>
       </div>
 
-      <div class="flex gap-2">
-        <input type="file" id="visorFile" accept="image/*" capture="environment" class="hidden" onchange="simulateVisorScan()" />
-        <button type="button" onclick="document.getElementById('visorFile').click()" class="flex-1 py-2 rounded-xl bg-sky-500 text-slate-950 font-extrabold text-xs">
-          📷 Foto do Visor LCD
-        </button>
-        <button type="button" onclick="simulateVisorScan()" class="flex-1 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold text-xs">
-          ⚡ Preencher Leitura Teste
-        </button>
-      </div>
-
-      <form onsubmit="saveWeighing(event)" class="space-y-2.5 text-xs">
-        <div class="grid grid-cols-2 gap-2.5">
-          <div>
-            <label class="text-[11px] text-slate-400">Peso Corporal (kg)</label>
-            <input type="number" step="0.1" id="mWeight" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400">IMC (Auto ou Visor)</label>
-            <input type="number" step="0.1" id="mBmi" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400">Gordura Corporal (%)</label>
-            <input type="number" step="0.1" id="mFat" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400">Músculo Esquelético (%)</label>
-            <input type="number" step="0.1" id="mMuscle" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400">Gordura Visceral (1–30)</label>
-            <input type="number" step="1" id="mVisc" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400">Idade Corporal (anos)</label>
-            <input type="number" step="1" id="mBodyAge" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400">Metabolismo Basal (kcal)</label>
-            <input type="number" step="1" id="mRm" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
-          </div>
-          <div class="grid grid-cols-2 gap-1.5">
-            <div>
-              <label class="text-[10px] text-slate-400">Cintura (cm)</label>
-              <input type="number" step="1" id="mWaist" value="74" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
-            </div>
-            <div>
-              <label class="text-[10px] text-slate-400">Quadril (cm)</label>
-              <input type="number" step="1" id="mHip" value="98" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
-            </div>
-          </div>
+      <form id="weighingForm" onsubmit="saveWeighing(event)" class="space-y-3 text-xs">
+        <div class="grid grid-cols-3 gap-2">
+          <label class="block text-[11px] text-slate-400">Data<input type="date" id="mDate" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-slate-700 text-white" /></label>
+          <label class="block text-[11px] text-slate-400">Peso (kg) *<input type="number" step=".1" min="1" max="150" id="mWeight" oninput="autoCalcModalBmi()" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-sky-500/50 font-bold mono text-white" /></label>
+          <label class="block text-[11px] text-sky-400">Altura (cm) *<input type="number" step=".1" min="100" max="220" id="mHeight" oninput="autoCalcModalBmi()" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-sky-500/50 font-bold mono text-white" /></label>
         </div>
-        <button type="submit" id="btnSaveWeighing" class="w-full py-3 rounded-xl bg-sky-500 text-slate-950 font-extrabold text-xs">
-          Salvar no Firebase (bioimpedancia-59fce)
-        </button>
+        <div class="rounded-xl bg-sky-500/10 border border-sky-500/30 px-3 py-2 flex flex-wrap items-center justify-between gap-2">
+          <span class="text-[11px] text-sky-300">IMC calculado automaticamente:</span>
+          <div class="flex items-center gap-2"><input type="number" id="mBmi" readonly aria-label="IMC calculado" class="w-16 bg-transparent text-right font-extrabold mono text-white" /><span id="mBmiBadge" class="text-[10px] px-2 py-1 rounded-md">--</span></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5"><label class="block text-[11px] text-slate-400">Gordura Corporal (%) *<input type="number" step=".1" min="1" max="60" id="mFat" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Músculo Esquelético (%) *<input type="number" step=".1" min="1" max="60" id="mMuscle" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Gordura Visceral (1–30) *<input type="number" step="1" min="1" max="30" id="mVisc" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Idade Corporal (anos) *<input type="number" step="1" min="1" max="120" id="mBodyAge" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Metabolismo em repouso (kcal) *<input type="number" step="1" min="1" max="10000" id="mRm" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Cintura (cm) *<input type="number" step=".1" min="1" max="300" id="mWaist" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Quadril (cm) *<input type="number" step=".1" min="1" max="300" id="mHip" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label></div>
+        <p id="saveStatus" class="text-xs text-amber-300" role="status" aria-live="polite"></p>
+        <button type="submit" id="btnSaveWeighing" class="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs">Salvar pesagem</button>
       </form>
     </div>
   </div>
 
   <!-- MODAL: GERAR LAUDO PDF -->
   <div id="reportModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3">
-    <div class="panel-dark rounded-2xl w-full max-w-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+    <div class="panel-dark cyber-panel hud-corners rounded-2xl w-full max-w-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex items-start justify-between border-b border-slate-800 pb-3">
         <div>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400">Laudo Clínico • Omron HBF-514C</span>
-          <h3 class="font-extrabold text-base text-white">Relatório de Bioimpedância & Diagnóstico Cruzado</h3>
-          <p class="text-xs text-slate-400">Paciente: Paloma Monti • Idade Cronológica: <span id="repAgeSpan">28</span> anos</p>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400">Relatório • Omron HBF-514C</span>
+          <h3 class="font-extrabold text-base text-white">Relatório de Bioimpedância e Evolução</h3>
+          <p class="text-xs text-slate-400">Idade: <span id="repAgeSpan">--</span> anos • Altura: <span id="repHeightSpan">--</span> cm</p>
         </div>
         <button onclick="closeReportModal()" class="text-slate-400 hover:text-white font-bold no-print">✕</button>
       </div>
 
-      <table class="w-full text-left text-xs border-collapse">
+      <div class="report-table-wrap"><table class="w-full text-left text-xs border-collapse">
         <thead>
           <tr class="border-b border-slate-700 text-slate-400">
             <th class="py-2">Indicador</th>
@@ -343,13 +374,14 @@
           </tr>
         </thead>
         <tbody id="repTableRows" class="divide-y divide-slate-800"></tbody>
-      </table>
+      </table></div>
 
       <div class="bg-[#07101f] border border-slate-800 rounded-xl p-3 text-xs space-y-1">
-        <p class="font-bold text-sky-400">Síntese Clínica:</p>
+        <p class="font-bold text-sky-400">Síntese dos registros:</p>
         <p id="repSynthesis" class="text-slate-300 leading-relaxed"></p>
       </div>
 
+      <p class="text-[10px] text-slate-400">Relatório de acompanhamento com estimativas da Omron; não substitui avaliação individual. Referências: <a href="https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf" target="_blank" rel="noopener noreferrer">Manual Omron HBF-514C</a>; <a href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight" target="_blank" rel="noopener noreferrer">OMS — IMC</a>; <a href="https://www.who.int/publications/i/item/9789241501491" target="_blank" rel="noopener noreferrer">OMS — Cintura e RCQ</a>.</p>
       <div class="flex gap-2 no-print">
         <button onclick="window.print()" class="flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs">
           🖨️ Imprimir / Salvar PDF (A4)
@@ -362,11 +394,6 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-
     const firebaseConfig = {
       apiKey: "AIzaSyBUJkLOV2b-P_Pq8dsp7rCGLV5bb-Jxgkg",
       authDomain: "bioimpedancia-59fce.firebaseapp.com",
@@ -376,341 +403,382 @@
       appId: "1:362561231892:web:f80f17728c8f2ab8e51b01",
       measurementId: "G-0NWF6LW0YS"
     };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    let readings = [
-      { id: "r1", date: "2026-08-18", weight: 66.2, bmi: 24.3, fat: 28.9, muscle: 30.1, visceral: 7, bodyAge: 29, rm: 1510, waist: 78, hip: 100, protocol: "Em jejum" },
-      { id: "r2", date: "2026-09-19", weight: 65.1, bmi: 23.9, fat: 27.6, muscle: 30.9, visceral: 6, bodyAge: 28, rm: 1498, waist: 76, hip: 99, protocol: "Em jejum" },
-      { id: "r3", date: "2026-10-20", weight: 64.4, bmi: 23.6, fat: 26.8, muscle: 31.4, visceral: 6, bodyAge: 27, rm: 1490, waist: 75, hip: 98, protocol: "Em jejum" },
-      { id: "r4", date: "2026-11-18", weight: 63.8, bmi: 23.4, fat: 26.2, muscle: 31.8, visceral: 6, bodyAge: 27, rm: 1485, waist: 74, hip: 98, protocol: "Em jejum" }
-    ];
-
-    let compareMode = false;
-    let selectedMetricKey = "fat";
-    let selectedProto = "Em jejum";
-    let chartInst = null;
-
-    async function loadFirebaseData() {
-      const pill = document.getElementById("syncPill");
-      try {
-        const q = query(collection(db, "measurements"), orderBy("date", "asc"));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          readings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        }
-        pill.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-semibold";
-        pill.textContent = "● Firebase Sincronizado";
-      } catch (e) {
-        pill.className = "text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-semibold";
-        pill.textContent = "● Modo Local";
+// BioVault Pro: real records, stable selection and recoverable synchronization.
+const $ = id => document.getElementById(id);
+const CACHE_KEY = 'biovault_local_readings';
+const PREFS_KEY = 'biovault_prefs';
+const GOALS_KEY = 'biovault_goals';
+let readings = [], selectedReadingId = null, compareMode = false;
+let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
+let currentAnalyses = {}, currentReading = null, chartInst = null;
+let db = null, fire = null, unsubscribe = null, connecting = false, serverSeen = false;
+let storageBlocked = false, saving = false;
+const inFlight = new Set();
+const number = v => v === '' || v == null ? NaN : Number(v);
+const validNumber = v => Number.isFinite(number(v));
+const fmt = (v, digits = 1) => validNumber(v) ? number(v).toFixed(digits) : '—';
+const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dateLabel = value => validDate(value) ? value.split('-').reverse().join('/') : 'Data não informada';
+function validDate(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const d = new Date(value + 'T12:00:00Z');
+  return Number.isFinite(d.getTime()) && d.toISOString().slice(0, 10) === value;
+}
+function localDate() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function notify(message = '') { $('appStatus').textContent = message; $('appStatus').classList.toggle('hidden', !message); }
+function readJSON(key, fallback) {
+  try { const value = localStorage.getItem(key); return value == null ? fallback : JSON.parse(value); }
+  catch { if (key === CACHE_KEY) storageBlocked = true; notify('Não foi possível ler os dados locais. Os dados existentes foram preservados.'); return fallback; }
+}
+function writeJSON(key, value) {
+  if (key === CACHE_KEY && storageBlocked) return false;
+  try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+  catch { notify('Não foi possível salvar neste navegador. Confira o espaço e as permissões de armazenamento.'); return false; }
+}
+function persist() { return writeJSON(CACHE_KEY, readings); }
+function normalize(r, id) {
+  if (!r || typeof r !== 'object' || Array.isArray(r)) return null;
+  const item = { ...r, id: String(id || r.id || ('bv_' + crypto.randomUUID())) };
+  for (const key of ['weight','height','bmi','fat','muscle','visceral','bodyAge','rm','waist','hip','age']) {
+    if (validNumber(item[key])) item[key] = number(item[key]);
+  }
+  return item;
+}
+function renderable(r) { return validDate(r.date) && validNumber(r.weight) && r.weight > 0 && !r._deleted; }
+function allVisible() { return readings.filter(renderable).sort((a,b) => a.date.localeCompare(b.date) || String(a.createdAt || '').localeCompare(String(b.createdAt || '')) || a.id.localeCompare(b.id)); }
+function visibleReadings() { const list = allVisible(); return $('onlyFastingChk').checked ? list.filter(r => r.protocol === 'Em jejum') : list; }
+function profile(r = {}) {
+  return { sex: ['F','M'].includes(r.sex) ? r.sex : $('sexSelect').value,
+    age: validNumber(r.age) ? r.age : number($('realAgeInput').value),
+    height: validNumber(r.height) && r.height > 0 ? r.height : number($('heightCmInput').value) };
+}
+function pendingCount() { return readings.filter(r => ['pending','deleting'].includes(r._sync)).length; }
+function setSyncStatus() {
+  const n = pendingCount(), synced = db && serverSeen && navigator.onLine && !n;
+  $('syncPill').className = `text-[10px] px-2 py-1 rounded-full font-semibold ${synced ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}`;
+  $('syncPill').textContent = n ? `● ${n} pendente(s) de sincronização` : synced ? '● Firebase sincronizado' : '● Modo local';
+}
+function loadProfilePrefs() {
+  const p = readJSON(PREFS_KEY, {}) || {};
+  if (['F','M'].includes(p.sex)) $('sexSelect').value = p.sex;
+  if (validNumber(p.age) && p.age >= 18 && p.age <= 120) $('realAgeInput').value = p.age;
+  if (validNumber(p.height) && p.height >= 100 && p.height <= 220) $('heightCmInput').value = p.height;
+  const goals = readJSON(GOALS_KEY, {}) || {};
+  for (const [k,id] of Object.entries({fat:'gFatSlider',muscle:'gMuscSlider',visceral:'gViscSlider'})) {
+    if (validNumber(goals[k])) $(id).value = goals[k];
+  }
+}
+function saveProfilePrefs() {
+  if (!$('realAgeInput').checkValidity() || !$('heightCmInput').checkValidity()) {
+    notify('Confira a idade (18–120 anos) e a altura (100–220 cm).'); return false;
+  }
+  return writeJSON(PREFS_KEY, {sex:$('sexSelect').value, age:number($('realAgeInput').value), height:number($('heightCmInput').value)});
+}
+function calcBmiValue(weight, height) {
+  const w = number(weight), h = number(height) / 100;
+  return Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0 ? w / (h*h) : NaN;
+}
+function classifyBmi(bmi, age = 28) {
+  if (!Number.isFinite(bmi) || !Number.isFinite(age) || age < 18) return {label:'SEM REFERÊNCIA',isAltered:false,neutral:true};
+  if (bmi < 18.5) return {label:'BAIXO PESO',isAltered:true};
+  if (bmi < 25) return {label:'NORMAL',isAltered:false};
+  if (bmi < 30) return {label:'SOBREPESO',isAltered:true};
+  return {label:bmi < 35 ? 'OBESIDADE I' : bmi < 40 ? 'OBESIDADE II' : 'OBESIDADE III',isAltered:true};
+}
+// Cut points from the Omron HBF-514C manual, p.31. Boundaries use unrounded values.
+const FAT_RANGES = {F:[[21,33,39],[23,34,40],[24,36,42]],M:[[8,20,25],[11,22,28],[13,25,30]]};
+const MUSCLE_RANGES = {F:[[24.3,30.4,35.4],[24.1,30.2,35.2],[23.9,30,35]],M:[[33.3,39.4,44.1],[33.1,39.2,43.9],[32.9,39,43.7]]};
+function reference(kind, sex, age) {
+  if (!['F','M'].includes(sex) || !Number.isFinite(age) || age < (kind === 'fat' ? 20 : 18) || age > (kind === 'fat' ? 79 : 80)) return null;
+  return (kind === 'fat' ? FAT_RANGES : MUSCLE_RANGES)[sex][age < 40 ? 0 : age < 60 ? 1 : 2];
+}
+function percentageInfo(value, limits, kind) {
+  if (!limits || !validNumber(value)) return {status:'SEM REFERÊNCIA',altered:false,neutral:true};
+  const v = number(value), status = v < limits[0] ? 'BAIXO' : v < limits[1] ? 'NORMAL' : v < limits[2] ? 'ALTO' : 'MUITO ALTO';
+  return {status, altered:kind === 'fat' ? status !== 'NORMAL' : status === 'BAIXO', neutral:kind === 'muscle' && ['ALTO','MUITO ALTO'].includes(status)};
+}
+function analyze(cur) {
+  const p = profile(cur), bmi = calcBmiValue(cur.weight,p.height), bi = classifyBmi(bmi,p.age);
+  const fr = reference('fat',p.sex,p.age), mr = reference('muscle',p.sex,p.age);
+  const fi = percentageInfo(cur.fat,fr,'fat'), mi = percentageInfo(cur.muscle,mr,'muscle');
+  const validVisceral = validNumber(cur.visceral) && cur.visceral >= 1 && cur.visceral <= 30 && p.age >= 18 && p.age <= 80;
+  const vi = {status:!validVisceral ? 'SEM REFERÊNCIA' : cur.visceral <= 9 ? 'NORMAL' : cur.visceral <= 14 ? 'ALTO' : 'MUITO ALTO',altered:validVisceral && cur.visceral > 9,neutral:!validVisceral};
+  const ratio = validNumber(cur.waist) && validNumber(cur.hip) && cur.waist > 0 && cur.hip > 0 ? cur.waist / cur.hip : NaN;
+  const rcqLimit = p.sex === 'F' ? .85 : .9, ratioAltered = Number.isFinite(ratio) && ratio >= rcqLimit;
+  const ageValid = validNumber(cur.bodyAge) && Number.isFinite(p.age) && p.age >= 18 && p.age <= 80;
+  const ageDiff = ageValid ? cur.bodyAge - p.age : NaN;
+  const fatKg = validNumber(cur.fat) ? cur.weight * cur.fat / 100 : NaN;
+  const muscleKg = validNumber(cur.muscle) ? cur.weight * cur.muscle / 100 : NaN;
+  const neutral = {altered:false,neutral:true};
+  const make = (title,status,info,whatIs,why,action) => ({title,status,...info,whatIs,why,action});
+  const result = {
+    bmi:make(`IMC automático — ${fmt(bmi)} kg/m²`,bi.label,{altered:bi.isAltered,neutral:bi.neutral},
+      `Relaciona peso e altura: ${fmt(cur.weight)} kg ÷ (${fmt(p.height)} cm / 100)². Referência para adultos: 18,5 a menos de 25 kg/m².${cur.height ? '' : ' Este registro antigo usa a altura informada no topo.'}`,
+      bi.neutral ? 'Confira a altura e a idade para interpretar o índice.' : bi.isAltered ? `O cálculo está na faixa ${bi.label.toLowerCase()}. O IMC não separa gordura, músculo e líquidos; músculo alto não permite atribuir sozinho a causa do IMC elevado.` : 'O cálculo está na faixa de referência para adultos. Isso não avalia todos os aspectos da saúde.',
+      'Compare com cintura, composição corporal e histórico. Avalie mudanças alimentares com orientação individual.'),
+    fat:make(`Gordura corporal — ${fmt(cur.fat)}% (${fmt(fatKg)} kg estimados)`,fi.status,fi,
+      `Proporção estimada do peso correspondente à gordura.${fr ? ` Referência Omron para ${p.sex === 'F' ? 'mulheres' : 'homens'} de ${p.age} anos: ${fmt(fr[0])}% a ${fmt(fr[1]-.1)}%.` : ' O manual não fornece classificação para a idade informada (faixas disponíveis: 20–79 anos).'}`,
+      fi.neutral ? 'Registre a idade correta. Sem uma faixa aplicável, o aplicativo não classifica esse percentual.' : fi.altered ? `O percentual está ${fi.status.toLowerCase()} em relação à referência. Hidratação e condições da medição influenciam a estimativa. A leitura não identifica a causa da diferença.` : 'O percentual estimado está na faixa de referência da idade e do sexo registrados.',
+      fi.status === 'BAIXO' ? 'Evite restrição calórica sem avaliação. Se houver perda involuntária de peso, alimentação insuficiente ou sintomas, procure avaliação.' : fi.altered ? 'Acompanhe a tendência em condições semelhantes e avalie alimentação, atividade física e preservação de músculo com um profissional.' : 'Mantenha condições semelhantes de medição para acompanhar a tendência.'),
+    muscle:make(`Músculo esquelético — ${fmt(cur.muscle)}% (${fmt(muscleKg)} kg estimados)`,mi.status,mi,
+      `Percentual estimado dos músculos ligados aos ossos.${mr ? ` Referência Omron: ${fmt(mr[0])}% a ${fmt(mr[1]-.1)}% na faixa normal; alto a partir de ${fmt(mr[1])}%.` : ' A classificação Omron está disponível de 18 a 80 anos.'}`,
+      mi.status === 'SEM REFERÊNCIA' ? 'Não há faixa aplicável para a idade ou não há valor registrado.' : mi.altered ? 'O percentual está abaixo da referência. Ele depende do peso total e da hidratação; não confirma perda muscular nem sarcopenia.' : 'A classificação descreve o percentual estimado. Valores altos não confirmam força, função ou proteção contra doenças.',
+      mi.altered ? 'Acompanhe força e função, além do percentual. Discuta treino de força e alimentação adequada ao seu contexto.' : 'Compare a tendência com força, medidas e atividade física.'),
+    visceral:make(`Gordura visceral — nível ${fmt(cur.visceral,0)}`,vi.status,vi,
+      'Índice relativo estimado pela Omron: 1–9 normal, 10–14 alto e 15–30 muito alto. Não equivale a uma medição por imagem.',
+      !validVisceral ? 'Confira o nível informado e a idade (referência de 18–80 anos).' : vi.altered ? 'O nível está acima da referência da balança. Adiposidade abdominal elevada pode se associar a risco metabólico; a leitura não mede cortisol, inflamação ou resistência à insulina.' : 'O nível está na faixa normal da balança. Ele não exclui fatores de risco cardiovascular ou metabólico.',
+      vi.altered ? 'Observe a evolução junto com a cintura e leve os registros para avaliação dos demais fatores de risco.' : 'Acompanhe a tendência do nível e da cintura em condições semelhantes.'),
+    bodyAge:make(`Idade corporal — ${fmt(cur.bodyAge,0)} anos (informada: ${fmt(p.age,0)})`,!ageValid ? 'SEM REFERÊNCIA' : ageDiff > 0 ? 'ACIMA DA INFORMADA' : ageDiff < 0 ? 'ABAIXO DA INFORMADA' : 'IGUAL À INFORMADA',{altered:ageValid && ageDiff > 0,neutral:true},
+      'Indicador da Omron derivado da estimativa de metabolismo em repouso e da composição corporal. Não mede envelhecimento biológico.',
+      ageValid ? `Diferença de ${ageDiff > 0 ? '+' : ''}${ageDiff} ano(s) em relação à idade registrada. Essa comparação não representa diagnóstico nem expectativa de vida.` : 'A referência da balança para esse indicador abrange 18–80 anos.',
+      'Acompanhe os indicadores individuais. Mudanças de peso, gordura e músculo podem influenciar a estimativa.'),
+    whr:make(`Cintura / quadril — ${fmt(cur.waist)} / ${fmt(cur.hip)} cm (RCQ ${fmt(ratio,2)})`,!Number.isFinite(ratio) ? 'SEM DADOS' : ratioAltered ? 'ACIMA DA REFERÊNCIA' : 'ABAIXO DO CORTE',{altered:ratioAltered,neutral:!Number.isFinite(ratio)},
+      `Relação entre cintura e quadril, em centímetros. Corte de referência utilizado: ${p.sex === 'F' ? '0,85 para mulheres' : '0,90 para homens'}.`,
+      !Number.isFinite(ratio) ? 'Informe medidas positivas para cintura e quadril.' : ratioAltered ? 'A relação atingiu ou ultrapassou o ponto de corte para adiposidade central. O cálculo usa a razão completa, antes do arredondamento.' : 'A razão está abaixo do ponto de corte. Isso não exclui cintura elevada nem outros fatores de risco.',
+      'Meça cintura e quadril com a mesma técnica e acompanhe também a cintura isoladamente. Os cortes dependem da população e do protocolo.'),
+    weight:make(`Peso corporal — ${fmt(cur.weight)} kg`,'REGISTRADO',neutral,
+      `Massa total do corpo. Com o percentual informado, a estimativa é de ${fmt(fatKg)} kg de gordura e ${fmt(cur.weight-fatKg)} kg de massa livre de gordura (água, órgãos, ossos e músculos).`,
+      'Horário, roupas, alimentação, líquidos e conteúdo intestinal podem alterar o peso e a estimativa por bioimpedância.',
+      'Compare medições em condições semelhantes, conforme o manual. Evite comparar uma leitura após treino com uma leitura em repouso.'),
+    rm:make(`Metabolismo em repouso — ${fmt(cur.rm,0)} kcal/dia`,'ESTIMATIVA',neutral,
+      'Estimativa da energia gasta em repouso para manter funções vitais. Não representa todo o gasto energético diário.',
+      'Tamanho corporal e composição influenciam o valor. Não é possível classificar metabolismo lento ou rápido a partir desse número isolado.',
+      'A leitura não define uma meta de consumo calórico nem um limite seguro para dieta. Use avaliação individual para planejar a alimentação.')
+  };
+  return result;
+}
+function populateCompareDropdown(list = visibleReadings()) {
+  const previous = $('compareSelect').value;
+  $('compareSelect').replaceChildren();
+  for (const r of list) { const option = document.createElement('option'); option.value = r.id; option.textContent = `${dateLabel(r.date)} (${fmt(r.weight)} kg)`; $('compareSelect').append(option); }
+  if (list.some(r => r.id === previous)) $('compareSelect').value = previous;
+  $('compareSelect').disabled = !list.length;
+}
+function recomputeAll() {
+  const all = allVisible(), list = visibleReadings();
+  $('emptyStateBox').classList.toggle('hidden', !!all.length);
+  $('dashboardMain').classList.toggle('hidden', !all.length);
+  $('filterEmpty').classList.toggle('hidden', !!list.length);
+  $('bioMap').classList.toggle('hidden', !list.length);
+  $('selectedMetricPanel').classList.toggle('hidden', !list.length);
+  $('btnOpenReport').disabled = !list.length;
+  populateCompareDropdown(list);
+  if (!list.some(r => r.id === selectedReadingId)) selectedReadingId = list.at(-1)?.id || null;
+  currentReading = list.find(r => r.id === selectedReadingId) || null;
+  renderHistoryList(list);
+  if (!currentReading) {
+    currentAnalyses = {}; $('alertCountBadge').textContent = '0';
+    $('subView-alerts').textContent = all.length ? 'Nenhuma pesagem atende ao filtro.' : 'Nenhuma pesagem registrada.';
+    $('goalsSummaryText').textContent = 'Selecione uma pesagem para acompanhar as metas.';
+    renderEvolutionChart(list); setSyncStatus(); return;
+  }
+  const cur = currentReading, previous = list.find(r => r.id === $('compareSelect').value) || list[0];
+  currentAnalyses = analyze(cur);
+  const a = currentAnalyses, altered = Object.keys(a).filter(k => a[k].altered);
+  $('activeReadingBadge').textContent = `${dateLabel(cur.date)} • ${cur.protocol || 'Protocolo não informado'}`;
+  $('phenotypeTitle').textContent = altered.length ? `${altered.length} indicador(es) em atenção` : 'Indicadores nas faixas avaliadas';
+  $('phenotypeDesc').textContent = altered.length ? 'Toque nos cards destacados ou nos alertas para entender cada resultado.' : 'Veja as referências e as limitações ao tocar nos indicadores.';
+  $('phenotypeBadge').textContent = altered.length ? 'Atenção' : 'Acompanhar';
+  $('phenotypeBadge').className = `px-2.5 py-1 rounded-lg border text-xs font-bold shrink-0 ${altered.length ? 'bg-amber-500/15 border-amber-500/40 text-amber-300' : 'bg-sky-500/15 border-sky-500/40 text-sky-300'}`;
+  const rcq = number(cur.waist) / number(cur.hip);
+  $('rcqBadge').textContent = `RCQ: ${number(cur.hip) > 0 ? fmt(rcq,2) : '—'} • ${a.whr.status}`;
+  const bmi = calcBmiValue(cur.weight,profile(cur).height), prevBmi = calcBmiValue(previous.weight,profile(previous).height);
+  const delta = (x,y,unit='',deltaUnit=unit) => !compareMode ? 'Toque para detalhes' : `Antes: ${fmt(y)}${unit} (${number(x)-number(y) > 0 ? '+' : ''}${fmt(number(x)-number(y))}${deltaUnit})`;
+  const definitions = {
+    weight:['PESO CORPORAL',`${fmt(cur.weight)} kg`,delta(cur.weight,previous.weight,' kg')],
+    fat:['GORDURA CORPORAL',`${fmt(cur.fat)}%`,delta(cur.fat,previous.fat,'%', ' p.p.')],
+    visceral:['GORDURA VISCERAL',`Nível ${fmt(cur.visceral,0)}`,delta(cur.visceral,previous.visceral)],
+    rm:['METABOLISMO EM REPOUSO',`${fmt(cur.rm,0)} kcal`,delta(cur.rm,previous.rm,' kcal')],
+    bmi:['IMC AUTOMÁTICO',fmt(bmi),delta(bmi,prevBmi)],
+    muscle:['MÚSCULO ESQUELÉTICO',`${fmt(cur.muscle)}%`,delta(cur.muscle,previous.muscle,'%', ' p.p.')],
+    bodyAge:['IDADE CORPORAL',`${fmt(cur.bodyAge,0)} anos`,delta(cur.bodyAge,previous.bodyAge,' anos')],
+    whr:['CINTURA / QUADRIL',`${fmt(cur.waist)} / ${fmt(cur.hip)} cm`,'Toque para detalhes']
+  };
+  const card = key => {
+    const [title,value,sub] = definitions[key], info = a[key];
+    return `<button type="button" data-metric="${key}" aria-pressed="${key===selectedMetricKey}" class="metric-card ${info.altered?'alert-card':''} ${key===selectedMetricKey?'active-card':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400">${title}${info.altered?' ⚠':''}</span><span class="metric-value block text-sm sm:text-base font-extrabold text-white mono mt-1">${value}</span><span class="block text-[9px] sm:text-[10px] font-extrabold uppercase mt-1 ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="block text-[9px] text-slate-400 mt-1">${sub}</span></button>`;
+  };
+  $('leftCardsColumn').innerHTML = ['weight','fat','visceral','rm'].map(card).join('');
+  $('rightCardsColumn').innerHTML = ['bmi','muscle','bodyAge','whr'].map(card).join('');
+  $('svgVisceralCore').setAttribute('r',String(validNumber(cur.visceral) ? Math.min(18,5+cur.visceral*.8) : 5));
+  $('svgVisceralCore').setAttribute('fill',a.visceral.altered ? '#ff2a5f' : '#10b981');
+  selectMetricDetail(selectedMetricKey,false); renderClinicalAlerts(altered); updateGoalsBox(); renderEvolutionChart(list); setSyncStatus();
+}
+function toggleCompareMode() {
+  compareMode = !compareMode;
+  $('compareStatusLabel').textContent = `Comparar Antes × Atual: ${compareMode?'ON':'OFF'}`;
+  $('btnToggleCompare').setAttribute('aria-pressed',String(compareMode)); recomputeAll();
+}
+function selectMetricDetail(key, shouldScroll = true) {
+  const info = currentAnalyses[key]; if (!info) return;
+  selectedMetricKey = key;
+  $('detailMetricTitle').textContent = info.title;
+  $('detailWhatIs').textContent = `O que é: ${info.whatIs}`;
+  $('detailWhyAltered').textContent = `Como interpretar: ${info.why}`;
+  $('detailActionPlan').textContent = `Como acompanhar: ${info.action}`;
+  $('detailStatusTag').textContent = info.status;
+  $('detailStatusTag').className = `text-[10px] px-2 py-1 rounded-full font-extrabold ${info.altered?'bg-amber-500/20 text-amber-300':'bg-sky-500/15 text-sky-300'}`;
+  $('selectedMetricPanel').style.borderLeftColor = info.altered ? '#f59e0b' : '#00f0ff';
+  document.querySelectorAll('.metric-card').forEach(el => { const active = el.dataset.metric===key; el.classList.toggle('active-card',active); el.setAttribute('aria-pressed',String(active)); });
+  if (shouldScroll) $('selectedMetricPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function renderClinicalAlerts(keys) {
+  $('alertCountBadge').textContent = keys.length;
+  $('subView-alerts').innerHTML = keys.length ? keys.map(key => `<button type="button" data-metric="${key}" class="w-full text-left bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 rounded-xl p-3"><span class="block font-extrabold text-amber-300">⚠ ${escapeHTML(currentAnalyses[key].title)} — ${currentAnalyses[key].status}</span><span class="block text-[11px] text-slate-300 mt-1">Toque para entender o resultado →</span></button>`).join('') : '<p class="bg-sky-500/10 border border-sky-500/30 rounded-xl p-3 text-sky-300">Nenhum alerta entre os indicadores com referência disponível. Toque em um card para ver os detalhes.</p>';
+}
+function renderHistoryList(list) {
+  $('histCountBadge').textContent = list.length;
+  $('subView-history').innerHTML = [...list].reverse().map(r => `<div class="bg-[#07101f] border ${r.id===selectedReadingId?'border-sky-500':'border-slate-800'} rounded-xl p-2.5 flex items-center justify-between gap-2"><button type="button" data-reading-id="${escapeHTML(r.id)}" class="text-left flex-1 min-w-0"><span class="block font-bold text-white mono">${dateLabel(r.date)} • ${fmt(r.weight)} kg (IMC ${fmt(calcBmiValue(r.weight,profile(r).height))})</span><span class="block text-[11px] text-slate-400">Gordura: ${fmt(r.fat)}% • Músculo: ${fmt(r.muscle)}% • Visceral: ${fmt(r.visceral,0)} • ${escapeHTML(r.protocol || 'Não informado')}${r._sync==='pending'?' • Pendente de sincronização':''}</span></button><button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}" class="px-2.5 py-2 rounded-lg bg-rose-500/15 text-rose-400 font-bold text-[11px]">Excluir</button></div>`).join('') || '<p class="text-slate-400">Nenhuma pesagem neste filtro.</p>';
+}
+function selectHistoryReading(id) { if (!visibleReadings().some(r=>r.id===id)) return; selectedReadingId=id; recomputeAll(); window.scrollTo({top:0,behavior:'smooth'}); }
+async function deleteReading(id) {
+  const r = readings.find(item=>item.id===id); if (!r || !confirm(`Deseja realmente excluir a pesagem de ${dateLabel(r.date)}?`)) return;
+  const before = readings.map(item=>({...item}));
+  // Keep a tombstone until Firebase acknowledges the deletion, including in-flight creates.
+  r._priorSync=r._sync; r._sync='deleting'; r._deleted=true;
+  if (!persist()) { readings=before; notify('A exclusão não foi aplicada: não foi possível guardar a alteração neste navegador.'); return; }
+  recomputeAll(); void flushPending();
+}
+function renderEvolutionChart(list = visibleReadings()) {
+  if (activeTab !== 'chart') return;
+  if (chartInst) { chartInst.destroy(); chartInst=null; }
+  if (!list.length || typeof Chart === 'undefined') { $('chartStatus').textContent = list.length ? 'Gráfico indisponível. Os registros continuam disponíveis no histórico.' : 'Sem pesagens para exibir.'; return; }
+  $('chartStatus').textContent='';
+  chartInst = new Chart($('bioChart'),{type:'line',data:{labels:list.map(r=>dateLabel(r.date)),datasets:[
+    {label:'Peso (kg)',data:list.map(r=>r.weight),borderColor:'#00f0ff',tension:.3,yAxisID:'kg'},
+    {label:'Gordura (%)',data:list.map(r=>validNumber(r.fat)?r.fat:null),borderColor:'#f59e0b',tension:.3,yAxisID:'percent'},
+    {label:'Músculo (%)',data:list.map(r=>validNumber(r.muscle)?r.muscle:null),borderColor:'#10b981',tension:.3,yAxisID:'percent'}
+  ]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#17253d'}},kg:{position:'left',title:{display:true,text:'kg',color:'#00f0ff'},ticks:{color:'#94a3b8'},grid:{color:'#17253d'}},percent:{position:'right',title:{display:true,text:'%',color:'#94a3b8'},ticks:{color:'#94a3b8'},grid:{drawOnChartArea:false}}}}});
+}
+function updateGoalsBox() {
+  const fat=number($('gFatSlider').value),muscle=number($('gMuscSlider').value),visceral=number($('gViscSlider').value);
+  $('gFatLbl').textContent=`${fmt(fat)}%`; $('gMuscLbl').textContent=`${fmt(muscle)}%`; $('gViscLbl').textContent=`Nível ${fmt(visceral,0)}`;
+  if (!currentReading) return;
+  const r=currentReading;
+  $('goalsSummaryText').textContent = `Metas pessoais de acompanhamento, ajustáveis: gordura ${fmt(fat)}% (atual ${fmt(r.fat)}%; diferença ${fmt(number(r.fat)-fat)} p.p.); músculo ${fmt(muscle)}% (atual ${fmt(r.muscle)}%; diferença ${fmt(muscle-number(r.muscle))} p.p.); visceral nível ${visceral} (atual ${fmt(r.visceral,0)}). Os alvos não são prescrições automáticas.`;
+}
+function saveGoals() { writeJSON(GOALS_KEY,{fat:number($('gFatSlider').value),muscle:number($('gMuscSlider').value),visceral:number($('gViscSlider').value)}); updateGoalsBox(); }
+function switchSubView(tab) {
+  if (!['alerts','chart','goals','history'].includes(tab)) return;
+  activeTab=tab;
+  for (const k of ['alerts','chart','goals','history']) { $('subView-'+k).classList.toggle('hidden',k!==tab); $('subBtn-'+k).className=`px-3 py-2 rounded-lg ${k===tab?'bg-sky-500/20 text-sky-300 font-bold':'text-slate-400 font-semibold'}`; $('subBtn-'+k).setAttribute('aria-selected',String(k===tab)); }
+  renderEvolutionChart(); updateGoalsBox();
+}
+function autoCalcModalBmi() { const bmi=calcBmiValue($('mWeight').value,$('mHeight').value); $('mBmi').value=Number.isFinite(bmi)?bmi.toFixed(1):''; $('mBmiBadge').textContent=Number.isFinite(bmi)?classifyBmi(bmi,number($('realAgeInput').value)).label:'—'; }
+function openNewWeighingModal() {
+  if (saving) return;
+  $('weighingForm').reset(); $('mDate').value=localDate(); $('mHeight').value=$('heightCmInput').value;
+  $('saveStatus').textContent=''; pickProto('Em jejum'); autoCalcModalBmi();
+  $('newWeighingModal').classList.remove('hidden'); $('mWeight').focus();
+}
+function closeNewWeighingModal() { if (!saving) $('newWeighingModal').classList.add('hidden'); }
+function pickProto(p) { if (!['Em jejum','Hidratado','Pós-treino','Final do dia'].includes(p)) return; selectedProto=p; document.querySelectorAll('.proto-opt').forEach(b=>{const active=b.textContent.includes(p);b.className=`proto-opt px-2.5 py-1.5 rounded-lg border font-bold ${active?'border-sky-500 bg-sky-500/15 text-sky-300':'border-slate-700 text-slate-400'}`;b.setAttribute('aria-pressed',String(active));}); }
+async function saveWeighing(event) {
+  event.preventDefault(); if (saving || !$('weighingForm').reportValidity()) return;
+  if (!saveProfilePrefs()) { $('saveStatus').textContent='Confira o perfil e o armazenamento do navegador antes de salvar.'; return; }
+  const fields={weight:'mWeight',height:'mHeight',fat:'mFat',muscle:'mMuscle',visceral:'mVisc',bodyAge:'mBodyAge',rm:'mRm',waist:'mWaist',hip:'mHip'};
+  const item={id:'bv_'+crypto.randomUUID(),date:$('mDate').value,protocol:selectedProto,sex:$('sexSelect').value,age:number($('realAgeInput').value),createdAt:new Date().toISOString(),_sync:'pending'};
+  for (const [key,id] of Object.entries(fields)) item[key]=number($(id).value);
+  if (!validDate(item.date) || Object.keys(fields).some(k=>!Number.isFinite(item[k]) || item[k]<=0) || item.fat+item.muscle>100) { $('saveStatus').textContent='Confira a data e os valores. A soma de gordura e músculo não pode ultrapassar 100%.';return; }
+  saving=true; $('btnSaveWeighing').disabled=true; $('btnSaveWeighing').textContent='Salvando…';
+  try {
+    item.bmi=Number(calcBmiValue(item.weight,item.height).toFixed(1));
+    readings.push(item);
+    if (!persist()) {readings=readings.filter(r=>r.id!==item.id);$('saveStatus').textContent='A pesagem não foi salva. Os campos foram mantidos para você tentar novamente.';return;}
+    $('heightCmInput').value=item.height;saveProfilePrefs(); selectedReadingId=item.id;
+    // A backdated record remains selected after chronological sorting.
+    if ($('onlyFastingChk').checked && item.protocol!=='Em jejum') $('onlyFastingChk').checked=false;
+    recomputeAll(); $('newWeighingModal').classList.add('hidden');
+    notify('Pesagem salva neste navegador. Acompanhe a confirmação de sincronização no topo.');
+    void flushPending();
+  } finally {saving=false;$('btnSaveWeighing').disabled=false;$('btnSaveWeighing').textContent='Salvar pesagem';}
+}
+function openReportModal() {
+  recomputeAll(); const cur=currentReading; if (!cur) return;
+  const list=visibleReadings(), first=list[0], a=analyze(cur), p=profile(cur);
+  $('repAgeSpan').textContent=fmt(p.age,0);$('repHeightSpan').textContent=fmt(p.height);
+  const definitions=[['weight','Peso corporal','kg'],['bmi','IMC automático','kg/m²'],['fat','Gordura corporal','%'],['muscle','Músculo esquelético','%'],['visceral','Gordura visceral','nível'],['rm','Metabolismo em repouso','kcal/dia'],['bodyAge','Idade corporal','anos'],['waist','Cintura','cm'],['hip','Quadril','cm'],['whr','RCQ','']];
+  const value=(r,key)=>key==='bmi'?calcBmiValue(r.weight,profile(r).height):key==='whr'?(r.hip>0?r.waist/r.hip:NaN):number(r[key]);
+  $('repTableRows').innerHTML=definitions.map(([key,label,unit])=>{const x=value(first,key),y=value(cur,key),d=y-x,info=a[key],digits=key==='whr'?2:['rm','bodyAge','visceral'].includes(key)?0:1;return `<tr><td class="py-2 font-bold text-white">${label}</td><td class="py-2 mono text-slate-400">${fmt(x,digits)} ${unit}</td><td class="py-2 mono font-bold text-white">${fmt(y,digits)} ${unit}</td><td class="py-2 mono text-sky-400">${d>0?'+':''}${fmt(d,digits)} ${['fat','muscle'].includes(key)?'p.p.':unit}</td><td class="py-2 font-bold ${info?.altered?'text-amber-300':info?.neutral?'text-sky-300':'text-emerald-400'}">${info?.status||'REGISTRADO'}</td></tr>`;}).join('');
+  $('repSynthesis').textContent=`Comparação entre ${dateLabel(first.date)} e a pesagem selecionada de ${dateLabel(cur.date)} (${cur.protocol||'protocolo não informado'}). Peso ${fmt(cur.weight)} kg; IMC ${fmt(calcBmiValue(cur.weight,p.height))} kg/m²; gordura ${fmt(cur.fat)}%; músculo ${fmt(cur.muscle)}%; visceral nível ${fmt(cur.visceral,0)}.${cur._sync==='pending'?' Registro pendente de sincronização.':''}${cur.height?'':' A altura desta pesagem antiga não estava registrada; o IMC usa a altura informada no topo.'}`;
+  $('reportModal').classList.remove('hidden');
+}
+function closeReportModal() { $('reportModal').classList.add('hidden'); }
+function shareWhatsApp() {
+  if (!currentReading) return; const r=currentReading,p=profile(r);
+  const message=`BioVault Pro • Omron HBF-514C (${dateLabel(r.date)})\n• Peso: ${fmt(r.weight)} kg | Altura: ${fmt(p.height)} cm | IMC: ${fmt(calcBmiValue(r.weight,p.height))}\n• Gordura: ${fmt(r.fat)}% | Músculo: ${fmt(r.muscle)}%\n• Visceral: nível ${fmt(r.visceral,0)} | Idade corporal: ${fmt(r.bodyAge,0)} anos`;
+  window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
+}
+async function flushPending() {
+  if (!db || !navigator.onLine) {setSyncStatus();return;}
+  for (const item of [...readings]) {
+    if (!['pending','deleting'].includes(item._sync) || inFlight.has(item.id)) continue;
+    inFlight.add(item.id);
+    const deleting=item._sync==='deleting';
+    try {
+      const ref=fire.doc(db,'measurements',item.id);
+      if (deleting) await fire.deleteDoc(ref);
+      else {
+        const payload=Object.fromEntries(Object.entries(item).filter(([key])=>!key.startsWith('_')&&key!=='id'));
+        await fire.setDoc(ref,{...payload,ts:fire.serverTimestamp()});
       }
-      populateCompareDropdown();
-      recomputeAll();
+      const latest=readings.find(r=>r.id===item.id);
+      if (deleting) readings=readings.filter(r=>r.id!==item.id);
+      else if (latest && latest._sync==='pending') latest._sync='synced';
+      persist(); serverSeen=true; recomputeAll();
+    } catch(error) {
+      if (deleting && ['permission-denied','unauthenticated'].includes(error.code)) {
+        const latest=readings.find(r=>r.id===item.id);if(latest){latest._deleted=false;latest._sync=latest._priorSync||'synced';delete latest._priorSync;}persist();recomputeAll();
+        notify('O Firebase recusou a exclusão. A pesagem foi mantida no histórico.');
+      } else notify('Alteração guardada neste navegador, aguardando sincronização com o Firebase.');
+    } finally {
+      inFlight.delete(item.id);setSyncStatus();
+      // If the user deleted while its creation was still uploading, delete after the create settles.
+      if (!deleting && readings.find(r=>r.id===item.id)?._sync==='deleting') void flushPending();
     }
+  }
+}
+async function connectCloud() {
+  if (connecting || unsubscribe || !navigator.onLine) return;
+  connecting=true;
+  try {
+    const [appSDK,fireSDK]=await Promise.all([import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js'),import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js')]);
+    fire=fireSDK;db=fire.getFirestore(appSDK.initializeApp(firebaseConfig));
+    unsubscribe=fire.onSnapshot(fire.collection(db,'measurements'),{includeMetadataChanges:true},snapshot=>{
+      const merged=new Map(snapshot.metadata.fromCache ? readings.map(r=>[r.id,r]) : []);
+      for (const d of snapshot.docs) {const r=normalize(d.data(),d.id);if(r) merged.set(d.id,{...r,_sync:'synced'});}
+      // Local pending entries survive an empty/partial cloud response and keep their stable IDs.
+      for (const r of readings) if (['pending','deleting'].includes(r._sync)) merged.set(r.id,r);
+      readings=[...merged.values()];
+      if (!snapshot.metadata.fromCache) serverSeen=true;
+      persist();recomputeAll();
+      if (!snapshot.metadata.fromCache) void flushPending();
+    },()=>{serverSeen=false;unsubscribe=null;setSyncStatus();notify('Não foi possível consultar o Firebase. Os registros locais continuam disponíveis.');});
+    void flushPending();
+  } catch {serverSeen=false;notify('Sem conexão com o Firebase. Novas pesagens ficam salvas neste navegador e aguardam sincronização.');}
+  finally {connecting=false;setSyncStatus();}
+}
+Object.assign(window,{saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
+document.addEventListener('click',event=>{
+  const metric=event.target.closest('[data-metric]');if(metric)selectMetricDetail(metric.dataset.metric);
+  const selected=event.target.closest('[data-reading-id]');if(selected)selectHistoryReading(selected.dataset.readingId);
+  const remove=event.target.closest('[data-delete-id]');if(remove)void deleteReading(remove.dataset.deleteId);
+});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeNewWeighingModal();closeReportModal();}});
+for (const id of ['gFatSlider','gMuscSlider','gViscSlider']) $(id).addEventListener('change',saveGoals);
+window.addEventListener('online',()=>{void connectCloud();void flushPending();});
+window.addEventListener('offline',()=>{serverSeen=false;setSyncStatus();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){void connectCloud();void flushPending();}});
+loadProfilePrefs();
+const cached=readJSON(CACHE_KEY,[]);
+if (Array.isArray(cached)) readings=cached.map(r=>normalize(r)).filter(Boolean).map(r=>({...r,_sync:r._sync||(r.id.startsWith('loc_')?'pending':'synced')}));
+else {storageBlocked=true;notify('O histórico local tem um formato inesperado e foi preservado.');}
+recomputeAll();
+void connectCloud();
 
-    function populateCompareDropdown() {
-      const sel = document.getElementById("compareSelect");
-      sel.innerHTML = readings.slice(0, -1).map((r, idx) =>
-        `<option value="${idx}">${r.date} (${r.weight} kg)</option>`
-      ).join("") || `<option value="0">${readings[0].date}</option>`;
-    }
-
-    window.toggleCompareMode = function() {
-      compareMode = !compareMode;
-      document.getElementById("compareStatusLabel").textContent = `Comparar Antes × Atual: ${compareMode ? "ON" : "OFF"}`;
-      document.getElementById("compareStatusLabel").className = compareMode ? "text-sky-400 font-bold" : "text-slate-300";
-      recomputeAll();
-    };
-
-    window.recomputeAll = function() {
-      const onlyFasting = document.getElementById("onlyFastingChk").checked;
-      const list = onlyFasting ? readings.filter(r => r.protocol === "Em jejum") : readings;
-      const cur = list[list.length - 1] || readings[readings.length - 1];
-      const compIdx = parseInt(document.getElementById("compareSelect").value || "0", 10);
-      const prev = list[compIdx] || list[0];
-      const realAge = parseInt(document.getElementById("realAgeInput").value || "28", 10);
-      const sex = document.getElementById("sexSelect").value;
-
-      document.getElementById("activeReadingBadge").textContent = `${cur.date} • ${cur.protocol}`;
-
-      const fatMaxNormal = sex === "F" ? 32.9 : 19.9;
-      const fatMinNormal = sex === "F" ? 21.0 : 8.0;
-      const muscHighMin = sex === "F" ? 30.4 : 39.0;
-
-      const fatStatus = cur.fat < fatMinNormal ? "BAIXO" : cur.fat <= fatMaxNormal ? "NORMAL" : "ALTO";
-      const muscStatus = cur.muscle >= muscHighMin ? "ALTO" : "NORMAL";
-      const viscStatus = cur.visceral <= 9 ? "NORMAL" : "ALTO";
-      const bmiStatus = cur.bmi < 18.5 ? "BAIXO" : cur.bmi < 25 ? "NORMAL" : "ELEVADO";
-      const ageStatus = cur.bodyAge <= realAge ? "IDEAL" : "ACIMA";
-      const rcq = (cur.waist / cur.hip).toFixed(2);
-      const rcqStatus = (sex === "F" ? rcq < 0.85 : rcq < 0.90) ? "BAIXO RISCO" : "ATENÇÃO";
-
-      document.getElementById("rcqBadge").textContent = `RCQ: ${rcq} (${rcqStatus === "BAIXO RISCO" ? "Baixo Risco" : "Atenção"})`;
-
-      if (fatStatus === "NORMAL" && (muscStatus === "ALTO" || muscStatus === "NORMAL") && viscStatus === "NORMAL") {
-        document.getElementById("phenotypeTitle").textContent = "Composição Corporal Saudável";
-        document.getElementById("phenotypeDesc").textContent = "Equilíbrio adequado entre massa muscular esquelética e reservas adiposas.";
-        document.getElementById("phenotypeBadge").textContent = "Equilibrado";
-      } else if (viscStatus === "ALTO") {
-        document.getElementById("phenotypeTitle").textContent = "Alerta Visceral Metabólico";
-        document.getElementById("phenotypeDesc").textContent = "Gordura visceral em zona de atenção. Priorize ajuste nutricional e treino aeróbico/força.";
-        document.getElementById("phenotypeBadge").textContent = "Atenção";
-      } else {
-        document.getElementById("phenotypeTitle").textContent = "Recomposição em Andamento";
-        document.getElementById("phenotypeDesc").textContent = "Ajuste progressivo entre tecido adiposo e densidade muscular esquelética.";
-        document.getElementById("phenotypeBadge").textContent = "Em Evolução";
-      }
-
-      const deltaStr = (a, b, unit = "") => {
-        if (!compareMode) return "Clique para análise";
-        const d = (a - b).toFixed(1);
-        const sign = d > 0 ? `+${d}` : `${d}`;
-        return `Antes: ${b}${unit} (${sign}${unit})`;
-      };
-
-      const leftCards = [
-        { key: "weight", title: "PESO CORPORAL", val: `${cur.weight} kg`, status: "NORMAL", statusColor: "text-emerald-400", sub: deltaStr(cur.weight, prev.weight, " kg") },
-        { key: "fat", title: "GORDURA CORPORAL", val: `${cur.fat}%`, status: fatStatus, statusColor: fatStatus === "NORMAL" ? "text-emerald-400" : "text-amber-400", sub: deltaStr(cur.fat, prev.fat, "%") },
-        { key: "visceral", title: "GORDURA VISCERAL", val: `Nível ${cur.visceral}`, status: viscStatus, statusColor: viscStatus === "NORMAL" ? "text-emerald-400" : "text-rose-400", sub: compareMode ? `Antes: Nível ${prev.visceral}` : "Clique para análise" },
-        { key: "rm", title: "METABOLISMO BASAL", val: `${cur.rm} kcal`, status: "ATIVO", statusColor: "text-sky-400", sub: compareMode ? `Antes: ${prev.rm} kcal` : "Clique para análise" }
-      ];
-
-      const rightCards = [
-        { key: "bmi", title: "IMC (AUTO)", val: `${cur.bmi}`, status: bmiStatus, statusColor: bmiStatus === "NORMAL" ? "text-emerald-400" : "text-amber-400", sub: deltaStr(cur.bmi, prev.bmi, "") },
-        { key: "muscle", title: "MÚSCULO ESQUELÉTICO", val: `${cur.muscle}%`, status: muscStatus, statusColor: "text-sky-400", sub: deltaStr(cur.muscle, prev.muscle, "%") },
-        { key: "bodyAge", title: "IDADE CORPORAL", val: `${cur.bodyAge} anos`, status: ageStatus, statusColor: ageStatus === "IDEAL" ? "text-emerald-400" : "text-amber-400", sub: compareMode ? `Antes: ${prev.bodyAge} anos` : "Clique para análise" },
-        { key: "whr", title: "CINTURA / QUADRIL", val: `${cur.waist} / ${cur.hip} cm`, status: rcqStatus, statusColor: "text-emerald-400", sub: `RCQ ${rcq} • Clique` }
-      ];
-
-      const renderCardHTML = (c) => `
-        <div onclick="selectMetricDetail('${c.key}')" class="metric-card ${selectedMetricKey === c.key ? 'active-card' : ''} rounded-xl p-2.5 sm:p-3 cursor-pointer">
-          <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">${c.title}</p>
-          <p class="text-sm sm:text-base font-extrabold text-white mono mt-0.5">${c.val}</p>
-          <p class="text-[9px] sm:text-[10px] font-extrabold uppercase mt-0.5 ${c.statusColor}">${c.status}</p>
-          <p class="text-[9px] text-slate-500 mt-0.5 truncate">${c.sub}</p>
-        </div>
-      `;
-
-      document.getElementById("leftCardsColumn").innerHTML = leftCards.map(renderCardHTML).join("");
-      document.getElementById("rightCardsColumn").innerHTML = rightCards.map(renderCardHTML).join("");
-
-      const core = document.getElementById("svgVisceralCore");
-      if (core) {
-        core.setAttribute("r", String(Math.min(18, 5 + cur.visceral * 0.8)));
-        core.setAttribute("fill", cur.visceral <= 9 ? "#34d399" : "#f43f5e");
-      }
-
-      selectMetricDetail(selectedMetricKey);
-      renderEvolutionChart(list);
-      updateGoalsBox();
-      renderClinicalAlerts(list, realAge);
-    };
-
-    window.selectMetricDetail = function(key) {
-      selectedMetricKey = key;
-      const cur = readings[readings.length - 1];
-      const fatKg = ((cur.weight * cur.fat) / 100).toFixed(1);
-      const muscKg = ((cur.weight * cur.muscle) / 100).toFixed(1);
-      const leanKg = (cur.weight - parseFloat(fatKg)).toFixed(1);
-
-      const map = {
-        weight: [`Peso Corporal — ${cur.weight} kg`, `Composição fracionada: ${leanKg} kg de massa livre de gordura e ${fatKg} kg de reserva adiposa.`],
-        fat: [`Gordura Corporal — ${cur.fat}% (${fatKg} kg)`, `Faixa saudável Omron HBF-514C (Feminino 20–39a): 21.0% a 32.9%. Seu índice atual está dentro da normalidade fisiológica.`],
-        visceral: [`Gordura Visceral — Nível ${cur.visceral}`, `Classificação Omron: 1 a 9 (Normal), 10 a 14 (Alto), 15 a 30 (Muito Alto). Nível ${cur.visceral} indica baixo risco metabólico.`],
-        rm: [`Metabolismo Basal — ${cur.rm} kcal/dia`, `Gasto energético mínimo em repouso calculado a partir da sua massa muscular esquelética (${muscKg} kg).`],
-        bmi: [`IMC (Auto) — ${cur.bmi} kg/m²`, `Índice de Massa Corporal dentro da faixa eutrófica da OMS (18.5 a 24.9 kg/m²).`],
-        muscle: [`Músculo Esquelético — ${cur.muscle}% (${muscKg} kg)`, `Percentual elevado de musculatura ativa (acima de 30.4% para referência feminina Omron), favorecendo a taxa metabólica basal.`],
-        bodyAge: [`Idade Corporal — ${cur.bodyAge} anos`, `Sua idade metabólica (${cur.bodyAge} anos) está abaixo da sua idade cronológica, refletindo boa densidade muscular.`],
-        whr: [`Cintura / Quadril — ${cur.waist} / ${cur.hip} cm`, `Relação Cintura-Quadril (RCQ) de ${(cur.waist / cur.hip).toFixed(2)}, classificada como baixo risco cardiovascular (< 0.85).`]
-      };
-
-      const info = map[key] || map.fat;
-      document.getElementById("detailMetricTitle").textContent = info[0];
-      document.getElementById("detailMetricBody").textContent = info[1];
-    };
-
-    function renderEvolutionChart(list) {
-      const ctx = document.getElementById("bioChart");
-      if (!ctx) return;
-      if (chartInst) chartInst.destroy();
-      chartInst = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: list.map(r => r.date),
-          datasets: [
-            { label: "Peso (kg)", data: list.map(r => r.weight), borderColor: "#38bdf8", tension: 0.35 },
-            { label: "Gordura (%)", data: list.map(r => r.fat), borderColor: "#f59e0b", tension: 0.35 },
-            { label: "Músculo (%)", data: list.map(r => r.muscle), borderColor: "#34d399", tension: 0.35 }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { labels: { color: "#94a3b8", font: { size: 10 } } } },
-          scales: {
-            x: { ticks: { color: "#64748b", font: { size: 10 } }, grid: { color: "#17253d" } },
-            y: { ticks: { color: "#64748b", font: { size: 10 } }, grid: { color: "#17253d" } }
-          }
-        }
-      });
-    }
-
-    window.updateGoalsBox = function() {
-      const cur = readings[readings.length - 1];
-      const gf = parseFloat(document.getElementById("gFatSlider").value);
-      const gm = parseFloat(document.getElementById("gMuscSlider").value);
-      const gv = parseInt(document.getElementById("gViscSlider").value, 10);
-
-      document.getElementById("gFatLbl").textContent = `${gf.toFixed(1)}%`;
-      document.getElementById("gMuscLbl").textContent = `${gm.toFixed(1)}%`;
-      document.getElementById("gViscLbl").textContent = `Nível ${gv}`;
-
-      const diffFat = (cur.fat - gf).toFixed(1);
-      const diffMusc = (gm - cur.muscle).toFixed(1);
-      document.getElementById("goalsSummaryText").innerHTML =
-        `• Para atingir <b>${gf.toFixed(1)}% de gordura</b>, faltam <b>${diffFat > 0 ? diffFat + "%" : "0% (Meta atingida!)"}</b>.<br>` +
-        `• Para atingir <b>${gm.toFixed(1)}% de músculo</b>, faltam <b>${diffMusc > 0 ? "+" + diffMusc + "%" : "0% (Meta atingida!)"}</b>.<br>` +
-        `• Alvo visceral definido em <b>Nível ${gv}</b> (atual: Nível ${cur.visceral}).`;
-    };
-
-    function renderClinicalAlerts(list, realAge) {
-      const cur = list[list.length - 1];
-      const prev = list[list.length - 2] || cur;
-      const items = [];
-      if (cur.fat < prev.fat && cur.muscle >= prev.muscle) {
-        items.push("🟢 Recomposição Corporal Ativa: redução de gordura com ganho de músculo esquelético.");
-      }
-      if (cur.visceral <= 9) {
-        items.push(`🔵 Gordura Visceral Ideal (Nível ${cur.visceral}): dentro da faixa saudável de 1 a 9.`);
-      } else {
-        items.push(`🔴 Alerta Visceral (Nível ${cur.visceral}): acima do limite clínico de 9.`);
-      }
-      if (cur.bodyAge <= realAge) {
-        items.push(`🟢 Idade Corporal (${cur.bodyAge} anos) inferior à idade real (${realAge} anos).`);
-      }
-      document.getElementById("subView-alerts").innerHTML = items.map(t =>
-        `<div class="bg-[#07101f] border border-slate-800 rounded-xl p-2.5 text-slate-200">${t}</div>`
-      ).join("");
-    }
-
-    window.switchSubView = function(v) {
-      ["chart", "goals", "alerts"].forEach(k => {
-        document.getElementById("subView-" + k).classList.add("hidden");
-        document.getElementById("subBtn-" + k).className = "px-3 py-1.5 rounded-lg text-slate-400 font-semibold";
-      });
-      document.getElementById("subView-" + v).classList.remove("hidden");
-      document.getElementById("subBtn-" + v).className = "px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 font-bold";
-    };
-
-    window.openNewWeighingModal = function() {
-      const cur = readings[readings.length - 1];
-      document.getElementById("mWeight").value = cur.weight;
-      document.getElementById("mBmi").value = cur.bmi;
-      document.getElementById("mFat").value = cur.fat;
-      document.getElementById("mMuscle").value = cur.muscle;
-      document.getElementById("mVisc").value = cur.visceral;
-      document.getElementById("mBodyAge").value = cur.bodyAge;
-      document.getElementById("mRm").value = cur.rm;
-      document.getElementById("mWaist").value = cur.waist;
-      document.getElementById("mHip").value = cur.hip;
-      document.getElementById("newWeighingModal").classList.remove("hidden");
-    };
-    window.closeNewWeighingModal = () => document.getElementById("newWeighingModal").classList.add("hidden");
-
-    window.pickProto = function(p) {
-      selectedProto = p;
-      document.querySelectorAll(".proto-opt").forEach(b => {
-        b.className = b.textContent.includes(p)
-          ? "proto-opt px-2.5 py-1.5 rounded-lg border border-sky-500 bg-sky-500/15 text-sky-300 font-bold"
-          : "proto-opt px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 font-bold";
-      });
-    };
-
-    window.simulateVisorScan = function() {
-      const cur = readings[readings.length - 1];
-      document.getElementById("mWeight").value = (cur.weight - 0.2).toFixed(1);
-      document.getElementById("mFat").value = (cur.fat - 0.3).toFixed(1);
-      document.getElementById("mMuscle").value = (cur.muscle + 0.2).toFixed(1);
-    };
-
-    window.saveWeighing = async function(e) {
-      e.preventDefault();
-      const btn = document.getElementById("btnSaveWeighing");
-      btn.disabled = true;
-      btn.textContent = "Sincronizando...";
-
-      const item = {
-        date: new Date().toISOString().split("T")[0],
-        weight: parseFloat(document.getElementById("mWeight").value),
-        bmi: parseFloat(document.getElementById("mBmi").value),
-        fat: parseFloat(document.getElementById("mFat").value),
-        muscle: parseFloat(document.getElementById("mMuscle").value),
-        visceral: parseInt(document.getElementById("mVisc").value, 10),
-        bodyAge: parseInt(document.getElementById("mBodyAge").value, 10),
-        rm: parseInt(document.getElementById("mRm").value, 10),
-        waist: parseInt(document.getElementById("mWaist").value, 10),
-        hip: parseInt(document.getElementById("mHip").value, 10),
-        protocol: selectedProto
-      };
-
-      try {
-        const ref = await addDoc(collection(db, "measurements"), { ...item, ts: serverTimestamp() });
-        item.id = ref.id;
-      } catch (err) {
-        item.id = "loc_" + Date.now();
-      }
-
-      readings.push(item);
-      populateCompareDropdown();
-      recomputeAll();
-      btn.disabled = false;
-      btn.textContent = "Salvar no Firebase (bioimpedancia-59fce)";
-      closeNewWeighingModal();
-    };
-
-    window.openReportModal = function() {
-      const first = readings[0];
-      const cur = readings[readings.length - 1];
-      document.getElementById("repAgeSpan").textContent = document.getElementById("realAgeInput").value;
-      const rows = [
-        ["Peso Corporal", `${first.weight} kg`, `${cur.weight} kg`, `${(cur.weight - first.weight).toFixed(1)} kg`, "Normal"],
-        ["Gordura Corporal", `${first.fat}%`, `${cur.fat}%`, `${(cur.fat - first.fat).toFixed(1)}%`, "Normal"],
-        ["Músculo Esquelético", `${first.muscle}%`, `${cur.muscle}%`, `+${(cur.muscle - first.muscle).toFixed(1)}%`, "Alto"],
-        ["Gordura Visceral", `Nível ${first.visceral}`, `Nível ${cur.visceral}`, `${cur.visceral - first.visceral}`, "Normal"],
-        ["IMC", first.bmi, cur.bmi, (cur.bmi - first.bmi).toFixed(1), "Normal"],
-        ["Metabolismo Basal", `${first.rm} kcal`, `${cur.rm} kcal`, `${cur.rm - first.rm} kcal`, "Ativo"],
-        ["Idade Corporal", `${first.bodyAge} anos`, `${cur.bodyAge} anos`, `${cur.bodyAge - first.bodyAge} anos`, "Ideal"],
-        ["Cintura / Quadril", `${first.waist}/${first.hip}`, `${cur.waist}/${cur.hip}`, `RCQ ${(cur.waist/cur.hip).toFixed(2)}`, "Baixo Risco"]
-      ];
-      document.getElementById("repTableRows").innerHTML = rows.map(r => `
-        <tr>
-          <td class="py-2 font-bold text-white">${r[0]}</td>
-          <td class="py-2 mono text-slate-400">${r[1]}</td>
-          <td class="py-2 mono font-bold text-white">${r[2]}</td>
-          <td class="py-2 mono text-sky-400">${r[3]}</td>
-          <td class="py-2 font-bold text-emerald-400">${r[4]}</td>
-        </tr>
-      `).join("");
-      document.getElementById("repSynthesis").textContent =
-        `Evolução de ${first.date} a ${cur.date}: redução de ${(first.weight - cur.weight).toFixed(1)} kg no peso total, queda de ${(first.fat - cur.fat).toFixed(1)}% na gordura corporal e aumento de ${(cur.muscle - first.muscle).toFixed(1)}% em músculo esquelético.`;
-      document.getElementById("reportModal").classList.remove("hidden");
-    };
-    window.closeReportModal = () => document.getElementById("reportModal").classList.add("hidden");
-
-    window.shareWhatsApp = function() {
-      const cur = readings[readings.length - 1];
-      const msg = encodeURIComponent(
-        `*BioVault Pro • Omron HBF-514C (${cur.date})*\n` +
-        `• Peso: ${cur.weight} kg | IMC: ${cur.bmi}\n` +
-        `• Gordura: ${cur.fat}% | Músculo: ${cur.muscle}%\n` +
-        `• Visceral: Nível ${cur.visceral} | Idade Corporal: ${cur.bodyAge} anos`
-      );
-      window.open(`https://wa.me/?text=${msg}`, "_blank");
-    };
-
-    loadFirebaseData();
   </script>
 </body>
 </html>
