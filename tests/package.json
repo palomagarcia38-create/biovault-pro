@@ -1,0 +1,11 @@
+{
+  "name": "biovault-regression-tests",
+  "private": true,
+  "scripts": {
+    "test": "node biovault.test.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0",
+    "three": "0.128.0"
+  }
+}

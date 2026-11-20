@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Holographic HUD v4.4</title>
+  <title>BioVault Pro • Holographic HUD v4.4.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -451,7 +451,7 @@ html {scrollbar-gutter:stable;}
           </div>
         </div>
         <button onclick="window.location.reload()" title="Atualizar App" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v4.4
+          ↻ v4.4.1
         </button>
       </div>
 
@@ -784,7 +784,7 @@ html {scrollbar-gutter:stable;}
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.4</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.4.1</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>INÍCIO</span></button>
@@ -1246,7 +1246,7 @@ function applyConversationalKnowledge(result,record) {
       if(info.status==='BAIXO')intro+=`São ${fmt(limits[0]-value)} ponto(s) percentual(is) abaixo do início da faixa. `;
     }else if(key==='bmi')intro=`Com ${fmt(record.weight)} kg e ${fmt(p.height)} cm, seu IMC é ${fmt(calcBmiValue(record.weight,p.height))} kg/m² (${info.status.toLowerCase()}). `;
     else if(key==='visceral')intro=`Você registrou nível ${fmt(record.visceral,0)}; a faixa normal da Omron vai de 1 a 9. `;
-    else if(key==='bodyAge')intro=`O visor informa ${fmt(record.bodyAge,0)} anos e sua idade registrada é ${fmt(p.age,0)}. `;
+    else if(key==='bodyAge')intro=`O registro informa ${fmt(record.bodyAge,0)} anos e sua idade registrada é ${fmt(p.age,0)}. `+(validNumber(record.bodyAge)&&(record.bodyAge<18||record.bodyAge>80)?'Esse valor de idade corporal está fora da faixa exibida pelo HBF-514C (18–80 anos); confira a transcrição. O valor salvo foi mantido. ':'');
     else if(key==='whr'&&number(record.hip)>0)intro=`Sua cintura é ${fmt(record.waist)} cm e seu quadril ${fmt(record.hip)} cm: a relação é ${fmt(record.waist/record.hip,2)}. `;
     else if(key==='weight')intro=`Sua pesagem foi de ${fmt(record.weight)} kg. `;
     else if(key==='rm')intro=`O registro traz ${fmt(record.rm,0)} kcal por dia em repouso${record.rmMethod==='harris-benedict-1984'?', calculadas por equação':', como estimativa informada'}. `;
@@ -1496,7 +1496,7 @@ function analyze(cur) {
   const vi = {status:!validVisceral ? 'SEM REFERÊNCIA' : cur.visceral <= 9 ? 'NORMAL' : cur.visceral <= 14 ? 'ALTO' : 'MUITO ALTO',altered:validVisceral && cur.visceral > 9,neutral:!validVisceral};
   const ratio = validNumber(cur.waist) && validNumber(cur.hip) && cur.waist > 0 && cur.hip > 0 ? cur.waist / cur.hip : NaN;
   const rcqLimit = p.sex === 'F' ? .85 : .9, ratioAltered = Number.isFinite(ratio) && ratio >= rcqLimit;
-  const ageValid = validNumber(cur.bodyAge) && Number.isFinite(p.age) && p.age >= 18 && p.age <= 80;
+  const ageValid = validNumber(cur.bodyAge) && cur.bodyAge >= 18 && cur.bodyAge <= 80 && Number.isFinite(p.age) && p.age >= 18 && p.age <= 80;
   const ageDiff = ageValid ? cur.bodyAge - p.age : NaN;
   const fatKg = validNumber(cur.fat) ? cur.weight * cur.fat / 100 : NaN;
   const muscleKg = validNumber(cur.muscle) ? cur.weight * cur.muscle / 100 : NaN;
