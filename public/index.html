@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Holographic HUD v4.5</title>
+  <title>BioVault Pro • Holographic HUD v4.5.1</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -476,7 +476,7 @@ html {scrollbar-gutter:stable;}
           </div>
         </div>
         <button onclick="window.location.reload()" title="Atualizar App" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v4.5
+          ↻ v4.5.1
         </button>
       </div>
 
@@ -521,7 +521,7 @@ html {scrollbar-gutter:stable;}
     <section class="panel-dark cyber-panel hud-corners rounded-2xl p-6 text-center space-y-3">
       <div class="text-3xl" aria-hidden="true">⚖️</div>
       <h2 class="text-base font-extrabold text-white">Nenhuma pesagem registrada ainda</h2>
-      <p class="text-xs text-slate-400 max-w-md mx-auto">Comece pelo seu nome, idade e altura. No mesmo formulário, registre o peso e os dados que você tem da balança. Seu perfil ficará lembrado para as próximas medições.</p>
+      <p class="text-xs text-slate-400 max-w-md mx-auto">Comece pelo seu nome, idade e altura. No mesmo formulário, registre o peso e os dados que você tem da balança. Seu perfil ficará lembrado neste aparelho para as próximas medições.</p>
       <button onclick="openNewWeighingModal()" class="bg-sky-500 text-slate-950 font-extrabold text-xs px-5 py-3 rounded-xl">+ Meu perfil e primeira medição</button>
     </section>
   </div>
@@ -719,7 +719,7 @@ html {scrollbar-gutter:stable;}
 <label class="person-field">Seu nome<input id="mPersonName" type="text" maxlength="80" autocomplete="name" placeholder="Ex.: Paloma" required /></label>
 <div class="person-form-grid"><label class="person-field">Idade (anos)<input id="mAge" type="number" min="18" max="120" step="1" required oninput="autoCalcModalBmi()" /></label>
 <label class="person-field">Sexo de referência<select id="mSex" required><option value="">Selecione</option><option value="F">Feminino</option><option value="M">Masculino</option></select></label></div>
-<p class="form-hint">Seu nome e seus dados ficam lembrados. A idade e o sexo de referência são usados nas faixas do manual.</p>
+<p class="form-hint">Seu nome fica salvo neste aparelho. A idade e o sexo de referência são usados nas faixas do manual.</p>
 </fieldset><fieldset class="measurement-section"><legend>2. Sua nova medição</legend>
 <p class="form-hint">Omron HBF-514C • Digite os valores do visor. Além de peso e altura, preencha apenas os dados que você tiver.</p>
         <div class="grid grid-cols-3 gap-2">
@@ -821,7 +821,7 @@ html {scrollbar-gutter:stable;}
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.5</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.5.1</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>INÍCIO</span></button>
@@ -1722,8 +1722,8 @@ async function flushPending() {
       const ref=fire.doc(db,'measurements',item.id);
       if (deleting) await fire.deleteDoc(ref);
       else {
-        const payload=Object.fromEntries(Object.entries(item).filter(([key])=>!key.startsWith('_')&&key!=='id'));
-        await fire.setDoc(ref,{...payload,ts:fire.serverTimestamp()});
+        const payload=cloudMeasurementPayload(item);
+        await fire.setDoc(ref,{...payload,ts:fire.serverTimestamp()},{merge:true});
       }
       const latest=readings.find(r=>r.id===item.id);
       if (deleting) readings=readings.filter(r=>r.id!==item.id);
@@ -1750,7 +1750,7 @@ async function connectCloud() {
     void loadCloudKnowledge(fire,db);
     unsubscribe=fire.onSnapshot(fire.collection(db,'measurements'),{includeMetadataChanges:true},snapshot=>{
       const merged=new Map(snapshot.metadata.fromCache ? readings.map(r=>[r.id,r]) : []);
-      for (const d of snapshot.docs) {const r=normalize(d.data(),d.id);if(r) merged.set(d.id,{...r,_sync:'synced'});}
+      for (const d of snapshot.docs) {const r=normalize(d.data(),d.id);if(r) merged.set(d.id,restoreLocalIdentity({...r,_sync:'synced'},readings.find(local=>local.id===d.id)));}
       // Local pending entries survive an empty/partial cloud response and keep their stable IDs.
       for (const r of readings) if (['pending','deleting'].includes(r._sync)) merged.set(r.id,r);
       readings=[...merged.values()];
@@ -1784,6 +1784,18 @@ function editReading(id){
   if(record.rmMethod==='harris-benedict-1984')$('mRm').value='';
   $('saveStatus').textContent='O registro mantém o mesmo identificador. A versão anterior fica no backup.';
   autoCalcModalBmi();$('mWeight').focus();
+}
+// Names stay on this device until authenticated, per-account storage is in place.
+function cloudMeasurementPayload(record){
+  const payload=Object.fromEntries(Object.entries(record).filter(([key])=>!key.startsWith('_')&&!['id','personName','personId','nome'].includes(key)));
+  if(Array.isArray(record.revisions))payload.revisions=record.revisions.map(version=>({...version,previous:cloudMeasurementPayload(version.previous||{})}));
+  return payload;
+}
+function restoreLocalIdentity(remote,local){
+  if(!local)return remote;const merged={...remote};
+  for(const key of ['personName','personId','nome'])if(local[key]!=null)merged[key]=local[key];
+  if(Array.isArray(remote.revisions))merged.revisions=remote.revisions.map(version=>{const old=local.revisions?.find(v=>v.editedAt===version.editedAt);return old?{...version,previous:restoreLocalIdentity(version.previous,old.previous)}:version;});
+  return merged;
 }
 function buildCsv(list=visibleReadings()){
   const headers=['Nome','Data','Sexo de referência','Idade (anos)','Altura (cm)','Peso (kg)','Gordura (%)','Músculo (%)','Visceral (nível)','Idade corporal (anos)','Repouso (kcal/dia)','Origem do repouso','Cintura (cm)','Quadril (cm)','IMC (kg/m²)','RCQ','Equipamento','Identificador'];

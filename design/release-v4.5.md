@@ -1,4 +1,4 @@
-# BioVault Pro v4.5 — 20/11/2026
+# BioVault Pro v4.5.1 — 20/11/2026
 
 ## Alterações solicitadas
 
@@ -21,8 +21,13 @@
 
 Pop-ups científicos, fontes, gráficos por indicador, comparação, metas, PDF, compartilhamento, fila offline, dados legados e sincronização Firebase permanecem. A base científica não foi alterada. Não houve escrita em measurements durante implementação/revisão, alteração de regras nem migração destrutiva.
 
-45 verificações automatizadas aprovadas. As verificações antigas específicas de modos/protocolos foram substituídas por verificações da retirada solicitada e preservação de dados. Testes de edição/importação utilizam registros sintéticos e Firestore simulado.
+46 verificações automatizadas aprovadas. As verificações antigas específicas de modos/protocolos foram substituídas por verificações da retirada solicitada e preservação de dados. Testes de edição/importação utilizam registros sintéticos e Firestore simulado.
 
 ## Etapas posteriores para distribuição pública
 
 Autenticação e isolamento de dados por conta, revisão das regras do Firebase, política de privacidade e gestão de conta exigem uma etapa própria antes de publicação comercial. Esta versão atualiza o aplicativo web existente; não declara lançamento em loja nem validação de OCR. OCR não foi adicionado sem uma base de imagens/testes de precisão.
+
+
+## Nome e sincronização
+
+O nome e personId são metadados locais, guardados no cache do aparelho. Não são enviados com medições nem com versões anteriores ao Firestore atual. O retorno do servidor preserva esses metadados locais, inclusive após edição e recarga. O envio utiliza merge para não apagar campos preexistentes no servidor. CSV, PDF e backup no aparelho continuam com o nome. Não foi alterada nenhuma regra de acesso; autenticação e isolamento de contas continuam necessários antes da distribuição comercial.
