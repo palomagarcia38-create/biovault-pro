@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Biometric HUD v4.2</title>
+  <title>BioVault Pro • Holographic HUD v4.3</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -222,6 +222,148 @@
     }
     @media print {.hud-panel {clip-path:none;}#appHeader,#appFooter,#quickPanelModal {display:none!important;} .clinical-grid {display:block;} }
 
+/* v4.3 — compact holographic dashboard, with all existing tools retained. */
+body {padding-bottom:92px;background-color:#020b15;}
+#appHeader {position:relative;background:#020b15;border:0;padding:0 14px;}
+#appHeader>div {padding:22px 0 8px;max-width:1100px;}
+.brand-row {display:flex;align-items:center;justify-content:center;position:relative;min-height:66px;}
+.brand-icon,.brand-row .brand-description {display:none;}
+.brand-copy {text-align:center;}
+.brand-copy .brand-line {display:block;}
+.brand-copy h1 {font-family:'Orbitron',sans-serif;font-size:clamp(22px,4vw,32px);line-height:1.4;letter-spacing:-.035em;font-weight:700;color:#94edf7;text-transform:none;text-shadow:0 0 20px #00f0ff38;}
+.brand-copy h1 span {color:inherit;}
+.brand-copy .model-label {display:block;color:#94bacb;background:none;border:0;padding:0;font:500 11px 'Orbitron',sans-serif;letter-spacing:.1em;margin-top:2px;}
+#syncPill {position:absolute;left:0;bottom:-10px;padding:0;background:none;font-size:8px;border:0;}
+.brand-refresh {position:absolute;right:0;bottom:-12px;background:none;border:0;padding:0;color:#607f90;font-size:9px;min-height:24px;}
+#profileDrawer {margin:12px auto 0;max-width:1100px;}
+#profileDrawer>summary {display:flex;align-items:center;justify-content:center;gap:7px;color:#8aabba;font:10px 'JetBrains Mono',monospace;cursor:pointer;padding:8px;min-height:32px;list-style:none;}
+#profileDrawer>summary::-webkit-details-marker {display:none;}
+#profileDrawer[open] {background:#071524;border:1px solid #144257;border-radius:12px;padding:4px 12px 12px;}
+#profileControls {padding-top:6px;}
+#dashboardMain {max-width:1100px;padding:4px 14px 0;}
+#bioMap.scanner-grid {background:#020b15;border:0;box-shadow:none;border-radius:0;padding:0;backdrop-filter:none;}
+#bioMap::before,#bioMap::after {display:none;}
+.map-heading {font:8px 'JetBrains Mono',monospace;color:#66899c;border-bottom:1px solid #00c8df25!important;padding:6px 0 8px;}
+.map-heading h2 {font-size:8px;letter-spacing:.13em;color:#85a8ba;font-family:'JetBrains Mono',monospace;font-weight:500;}
+.map-heading .map-led {height:4px;width:4px;}
+#activeReadingBadge {font-size:8px;max-width:66%;color:#8ab0bf;}
+#biometricGrid {position:relative;isolation:isolate;grid-template-columns:minmax(0,1fr) minmax(0,2.25fr) minmax(0,1fr);gap:8px;align-items:center;min-height:570px;margin-top:8px!important;}
+#biometricGrid>#leftCardsColumn {grid-column:1;grid-row:1;}
+#biometricGrid>#holoStage {grid-column:2;grid-row:1;}
+#biometricGrid>#rightCardsColumn {grid-column:3;grid-row:1;}
+#leftCardsColumn,#rightCardsColumn {position:relative;z-index:3;gap:20px;padding:0;justify-content:center;align-self:center;}
+.metric-card.hud-panel {clip-path:none;border-radius:9px;min-height:102px;flex:0 0 auto;padding:12px!important;border-color:#769cac88;box-shadow:inset 0 0 15px #b9eff30b,0 0 12px #00c8df0a;background:#0b2332cc;backdrop-filter:blur(9px);text-align:center;overflow:visible;}
+.metric-card.hud-panel:hover {transform:translateY(-1px);}
+.metric-card .metric-title {font:500 10px 'Inter',sans-serif;letter-spacing:0;color:#afc6d2;display:block;line-height:1.3;}
+.metric-full-label {display:none;}
+.metric-card .metric-glyph {display:none;}
+.metric-card .metric-value {font:500 25px 'Orbitron',sans-serif;letter-spacing:-.04em;white-space:nowrap;line-height:1.25;margin:8px 0 6px;color:#b6edfa;text-shadow:0 0 12px #00eaff3a;}
+.metric-card .metric-unit {font:500 10px 'Inter',sans-serif;letter-spacing:0;color:#93afc0;margin-left:3px;}
+.metric-card .metric-status {display:block;font:600 9px 'JetBrains Mono',monospace;line-height:1.3;min-height:12px;margin-top:3px;color:#8cb9c4;}
+.metric-card .metric-sub {font:8px 'JetBrains Mono',monospace;line-height:1.35;color:#7d9cae;margin-top:5px;display:none;}
+.metric-card[data-compare=true] .metric-sub {display:block;}
+.metric-card[data-metric=whr] .metric-value {font-size:23px;}
+.metric-card[data-metric=rm] .metric-value {font-size:23px;}
+.metric-card.alert-card {border-color:#e69743b3;background:#322016c9;box-shadow:inset 0 0 17px #f59e0b12,0 0 12px #f59e0b20;}
+.metric-card.alert-card .metric-value {color:#ffd29d;text-shadow:0 0 13px #f59e0b50;}
+.metric-card.alert-danger-border {border-color:#ff6b82b3;background:#321821cc;box-shadow:inset 0 0 16px #ff2a5f15,0 0 14px #ff2a5f20;}
+.metric-card.alert-danger-border .metric-value {color:#ffadbb;text-shadow:0 0 13px #ff2a5f60;}
+.metric-card.active-card {border-color:#a8faff!important;box-shadow:0 0 14px #00f0ff26,inset 0 0 16px #00f0ff12!important;}
+.metric-reference-bar {height:7px;gap:2px;border:1px solid #819eae44;border-radius:3px;overflow:hidden;margin:5px 0 0;padding:1px;}
+.metric-reference-bar i {border-radius:1px;background:#123044;}
+.metric-reference-bar i[data-current=true] {background:#4ee8e6;box-shadow:0 0 9px #00f0ff99;}
+.metric-value-line {height:5px;border:1px solid #6e96aa55;border-radius:3px;margin:5px 0 0;background:#11344a;}
+#holoStage.hud-body-console {min-height:570px;height:570px;border:0;border-radius:0;padding:0!important;background:transparent;overflow:visible;isolation:auto;z-index:0;justify-content:center;}
+.hud-body-console::after {display:none;}
+.hud-body-console .holo-console-title {display:none;}
+#holoStage>.holo-mode {position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:5;flex-wrap:nowrap;margin:0;gap:2px;background:#020b15c9;border-radius:6px;padding:3px;border:1px solid #164e6366;}
+.holo-mode button {font:9px 'JetBrains Mono',monospace;border:0;background:transparent;padding:5px 6px;min-height:28px;}
+.holo-mode button[aria-pressed=true] {background:#0a3544;color:#b9faff;}
+#holoPortrait {position:absolute;inset:34px -35% 22px;overflow:visible;z-index:0;}
+.holo-art-image {position:absolute;height:100%;width:auto;max-width:none;left:50%;top:0;transform:translateX(-50%) scaleX(var(--body-width,1));transform-origin:center;object-fit:contain;transition:opacity .35s ease;filter:saturate(.85) brightness(.8);pointer-events:none;}
+#holoArtWarm {opacity:0;}
+#holoPortrait[data-warm=true] #holoArtWarm {opacity:1;}
+#holoPortrait[data-warm=true] #holoArtCool {opacity:0;}
+.live-visceral {position:absolute;left:50%;top:34.6%;transform:translate(-50%,-50%);width:21px;height:21px;border-radius:50%;border:1px solid currentColor;background:currentColor;color:#10b981;box-shadow:0 0 8px currentColor,0 0 22px currentColor;z-index:1;opacity:.9;}
+.live-visceral::after {content:'';position:absolute;inset:-6px;border:1px solid currentColor;border-radius:50%;opacity:.45;}
+#holoStage>#holoStatus {position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:max-content;max-width:150%;font:7px 'JetBrains Mono',monospace;color:#64899a;line-height:1.5;margin:0;z-index:3;}
+#holoStage #canvas3dContainer {height:400px;width:100%;margin-top:20px;}
+#holoStage #holoFallback {margin-top:30px;}
+#holoFallback svg {height:390px;max-height:390px;}
+#holoStage[data-view=3d] .holo-rotation {position:relative;z-index:4;}
+.holo-rotation {gap:2px;flex-wrap:wrap;}
+.holo-rotation button {font-size:8px;padding:4px;min-height:26px;}
+#holoStage .holo-auto {font-size:8px;min-height:26px;margin-top:3px;padding:5px;}
+#biometricLinks {position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;}
+.map-legend {margin-top:0!important;font-size:8px!important;padding-top:8px;border-color:#00c8df22;color:#7897a8;}
+.map-legend>div {gap:12px;}
+.map-legend #rcqBadge {font-size:8px;}
+#inspectionDock {position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e99453a6;background:#20141bd6;border-radius:4px 13px 4px 13px;padding:13px 16px;box-shadow:inset 0 0 16px #ff8a3a12,0 0 16px #ff8a3a0c;margin-top:14px!important;}
+#inspectionDock[data-alert=false] {background:#071c27;border-color:#00c8df77;}
+#inspectionDock .dock-label {display:block;color:#c2a58e;font:10px 'Orbitron',sans-serif;letter-spacing:.04em;margin-bottom:5px;}
+#phenotypeTitle {color:#ffbd87;font:600 11px 'JetBrains Mono',monospace;line-height:1.5;margin:0;}
+#phenotypeDesc {font:9px 'Inter',sans-serif;color:#a48e87;margin-top:4px;}
+#phenotypeBadge {display:none;}
+.dock-action {border:1px solid #5bdefb80;color:#a7f0ff;background:#0c3c4bd9;border-radius:5px;padding:11px 13px;font:600 10px 'Orbitron',sans-serif;white-space:nowrap;box-shadow:0 0 12px #00d9ff20;min-height:40px;}
+.compare-toolbar {margin-top:10px!important;border-radius:6px;padding:9px 10px;background:#06121e;font-size:10px;}
+.compare-toolbar #compareStatusLabel {font-size:9px;}
+.compare-toolbar select {font-size:9px;max-width:145px;}
+.compare-toolbar .compare-ref-label {font-size:9px;}
+#bottomNav {position:fixed;z-index:35;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,1100px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid #00c8df44;background:#03101df5;backdrop-filter:blur(16px);padding:9px 10px max(9px,env(safe-area-inset-bottom));box-shadow:0 -5px 30px #020611cc;}
+#bottomNav button {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:44px;color:#698495;font:8px 'JetBrains Mono',monospace;}
+#bottomNav i {font-size:20px;}
+#bottomNav button[aria-current=page] {color:#51dfff;text-shadow:0 0 13px #00d9ffbb;}
+#selectedMetricPanel {margin-top:22px;scroll-margin-top:16px;}
+#profileDrawer,#bioMap {scroll-margin-top:16px;}
+@media(min-width:981px) {
+ #biometricGrid {grid-template-columns:minmax(0,1fr) minmax(0,2.1fr) minmax(0,1fr);max-width:880px;margin-left:auto;margin-right:auto;}
+ #holoPortrait {inset:34px -10% 22px;}
+ #inspectionDock,.compare-toolbar,.map-legend {max-width:880px;margin-left:auto;margin-right:auto;}
+ .metric-card.hud-panel {min-height:109px;}
+}
+@media(max-width:600px) {
+ #appHeader>div {padding-top:14px;}
+ #dashboardMain {padding:4px 10px 0;}
+ #bioMap.scanner-grid {padding:0;}
+ #biometricGrid {min-height:470px;grid-template-columns:minmax(0,1fr) minmax(0,1.68fr) minmax(0,1fr);gap:7px;}
+ #biometricGrid>#holoStage {height:470px;min-height:470px;}
+ #leftCardsColumn,#rightCardsColumn {gap:18px;padding-bottom:14px;}
+ .metric-card.hud-panel {min-height:82px;padding:9px 5px!important;border-radius:8px;}
+ .metric-card .metric-title {font-size:9px;line-height:1.25;}
+ .metric-card .metric-value {font-size:17px;margin:6px 0 4px;}
+ .metric-card .metric-unit {font-size:8px;margin-left:2px;}
+ .metric-card .metric-status {font-size:7px;line-height:1.3;min-height:9px;}
+ .metric-card[data-metric=whr] .metric-value,.metric-card[data-metric=rm] .metric-value {font-size:17px;}
+ .metric-card .metric-sub {font-size:7px;}
+ .metric-reference-bar {height:7px;margin-top:4px;gap:1px;}
+ #holoPortrait {inset:35px -58% 15px;}
+ #holoStage>.holo-mode {top:2px;}
+ .holo-mode button {font-size:7px;padding:4px 5px;min-height:25px;}
+ #holoStage>#holoStatus {font-size:6px;max-width:180%;}
+ #holoStage #canvas3dContainer {height:290px;}
+ #holoFallback svg {height:330px;max-height:330px;}
+ .live-visceral {height:16px;width:16px;}
+ #inspectionDock {padding:10px 11px;gap:8px;}
+ #inspectionDock .dock-label {font-size:8px;}
+ #phenotypeTitle {font-size:9px;}
+ #phenotypeDesc {font-size:8px;}
+ .dock-action {padding:8px;font-size:8px;}
+ .compare-toolbar {gap:5px;}
+ .compare-toolbar .compare-ref-label {display:none;}
+ .map-legend {font-size:7px!important;gap:4px;}
+ .map-legend>div {gap:8px;}
+ .map-legend #rcqBadge {font-size:7px;}
+}
+@media(max-width:360px) {
+ #dashboardMain {padding-left:7px;padding-right:7px;}
+ #biometricGrid {gap:5px;grid-template-columns:minmax(0,1fr) minmax(0,1.55fr) minmax(0,1fr);}
+ .metric-card .metric-value {font-size:15px;}
+ .metric-card .metric-title {font-size:8px;}
+ .metric-card .metric-status {font-size:6px;}
+}
+@media(prefers-reduced-motion:reduce) {.holo-art-image {transition:none;}}
+@media print {#bottomNav,#holoPortrait,#biometricLinks {display:none!important;}}
+
   </style>
 </head>
 <body class="pb-20">
@@ -229,27 +371,28 @@
   <!-- TOP HEADER -->
   <header id="appHeader" class="max-w-7xl mx-auto px-3 pt-3 pb-2 no-print">
     <div class="panel-dark cyber-panel hud-corners rounded-2xl p-3.5 space-y-3">
-      <div class="flex items-start justify-between gap-2">
+      <div class="brand-row">
         <div class="flex items-center gap-2.5">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-indigo-600 flex items-center justify-center font-black text-slate-950 text-sm shadow-lg shadow-sky-500/25">
+          <div class="brand-icon w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-indigo-600 flex items-center justify-center font-black text-slate-950 text-sm shadow-lg shadow-sky-500/25">
             BV
           </div>
-          <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <h1 class="hud-font font-extrabold text-sm sm:text-base text-white tracking-wider">BIOVAULT <span class="text-cyan-400">PRO</span></h1>
-              <span class="text-[11px] px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 font-semibold">Omron HBF-514C</span>
+          <div class="brand-copy">
+            <div class="brand-line flex items-center gap-2 flex-wrap">
+              <h1 class="hud-font font-extrabold text-sm sm:text-base text-white tracking-wider">BioVault <span class="text-cyan-400">Pro</span></h1>
+              <span class="model-label">OMRON HBF-514C</span>
               <span id="syncPill" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-medium">● Conectando...</span>
             </div>
-            <p class="text-[11px] text-slate-400 mt-0.5">Corpo 3D interativo • Composição e evolução</p>
+            <p class="brand-description text-[11px] text-slate-400 mt-0.5">Corpo 3D interativo • Composição e evolução</p>
           </div>
         </div>
-        <button onclick="window.location.reload()" title="Atualizar App" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v4.2
+        <button onclick="window.location.reload()" title="Atualizar App" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
+          ↻ v4.3
         </button>
       </div>
 
       <!-- CONTROLES SUPERIORES -->
-      <div class="flex flex-wrap items-center gap-2">
+      <details id="profileDrawer"><summary><i class="fa-solid fa-sliders" aria-hidden="true"></i> Perfil e ferramentas <i class="fa-solid fa-angle-down" aria-hidden="true"></i></summary>
+      <div id="profileControls" class="flex flex-wrap items-center gap-2">
         <select id="sexSelect" onchange="saveProfilePrefs(); recomputeAll()" class="bg-[#081222] border border-slate-700/80 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 outline-none">
           <option value="F" selected>Sexo: Feminino (Ref. Omron)</option>
           <option value="M">Sexo: Masculino (Ref. Omron)</option>
@@ -276,6 +419,7 @@
           Gerar Laudo PDF
         </button>
       </div>
+      </details>
     </div>
   </header>
 
@@ -292,51 +436,34 @@
   <main id="dashboardMain" class="max-w-7xl mx-auto px-3 space-y-3">
     <p id="filterEmpty" class="hidden panel-dark cyber-panel hud-corners rounded-2xl p-4 text-sm text-slate-300">Nenhuma pesagem em jejum neste histórico. Desmarque “Só jejum” para ver as demais.</p>
     <section id="bioMap" class="panel-dark cyber-panel hud-corners scanner-grid rounded-2xl p-3.5 sm:p-4 space-y-3.5">
-      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-500/15 pb-2">
+      <div class="map-heading flex flex-wrap items-center justify-between gap-2 border-b border-cyan-500/15 pb-2">
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
-          <h2 class="hud-font font-bold text-xs sm:text-sm text-cyan-100 uppercase tracking-wider">Holograma corporal 3D</h2>
+          <span class="map-led w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
+          <h2 class="hud-font font-bold text-xs sm:text-sm text-cyan-100 uppercase tracking-wider">PAINEL BIOMÉTRICO</h2>
         </div>
         <span id="activeReadingBadge" class="text-[11px] text-slate-400 mono">--/--/----</span>
       </div>
 
-      <!-- RESUMO DOS INDICADORES -->
-      <div class="rounded-xl bg-[#07101f]/95 border border-slate-800 p-3 flex items-start justify-between gap-3">
-        <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">RESUMO DOS INDICADORES</span>
-          <h3 id="phenotypeTitle" class="text-sm font-extrabold text-sky-400 mt-0.5">--</h3>
-          <p id="phenotypeDesc" class="text-xs text-slate-300 mt-0.5">--</p>
-        </div>
-        <span id="phenotypeBadge" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-bold shrink-0">
-          --
-        </span>
-      </div>
-
-      <!-- COMPARAR ANTES x ATUAL -->
-      <div class="rounded-xl bg-[#07101f] border border-slate-800 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <button id="btnToggleCompare" onclick="toggleCompareMode()" class="flex items-center gap-2 font-semibold text-slate-300">
-          <span class="text-sky-400">⇄</span>
-          <span id="compareStatusLabel">Comparar Antes × Atual: OFF</span>
-        </button>
-        <div class="flex items-center gap-2">
-          <span class="text-slate-400 text-[11px]">Comparar com:</span>
-          <select id="compareSelect" onchange="recomputeAll()" class="bg-[#0c182d] border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-slate-200 outline-none"></select>
-        </div>
-      </div>
-
       <!-- GRID CENTRAL -->
       <div id="biometricGrid" class="grid grid-cols-12 gap-1.5 sm:gap-3 items-center pt-1">
+        <canvas id="biometricLinks" aria-hidden="true"></canvas>
         <div class="col-span-4 space-y-2.5" id="leftCardsColumn"></div>
 
         <!-- 3D INTERATIVO COM A VISUALIZAÇÃO ANTERIOR DISPONÍVEL EM 2D -->
-        <div id="holoStage" class="hud-body-console col-span-4 flex flex-col items-center justify-center relative py-2">
+        <div id="holoStage" data-view="portrait" class="hud-body-console col-span-4 flex flex-col items-center justify-center relative py-2">
           <div class="holo-console-title"><span class="holo-dot"></span> HOLO-BODY 3D <span class="text-slate-400 text-[9px]">ILUSTRAÇÃO</span></div>
           <div class="holo-mode no-print" role="group" aria-label="Tipo de visualização">
+            <button type="button" id="holoModePortrait" data-holo-mode="portrait" aria-pressed="true">Holo</button>
             <button type="button" id="holoMode3d" data-holo-mode="3d" aria-pressed="false">3D</button>
-            <button type="button" id="holoMode2d" data-holo-mode="2d" aria-pressed="true">2D</button>
+            <button type="button" id="holoMode2d" data-holo-mode="2d" aria-pressed="false">2D</button>
+          </div>
+          <div id="holoPortrait" data-warm="false" role="img" aria-label="Ilustração holográfica. As cores representam apenas as faixas dos indicadores, sem localização medida de gordura.">
+            <img id="holoArtCool" class="holo-art-image" src="assets/hologram-cyan-v43.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async" />
+            <img id="holoArtWarm" class="holo-art-image" src="assets/hologram-amber-v43.webp" alt="" width="1024" height="1536" decoding="async" />
+            <span id="portraitVisceralCore" class="live-visceral" aria-hidden="true"></span>
           </div>
           <div id="canvas3dContainer" class="hidden" tabindex="0" role="img" aria-label="Ilustração corporal 3D. Arraste na horizontal ou use as setas para girar."></div>
-          <div id="holoFallback" class="w-full flex justify-center" aria-label="Ilustração corporal em duas dimensões">
+          <div id="holoFallback" class="hidden w-full flex justify-center" aria-label="Ilustração corporal em duas dimensões">
           <svg viewBox="0 0 220 430" class="w-full max-w-[185px] h-auto drop-shadow-[0_0_22px_rgba(14,165,233,0.22)]">
             <defs>
               <linearGradient id="muscleGrad" x1="0" y1="0" x2="0" y2="1">
@@ -396,14 +523,39 @@
       </div>
 
       <!-- LEGENDA INFERIOR -->
-      <div class="border-t border-slate-800/90 pt-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+      <div class="map-legend border-t border-slate-800/90 pt-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
         <div class="flex items-center gap-3">
-          <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-sky-400 inline-block"></i> Massa Magra</span>
-          <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-amber-400 inline-block"></i> Subcutânea</span>
-          <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-rose-500 inline-block"></i> Visceral</span>
+          <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-sky-400 inline-block"></i> Holograma</span>
+          <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-amber-400 inline-block"></i> Atenção</span>
+          <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-rose-500 inline-block"></i> Índice elevado</span>
         </div>
         <span id="rcqBadge" class="mono font-bold text-slate-300">RCQ: --</span>
       </div>
+      <!-- RESUMO DOS INDICADORES -->
+      <div id="inspectionDock" data-alert="false" role="region" aria-label="Resumo dos indicadores">
+        <div>
+          <span class="dock-label">INSPEÇÃO DOS INDICADORES</span>
+          <h3 id="phenotypeTitle" class="text-sm font-extrabold text-sky-400 mt-0.5">--</h3>
+          <p id="phenotypeDesc" class="text-xs text-slate-300 mt-0.5">--</p>
+        </div>
+        <span id="phenotypeBadge" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-bold shrink-0">
+          --
+        </span>
+        <button type="button" id="inspectReadingButton" class="dock-action" onclick="inspectCurrentReading()">ANALISAR <i class="fa-solid fa-angle-right" aria-hidden="true"></i></button>
+      </div>
+
+      <!-- COMPARAR ANTES x ATUAL -->
+      <div class="compare-toolbar rounded-xl bg-[#07101f] border border-slate-800 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <button id="btnToggleCompare" onclick="toggleCompareMode()" class="flex items-center gap-2 font-semibold text-slate-300">
+          <span class="text-sky-400">⇄</span>
+          <span id="compareStatusLabel">Comparar Antes × Atual: OFF</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <span class="compare-ref-label text-slate-400 text-[11px]">Referência:</span>
+          <select id="compareSelect" onchange="recomputeAll()" class="bg-[#0c182d] border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-slate-200 outline-none"></select>
+        </div>
+      </div>
+
     </section>
 
     <section id="selectedMetricPanel" class="panel-dark cyber-panel rounded-2xl p-4 space-y-3 border-l-4 border-l-cyan-400">
@@ -554,7 +706,14 @@
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.2</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.3</span><span>Histórico local e sincronização Firebase</span></footer>
+
+  <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
+    <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>INÍCIO</span></button>
+    <button type="button" data-app-nav="scan"><i class="fa-solid fa-expand" aria-hidden="true"></i><span>NOVA LEITURA</span></button>
+    <button type="button" data-app-nav="history"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span>HISTÓRICO</span></button>
+    <button type="button" data-app-nav="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i><span>FERRAMENTAS</span></button>
+  </nav>
 
   <script type="module">
     const firebaseConfig = {
@@ -714,7 +873,7 @@ function historyTelemetryTable(list) {
 
 // Optional visualization. A failed CDN or GPU never prevents measurements from loading.
 const holo = {renderer:null,scene:null,camera:null,body:null,materials:null,parts:null,
-  target:.28,dragging:false,auto:false,mode:'3d',failed:false,reduced:false,
+  target:.28,dragging:false,auto:false,mode:'portrait',failed:false,reduced:false,
   frameVisible:true,resizeObserver:null,intersectionObserver:null,previousTime:0,scanActive:false};
 const clampHolo = (v,lo,hi) => Math.max(lo,Math.min(hi,v));
 function holoAppearance(record, analyses = analyze(record)) {
@@ -730,18 +889,69 @@ function holoAppearance(record, analyses = analyze(record)) {
     visceralColor:visceralHigh ? 0xff2a5f : analyses.visceral.neutral ? 0x94a3b8 : 0x10b981,
     thighColor:fatHigh ? 0xf59e0b : 0x0ea5e9};
 }
+function updatePortraitState(record) {
+  const state=holoAppearance(record);
+  $('holoPortrait').dataset.warm=String(state.fatHigh);
+  // Illustrative width, not a reconstruction or a measured regional heatmap.
+  $('holoPortrait').style.setProperty('--body-width',String(clampHolo(state.volume,.9,1.18)));
+  $('portraitVisceralCore').style.color=`#${state.visceralColor.toString(16).padStart(6,'0')}`;
+  $('holoPortrait').dataset.visceral=state.visceralHigh?'high':'normal';
+  setHoloMode(holo.mode);
+  scheduleBiometricLinks();
+}
+function scheduleBiometricLinks() {
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(drawBiometricLinks);
+}
+function drawBiometricLinks() {
+  if(typeof CanvasRenderingContext2D==='undefined')return;
+  const grid=$('biometricGrid'),canvas=$('biometricLinks'),stage=$('holoStage');
+  if(!grid||!canvas||!currentReading)return;
+  const box=grid.getBoundingClientRect(),body=stage.getBoundingClientRect();
+  if(!box.width||!box.height)return;
+  const scale=Math.min(window.devicePixelRatio||1,2),ctx=canvas.getContext('2d');
+  if(!ctx)return;
+  canvas.width=Math.round(box.width*scale);canvas.height=Math.round(box.height*scale);
+  ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,box.width,box.height);
+  const anchors={weight:[.35,.23],fat:[.41,.38],visceral:[.5,.40],rm:[.36,.66],bmi:[.64,.23],muscle:[.68,.34],bodyAge:[.68,.65],whr:[.59,.45]};
+  for(const button of grid.querySelectorAll('[data-metric]')){
+    const key=button.dataset.metric,card=button.getBoundingClientRect(),left=['weight','fat','visceral','rm'].includes(key);
+    const x=(left?card.right:card.left)-box.left,y=card.top+card.height/2-box.top;
+    const anchor=anchors[key],endX=body.left-box.left+body.width*anchor[0],endY=body.top-box.top+body.height*anchor[1];
+    const info=currentAnalyses[key];
+    ctx.strokeStyle=info?.altered?(info.status==='MUITO ALTO'?'#fb718577':'#f5aa6677'):'#69d5e077';
+    ctx.fillStyle=info?.altered?'#f5aa66':'#69d5e0';ctx.lineWidth=.7;
+    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+(left?1:-1)*Math.min(14,body.width*.1),y);ctx.lineTo(endX,endY);ctx.stroke();
+    ctx.beginPath();ctx.arc(endX,endY,2.2,0,Math.PI*2);ctx.fill();
+  }
+}
+function inspectCurrentReading() {
+  if(!currentReading)return;
+  const key=currentAnalyses[selectedMetricKey]?.altered?selectedMetricKey:Object.keys(currentAnalyses).find(k=>currentAnalyses[k].altered)||selectedMetricKey;
+  selectMetricDetail(key,true);
+}
+function navigateApp(destination) {
+  if(destination==='home'){$('bioMap').scrollIntoView({behavior:'smooth',block:'start'});return;}
+  if(destination==='scan'){openNewWeighingModal();return;}
+  if(destination==='history'){openQuickPanel('history');return;}
+  if(destination==='settings'){$('profileDrawer').open=true;$('profileDrawer').scrollIntoView({behavior:'smooth',block:'start'});}
+}
 function setHoloMode(mode) {
-  if (!['2d','3d'].includes(mode)) return;
+  if (!['portrait','2d','3d'].includes(mode)) return;
+  if(mode==='3d')initHolo3D();
   holo.mode=mode;
   const enabled=mode==='3d' && !!holo.renderer && !holo.failed;
+  const portrait=mode==='portrait';
+  $('holoPortrait').classList.toggle('hidden',!portrait);
+  $('holoStage').dataset.view=portrait?'portrait':enabled?'3d':'2d';
   $('canvas3dContainer').classList.toggle('hidden',!enabled);
-  $('holoFallback').classList.toggle('hidden',enabled);
+  $('holoFallback').classList.toggle('hidden',enabled||portrait);
   $('holoRotationControls').classList.toggle('hidden',!enabled);
   $('holoAutoRotate').classList.toggle('hidden',!enabled);
   $('holoScanBeam').classList.toggle('hidden',!enabled);
   $('holoMode3d').setAttribute('aria-pressed',String(enabled));
-  $('holoMode2d').setAttribute('aria-pressed',String(!enabled));
-  $('holoStatus').textContent=enabled ? 'Arraste na horizontal • Ilustração estimada' : 'Ilustração 2D • As demais funções continuam disponíveis';
+  $('holoMode2d').setAttribute('aria-pressed',String(!enabled&&!portrait));
+  $('holoModePortrait').setAttribute('aria-pressed',String(portrait));
+  $('holoStatus').textContent=portrait ? 'Ilustração • Cores dos indicadores' : enabled ? 'Arraste para girar • Ilustração 3D' : 'Ilustração 2D • Visualização simplificada';
   updateHoloLoop();
   if(enabled) resizeHolo();
 }
@@ -870,6 +1080,7 @@ function initHolo3D() {
 }
 function updateHolo3DState(record) {
   if(!record){updateHoloLoop();return;}
+  updatePortraitState(record);
   if(!initHolo3D())return;
   const s=holoAppearance(record),p=holo.parts,m=holo.materials;
   const smooth=p.sculptedTorso.geometry,positions=smooth.attributes.position,colors=smooth.attributes.color,original=smooth.userData.basePositions;
@@ -895,7 +1106,7 @@ function updateHolo3DState(record) {
   // Normal visceral stays green even if total body fat is high.
   p.core.material.color.setHex(s.visceralColor);p.halo.material.color.setHex(s.visceralColor);
   p.halo.material.opacity=s.visceralHigh?.34:.18;
-  if(holo.mode==='3d')setHoloMode('3d');else drawHolo();
+  if(holo.mode==='3d')setHoloMode('3d');else {setHoloMode(holo.mode);drawHolo();}
 }
 function disposeHolo() {
   if(!holo.renderer)return;
@@ -915,6 +1126,12 @@ function initializeHoloControls() {
   $('threeSdk')?.addEventListener('error',()=>disableHolo());
   document.addEventListener('visibilitychange',updateHoloLoop);
   window.addEventListener('pagehide',event=>{if(!event.persisted)disposeHolo();});
+  setHoloMode('portrait');
+  window.addEventListener('resize',scheduleBiometricLinks);
+  for(const id of ['holoArtCool','holoArtWarm'])$(id).addEventListener('error',()=>{
+    if(holo.mode==='portrait')setHoloMode('2d');
+  });
+  document.fonts?.ready.then(scheduleBiometricLinks);
 }
 
 const clinicalSources={
@@ -1160,6 +1377,7 @@ function recomputeAll() {
   $('activeReadingBadge').textContent = `${dateLabel(cur.date)} • ${cur.protocol || 'Protocolo não informado'}`;
   $('phenotypeTitle').textContent = altered.length ? `${altered.length} indicador(es) em atenção` : 'Indicadores nas faixas avaliadas';
   $('phenotypeDesc').textContent = altered.length ? 'Toque nos cards destacados ou nos alertas para entender cada resultado.' : 'Veja as referências e as limitações ao tocar nos indicadores.';
+  $('inspectionDock').dataset.alert=String(altered.length>0);
   $('phenotypeBadge').textContent = altered.length ? 'Atenção' : 'Acompanhar';
   $('phenotypeBadge').className = `px-2.5 py-1 rounded-lg border text-xs font-bold shrink-0 ${altered.length ? 'bg-amber-500/15 border-amber-500/40 text-amber-300' : 'bg-sky-500/15 border-sky-500/40 text-sky-300'}`;
   const rcq = number(cur.waist) / number(cur.hip);
@@ -1180,7 +1398,10 @@ function recomputeAll() {
     const [title,value,sub] = definitions[key], info = a[key];
     const danger=info.altered && (info.status==='MUITO ALTO'||['OBESIDADE II','OBESIDADE III'].includes(info.status));
     const glyph={weight:'weight-scale',fat:'fire-flame-curved',visceral:'atom',rm:'bolt',bmi:'calculator',muscle:'dumbbell',bodyAge:'hourglass-half',whr:'ruler-combined'}[key];
-    return `<button type="button" data-metric="${key}" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node hud-panel ${danger?'alert-danger-border':''} ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400">${title}${info.altered?' ⚠':''}<i class="fa-solid fa-${glyph} metric-glyph" aria-hidden="true"></i></span><span class="metric-value block text-sm sm:text-base font-extrabold text-white mono mt-1">${value}</span><span class="block text-[9px] sm:text-[10px] font-extrabold uppercase mt-1 ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span>${metricReferenceBar(key,cur,info)}<span class="block text-[9px] text-slate-400 mt-1">${sub}</span></button>`;
+    const short={weight:'PESO',fat:'GORDURA',visceral:'VISCERAL',rm:'BASAL',bmi:'IMC AUTO',muscle:'MÚSCULO',bodyAge:'IDADE CORPORAL',whr:'CINTURA / QUADRIL'}[key];
+    const primary={weight:fmt(cur.weight),fat:fmt(cur.fat),visceral:fmt(cur.visceral,0),rm:fmt(cur.rm,0),bmi:fmt(bmi),muscle:fmt(cur.muscle),bodyAge:fmt(cur.bodyAge,0),whr:number(cur.hip)>0?fmt(rcq,2):'—'}[key];
+    const unit={weight:'kg',fat:'%',visceral:'nível',rm:'kcal',bmi:'',muscle:'%',bodyAge:'anos',whr:''}[key];
+    return `<button type="button" data-metric="${key}" data-compare="${compareMode}" aria-label="${title}: ${value}. ${info.status}. Abrir detalhes" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node hud-panel ${danger?'alert-danger-border':''} ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title"><span class="metric-full-label">${title}</span><span class="metric-short-label" aria-hidden="true">${short}</span><i class="fa-solid fa-${glyph} metric-glyph" aria-hidden="true"></i></span><span class="metric-value">${primary}<span class="metric-unit">${unit}</span></span>${metricReferenceBar(key,cur,info)}<span class="metric-status ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="metric-sub">${sub}</span></button>`;
   };
   $('leftCardsColumn').innerHTML = ['weight','fat','visceral','rm'].map(card).join('');
   $('rightCardsColumn').innerHTML = ['bmi','muscle','bodyAge','whr'].map(card).join('');
@@ -1348,8 +1569,9 @@ async function connectCloud() {
   } catch {serverSeen=false;notify('Sem conexão com o Firebase. Novas pesagens ficam salvas neste navegador e aguardam sincronização.');}
   finally {connecting=false;setSyncStatus();}
 }
-Object.assign(window,{openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
+Object.assign(window,{inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
 document.addEventListener('click',event=>{
+  const nav=event.target.closest('[data-app-nav]');if(nav)navigateApp(nav.dataset.appNav);
   const mode=event.target.closest('[data-holo-mode]');if(mode)setHoloMode(mode.dataset.holoMode);
   const turn=event.target.closest('[data-holo-turn]');if(turn)rotateHolo(turn.dataset.holoTurn);
   const metric=event.target.closest('[data-metric]');if(metric)selectMetricDetail(metric.dataset.metric);
