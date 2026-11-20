@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#060d1a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>BioVault Pro • Omron HBF-514C</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #050a14;
+      color: #f1f5f9;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .panel-dark {
+      background: linear-gradient(180deg, #0b1426 0%, #08101e 100%);
+      border: 1px solid #17253d;
+    }
+    .metric-card {
+      background: rgba(11, 21, 39, 0.88);
+      border: 1px solid #182844;
+      transition: all 0.2s ease;
+    }
+    .metric-card:hover, .metric-card.active-card {
+      border-color: #0ea5e9;
+      box-shadow: 0 0 18px rgba(14, 165, 233, 0.16);
+    }
+    .scanner-grid {
+      background-image:
+        linear-gradient(to right, rgba(14, 165, 233, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(14, 165, 233, 0.06) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.75; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.06); }
+    }
+    .visceral-glow { animation: pulseGlow 2.6s ease-in-out infinite; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; color: #000 !important; }
+      .panel-dark, .metric-card { background: #fff !important; border: 1px solid #cbd5e1 !important; color: #000 !important; }
+    }
+  </style>
+</head>
+<body class="pb-20">
+
+  <!-- TOP HEADER -->
+  <header class="max-w-4xl mx-auto px-3 pt-3 pb-2 no-print">
+    <div class="panel-dark rounded-2xl p-3.5 space-y-3">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center font-black text-slate-950 text-sm shadow-lg shadow-sky-500/25">
+            BV
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="font-extrabold text-base text-white tracking-tight">BioVault Pro</h1>
+              <span class="text-[11px] px-2 py-0.5 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 font-semibold">Omron HBF-514C</span>
+              <span id="syncPill" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-medium">● Conectando...</span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Scanner Corporal 3D • Diagnóstico Cruzado & Evidências Clínicas</p>
+          </div>
+        </div>
+        <button onclick="window.location.reload(true)" title="Atualizar App" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
+          ↻ v2.0
+        </button>
+      </div>
+
+      <!-- CONTROLES SUPERIORES -->
+      <div class="flex flex-wrap items-center gap-2">
+        <select id="sexSelect" onchange="recomputeAll()" class="bg-[#081222] border border-slate-700/80 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 outline-none">
+          <option value="F" selected>Sexo: Feminino (Ref. Omron)</option>
+          <option value="M">Sexo: Masculino (Ref. Omron)</option>
+        </select>
+
+        <div class="flex items-center gap-1.5 bg-[#081222] border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs">
+          <span class="text-slate-400">Idade Real:</span>
+          <input type="number" id="realAgeInput" value="28" min="15" max="95" onchange="recomputeAll()" class="w-10 bg-transparent text-white font-extrabold text-center outline-none mono" />
+          <span class="text-slate-400">anos</span>
+        </div>
+
+        <button onclick="openNewWeighingModal()" class="bg-sky-500 hover:bg-sky-400 text-slate-950 font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-sky-500/20">
+          + Nova Pesagem
+        </button>
+
+        <button onclick="openReportModal()" class="bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-xs px-3.5 py-2 rounded-xl">
+          Gerar Laudo PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAPA BIOMÉTRICO INTERATIVO -->
+  <main class="max-w-4xl mx-auto px-3 space-y-3">
+    <section class="panel-dark scanner-grid rounded-2xl p-3.5 sm:p-4 space-y-3.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
+          <h2 class="font-bold text-sm text-white">Mapa Biométrico Interativo</h2>
+        </div>
+        <span id="activeReadingBadge" class="text-[11px] text-slate-400 mono">18/11/2026 • Em jejum</span>
+      </div>
+
+      <!-- FENÓTIPO METABÓLICO DETECTADO -->
+      <div class="rounded-xl bg-[#07101f]/95 border border-slate-800 p-3 flex items-start justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">FENÓTIPO METABÓLICO DETECTADO</span>
+          <h3 id="phenotypeTitle" class="text-sm font-extrabold text-sky-400 mt-0.5">Composição Corporal Saudável</h3>
+          <p id="phenotypeDesc" class="text-xs text-slate-300 mt-0.5">Equilíbrio adequado entre massa muscular esquelética e reservas adiposas.</p>
+        </div>
+        <span id="phenotypeBadge" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-bold shrink-0">
+          Equilibrado
+        </span>
+      </div>
+
+      <!-- COMPARAR ANTES x ATUAL -->
+      <div class="rounded-xl bg-[#07101f] border border-slate-800 px-3 py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <button id="btnToggleCompare" onclick="toggleCompareMode()" class="flex items-center gap-2 font-semibold text-slate-300">
+          <span class="text-sky-400">⇄</span>
+          <span id="compareStatusLabel">Comparar Antes × Atual: OFF</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <span class="text-slate-400 text-[11px]">Comparar com:</span>
+          <select id="compareSelect" onchange="recomputeAll()" class="bg-[#0c182d] border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-slate-200 outline-none"></select>
+        </div>
+      </div>
+
+      <!-- GRID CENTRAL -->
+      <div class="grid grid-cols-12 gap-2 sm:gap-3 items-center pt-1">
+        <div class="col-span-4 space-y-2.5" id="leftCardsColumn"></div>
+
+        <!-- SILHUETA ANATÔMICA CENTRAL -->
+        <div class="col-span-4 flex flex-col items-center justify-center relative py-2">
+          <svg viewBox="0 0 220 430" class="w-full max-w-[185px] h-auto drop-shadow-[0_0_22px_rgba(14,165,233,0.22)]">
+            <defs>
+              <linearGradient id="muscleGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#38bdf8" />
+                <stop offset="100%" stop-color="#0284c7" />
+              </linearGradient>
+              <radialGradient id="viscGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#34d399" stop-opacity="0.95" />
+                <stop offset="55%" stop-color="#10b981" stop-opacity="0.45" />
+                <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <line x1="110" y1="15" x2="110" y2="412" stroke="#1e3a5f" stroke-width="1" stroke-dasharray="3 3" />
+            <ellipse cx="110" cy="410" rx="68" ry="10" fill="none" stroke="#0ea5e9" stroke-opacity="0.35" stroke-width="1.2" />
+            <ellipse cx="110" cy="410" rx="42" ry="6" fill="none" stroke="#38bdf8" stroke-opacity="0.55" stroke-width="1" />
+            <path d="M95 26 C95 14, 125 14, 125 26 C126 42, 121 53, 110 53 C99 53, 94 42, 95 26 Z" fill="url(#muscleGrad)" opacity="0.9" />
+            <rect x="103" y="55" width="14" height="10" rx="3" fill="#0ea5e9" opacity="0.7" />
+            <path d="M62 74 C66 64, 82 64, 86 74 L82 95 L60 92 Z" fill="url(#muscleGrad)" />
+            <path d="M158 74 C154 64, 138 64, 134 74 L138 95 L160 92 Z" fill="url(#muscleGrad)" />
+            <path d="M88 68 L108 68 L108 98 L85 95 Z" fill="url(#muscleGrad)" />
+            <path d="M132 68 L112 68 L112 98 L135 95 Z" fill="url(#muscleGrad)" />
+            <rect x="55" y="96" width="16" height="44" rx="7" transform="rotate(6 55 96)" fill="url(#muscleGrad)" opacity="0.88" />
+            <rect x="149" y="96" width="16" height="44" rx="7" transform="rotate(-6 165 96)" fill="url(#muscleGrad)" opacity="0.88" />
+            <rect x="49" y="144" width="13" height="44" rx="6" transform="rotate(8 49 144)" fill="#0284c7" opacity="0.82" />
+            <rect x="158" y="144" width="13" height="44" rx="6" transform="rotate(-8 171 144)" fill="#0284c7" opacity="0.82" />
+            <rect x="92" y="103" width="15" height="13" rx="3" fill="#38bdf8" opacity="0.85" />
+            <rect x="113" y="103" width="15" height="13" rx="3" fill="#38bdf8" opacity="0.85" />
+            <rect x="92" y="120" width="15" height="13" rx="3" fill="#0ea5e9" opacity="0.85" />
+            <rect x="113" y="120" width="15" height="13" rx="3" fill="#0ea5e9" opacity="0.85" />
+            <rect x="93" y="137" width="14" height="14" rx="3" fill="#0284c7" opacity="0.85" />
+            <rect x="113" y="137" width="14" height="14" rx="3" fill="#0284c7" opacity="0.85" />
+            <circle id="svgVisceralGlow" cx="110" cy="166" r="32" fill="url(#viscGlow)" class="visceral-glow" />
+            <circle id="svgVisceralCore" cx="110" cy="166" r="9" fill="#34d399" />
+            <ellipse cx="110" cy="166" rx="46" ry="11" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="4 3" />
+            <circle cx="66" cy="166" r="3.5" fill="#f43f5e" />
+            <path d="M84 182 L136 182 L131 206 L89 206 Z" fill="#0369a1" opacity="0.75" />
+            <ellipse cx="110" cy="212" rx="54" ry="13" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5 3" />
+            <circle cx="156" cy="216" r="3.5" fill="#f59e0b" />
+            <path d="M84 218 L104 218 L101 294 L86 294 Z" fill="url(#muscleGrad)" />
+            <path d="M116 218 L136 218 L134 294 L119 294 Z" fill="url(#muscleGrad)" />
+            <path d="M86 306 L101 306 L98 382 L88 382 Z" fill="url(#muscleGrad)" opacity="0.9" />
+            <path d="M119 306 L134 306 L132 382 L122 382 Z" fill="url(#muscleGrad)" opacity="0.9" />
+          </svg>
+        </div>
+
+        <div class="col-span-4 space-y-2.5" id="rightCardsColumn"></div>
+      </div>
+
+      <!-- LEGENDA INFERIOR -->
+      <div class="border-t border-slate-800/90 pt-2.5 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-sky-400 inline-block"></i> Massa Magra</span>
+          <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-amber-400 inline-block"></i> Subcutânea</span>
+          <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-rose-500 inline-block"></i> Visceral</span>
+        </div>
+        <span id="rcqBadge" class="mono font-bold text-slate-300">RCQ: 0.76 (Baixo Risco)</span>
+      </div>
+    </section>
+
+    <!-- ANÁLISE CLÍNICA DETALHADA -->
+    <section id="selectedMetricPanel" class="panel-dark rounded-2xl p-4 space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Análise Clínica Detalhada</span>
+        <span class="text-[11px] mono text-slate-400">Toque em qualquer card acima</span>
+      </div>
+      <p id="detailMetricTitle" class="text-sm font-bold text-white">Gordura Corporal — 26.2% (Normal)</p>
+      <p id="detailMetricBody" class="text-xs text-slate-300 leading-relaxed"></p>
+    </section>
+
+    <!-- ABAS COMPLEMENTARES: EVOLUÇÃO, METAS E ALERTAS -->
+    <section class="panel-dark rounded-2xl p-4 space-y-3 no-print">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div class="flex gap-2 text-xs">
+          <button onclick="switchSubView('chart')" id="subBtn-chart" class="px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 font-bold">Evolução Mensal</button>
+          <button onclick="switchSubView('goals')" id="subBtn-goals" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Metas</button>
+          <button onclick="switchSubView('alerts')" id="subBtn-alerts" class="px-3 py-1.5 rounded-lg text-slate-400 font-semibold">Alertas Clínicos</button>
+        </div>
+        <label class="flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer">
+          <input type="checkbox" id="onlyFastingChk" onchange="recomputeAll()" class="accent-sky-500" />
+          <span>Só jejum</span>
+        </label>
+      </div>
+
+      <div id="subView-chart" class="h-48">
+        <canvas id="bioChart"></canvas>
+      </div>
+
+      <div id="subView-goals" class="hidden space-y-3 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div class="bg-[#07101f] border border-slate-800 rounded-xl p-2.5">
+            <div class="flex justify-between font-bold"><span>Meta Gordura %</span><span id="gFatLbl" class="text-sky-400 mono">22.0%</span></div>
+            <input type="range" min="14" max="38" step="0.5" value="22" id="gFatSlider" oninput="updateGoalsBox()" class="w-full accent-sky-500 mt-1" />
+          </div>
+          <div class="bg-[#07101f] border border-slate-800 rounded-xl p-2.5">
+            <div class="flex justify-between font-bold"><span>Meta Músculo %</span><span id="gMuscLbl" class="text-emerald-400 mono">34.0%</span></div>
+            <input type="range" min="24" max="44" step="0.5" value="34" id="gMuscSlider" oninput="updateGoalsBox()" class="w-full accent-emerald-500 mt-1" />
+          </div>
+          <div class="bg-[#07101f] border border-slate-800 rounded-xl p-2.5">
+            <div class="flex justify-between font-bold"><span>Meta Visceral</span><span id="gViscLbl" class="text-amber-400 mono">Nível 5</span></div>
+            <input type="range" min="1" max="12" step="1" value="5" id="gViscSlider" oninput="updateGoalsBox()" class="w-full accent-amber-500 mt-1" />
+          </div>
+        </div>
+        <div id="goalsSummaryText" class="bg-[#07101f] border border-slate-800 rounded-xl p-3 text-slate-300"></div>
+      </div>
+
+      <div id="subView-alerts" class="hidden space-y-2 text-xs"></div>
+    </section>
+  </main>
+
+  <!-- MODAL: + NOVA PESAGEM -->
+  <div id="newWeighingModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 no-print">
+    <div class="panel-dark rounded-2xl w-full max-w-lg p-4 space-y-3 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+        <h3 class="font-extrabold text-sm text-white">Nova Pesagem • Omron HBF-514C</h3>
+        <button onclick="closeNewWeighingModal()" class="text-slate-400 hover:text-white text-sm font-bold px-2">✕</button>
+      </div>
+
+      <div class="flex flex-wrap gap-1.5 text-[11px]">
+        <button type="button" onclick="pickProto('Em jejum')" class="proto-opt px-2.5 py-1.5 rounded-lg border border-sky-500 bg-sky-500/15 text-sky-300 font-bold">☀️ Em jejum</button>
+        <button type="button" onclick="pickProto('Hidratado')" class="proto-opt px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 font-bold">💧 Hidratado</button>
+        <button type="button" onclick="pickProto('Pós-treino')" class="proto-opt px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 font-bold">🏋️ Pós-treino</button>
+        <button type="button" onclick="pickProto('Final do dia')" class="proto-opt px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 font-bold">🌙 Final do dia</button>
+      </div>
+
+      <div class="flex gap-2">
+        <input type="file" id="visorFile" accept="image/*" capture="environment" class="hidden" onchange="simulateVisorScan()" />
+        <button type="button" onclick="document.getElementById('visorFile').click()" class="flex-1 py-2 rounded-xl bg-sky-500 text-slate-950 font-extrabold text-xs">
+          📷 Foto do Visor LCD
+        </button>
+        <button type="button" onclick="simulateVisorScan()" class="flex-1 py-2 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold text-xs">
+          ⚡ Preencher Leitura Teste
+        </button>
+      </div>
+
+      <form onsubmit="saveWeighing(event)" class="space-y-2.5 text-xs">
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-[11px] text-slate-400">Peso Corporal (kg)</label>
+            <input type="number" step="0.1" id="mWeight" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400">IMC (Auto ou Visor)</label>
+            <input type="number" step="0.1" id="mBmi" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400">Gordura Corporal (%)</label>
+            <input type="number" step="0.1" id="mFat" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400">Músculo Esquelético (%)</label>
+            <input type="number" step="0.1" id="mMuscle" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400">Gordura Visceral (1–30)</label>
+            <input type="number" step="1" id="mVisc" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400">Idade Corporal (anos)</label>
+            <input type="number" step="1" id="mBodyAge" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400">Metabolismo Basal (kcal)</label>
+            <input type="number" step="1" id="mRm" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <div>
+              <label class="text-[10px] text-slate-400">Cintura (cm)</label>
+              <input type="number" step="1" id="mWaist" value="74" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-400">Quadril (cm)</label>
+              <input type="number" step="1" id="mHip" value="98" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" />
+            </div>
+          </div>
+        </div>
+        <button type="submit" id="btnSaveWeighing" class="w-full py-3 rounded-xl bg-sky-500 text-slate-950 font-extrabold text-xs">
+          Salvar no Firebase (bioimpedancia-59fce)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: GERAR LAUDO PDF -->
+  <div id="reportModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="panel-dark rounded-2xl w-full max-w-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400">Laudo Clínico • Omron HBF-514C</span>
+          <h3 class="font-extrabold text-base text-white">Relatório de Bioimpedância & Diagnóstico Cruzado</h3>
+          <p class="text-xs text-slate-400">Paciente: Paloma Monti • Idade Cronológica: <span id="repAgeSpan">28</span> anos</p>
+        </div>
+        <button onclick="closeReportModal()" class="text-slate-400 hover:text-white font-bold no-print">✕</button>
+      </div>
+
+      <table class="w-full text-left text-xs border-collapse">
+        <thead>
+          <tr class="border-b border-slate-700 text-slate-400">
+            <th class="py-2">Indicador</th>
+            <th class="py-2">Inicial</th>
+            <th class="py-2">Atual</th>
+            <th class="py-2">Variação (Δ)</th>
+            <th class="py-2">Classificação</th>
+          </tr>
+        </thead>
+        <tbody id="repTableRows" class="divide-y divide-slate-800"></tbody>
+      </table>
+
+      <div class="bg-[#07101f] border border-slate-800 rounded-xl p-3 text-xs space-y-1">
+        <p class="font-bold text-sky-400">Síntese Clínica:</p>
+        <p id="repSynthesis" class="text-slate-300 leading-relaxed"></p>
+      </div>
+
+      <div class="flex gap-2 no-print">
+        <button onclick="window.print()" class="flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs">
+          🖨️ Imprimir / Salvar PDF (A4)
+        </button>
+        <button onclick="shareWhatsApp()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs">
+          📲 Enviar via WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBUJkLOV2b-P_Pq8dsp7rCGLV5bb-Jxgkg",
+      authDomain: "bioimpedancia-59fce.firebaseapp.com",
+      projectId: "bioimpedancia-59fce",
+      storageBucket: "bioimpedancia-59fce.firebasestorage.app",
+      messagingSenderId: "362561231892",
+      appId: "1:362561231892:web:f80f17728c8f2ab8e51b01",
+      measurementId: "G-0NWF6LW0YS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let readings = [
+      { id: "r1", date: "2026-08-18", weight: 66.2, bmi: 24.3, fat: 28.9, muscle: 30.1, visceral: 7, bodyAge: 29, rm: 1510, waist: 78, hip: 100, protocol: "Em jejum" },
+      { id: "r2", date: "2026-09-19", weight: 65.1, bmi: 23.9, fat: 27.6, muscle: 30.9, visceral: 6, bodyAge: 28, rm: 1498, waist: 76, hip: 99, protocol: "Em jejum" },
+      { id: "r3", date: "2026-10-20", weight: 64.4, bmi: 23.6, fat: 26.8, muscle: 31.4, visceral: 6, bodyAge: 27, rm: 1490, waist: 75, hip: 98, protocol: "Em jejum" },
+      { id: "r4", date: "2026-11-18", weight: 63.8, bmi: 23.4, fat: 26.2, muscle: 31.8, visceral: 6, bodyAge: 27, rm: 1485, waist: 74, hip: 98, protocol: "Em jejum" }
+    ];
+
+    let compareMode = false;
+    let selectedMetricKey = "fat";
+    let selectedProto = "Em jejum";
+    let chartInst = null;
+
+    async function loadFirebaseData() {
+      const pill = document.getElementById("syncPill");
+      try {
+        const q = query(collection(db, "measurements"), orderBy("date", "asc"));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          readings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        }
+        pill.className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-semibold";
+        pill.textContent = "● Firebase Sincronizado";
+      } catch (e) {
+        pill.className = "text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-semibold";
+        pill.textContent = "● Modo Local";
+      }
+      populateCompareDropdown();
+      recomputeAll();
+    }
+
+    function populateCompareDropdown() {
+      const sel = document.getElementById("compareSelect");
+      sel.innerHTML = readings.slice(0, -1).map((r, idx) =>
+        `<option value="${idx}">${r.date} (${r.weight} kg)</option>`
+      ).join("") || `<option value="0">${readings[0].date}</option>`;
+    }
+
+    window.toggleCompareMode = function() {
+      compareMode = !compareMode;
+      document.getElementById("compareStatusLabel").textContent = `Comparar Antes × Atual: ${compareMode ? "ON" : "OFF"}`;
+      document.getElementById("compareStatusLabel").className = compareMode ? "text-sky-400 font-bold" : "text-slate-300";
+      recomputeAll();
+    };
+
+    window.recomputeAll = function() {
+      const onlyFasting = document.getElementById("onlyFastingChk").checked;
+      const list = onlyFasting ? readings.filter(r => r.protocol === "Em jejum") : readings;
+      const cur = list[list.length - 1] || readings[readings.length - 1];
+      const compIdx = parseInt(document.getElementById("compareSelect").value || "0", 10);
+      const prev = list[compIdx] || list[0];
+      const realAge = parseInt(document.getElementById("realAgeInput").value || "28", 10);
+      const sex = document.getElementById("sexSelect").value;
+
+      document.getElementById("activeReadingBadge").textContent = `${cur.date} • ${cur.protocol}`;
+
+      const fatMaxNormal = sex === "F" ? 32.9 : 19.9;
+      const fatMinNormal = sex === "F" ? 21.0 : 8.0;
+      const muscHighMin = sex === "F" ? 30.4 : 39.0;
+
+      const fatStatus = cur.fat < fatMinNormal ? "BAIXO" : cur.fat <= fatMaxNormal ? "NORMAL" : "ALTO";
+      const muscStatus = cur.muscle >= muscHighMin ? "ALTO" : "NORMAL";
+      const viscStatus = cur.visceral <= 9 ? "NORMAL" : "ALTO";
+      const bmiStatus = cur.bmi < 18.5 ? "BAIXO" : cur.bmi < 25 ? "NORMAL" : "ELEVADO";
+      const ageStatus = cur.bodyAge <= realAge ? "IDEAL" : "ACIMA";
+      const rcq = (cur.waist / cur.hip).toFixed(2);
+      const rcqStatus = (sex === "F" ? rcq < 0.85 : rcq < 0.90) ? "BAIXO RISCO" : "ATENÇÃO";
+
+      document.getElementById("rcqBadge").textContent = `RCQ: ${rcq} (${rcqStatus === "BAIXO RISCO" ? "Baixo Risco" : "Atenção"})`;
+
+      if (fatStatus === "NORMAL" && (muscStatus === "ALTO" || muscStatus === "NORMAL") && viscStatus === "NORMAL") {
+        document.getElementById("phenotypeTitle").textContent = "Composição Corporal Saudável";
+        document.getElementById("phenotypeDesc").textContent = "Equilíbrio adequado entre massa muscular esquelética e reservas adiposas.";
+        document.getElementById("phenotypeBadge").textContent = "Equilibrado";
+      } else if (viscStatus === "ALTO") {
+        document.getElementById("phenotypeTitle").textContent = "Alerta Visceral Metabólico";
+        document.getElementById("phenotypeDesc").textContent = "Gordura visceral em zona de atenção. Priorize ajuste nutricional e treino aeróbico/força.";
+        document.getElementById("phenotypeBadge").textContent = "Atenção";
+      } else {
+        document.getElementById("phenotypeTitle").textContent = "Recomposição em Andamento";
+        document.getElementById("phenotypeDesc").textContent = "Ajuste progressivo entre tecido adiposo e densidade muscular esquelética.";
+        document.getElementById("phenotypeBadge").textContent = "Em Evolução";
+      }
+
+      const deltaStr = (a, b, unit = "") => {
+        if (!compareMode) return "Clique para análise";
+        const d = (a - b).toFixed(1);
+        const sign = d > 0 ? `+${d}` : `${d}`;
+        return `Antes: ${b}${unit} (${sign}${unit})`;
+      };
+
+      const leftCards = [
+        { key: "weight", title: "PESO CORPORAL", val: `${cur.weight} kg`, status: "NORMAL", statusColor: "text-emerald-400", sub: deltaStr(cur.weight, prev.weight, " kg") },
+        { key: "fat", title: "GORDURA CORPORAL", val: `${cur.fat}%`, status: fatStatus, statusColor: fatStatus === "NORMAL" ? "text-emerald-400" : "text-amber-400", sub: deltaStr(cur.fat, prev.fat, "%") },
+        { key: "visceral", title: "GORDURA VISCERAL", val: `Nível ${cur.visceral}`, status: viscStatus, statusColor: viscStatus === "NORMAL" ? "text-emerald-400" : "text-rose-400", sub: compareMode ? `Antes: Nível ${prev.visceral}` : "Clique para análise" },
+        { key: "rm", title: "METABOLISMO BASAL", val: `${cur.rm} kcal`, status: "ATIVO", statusColor: "text-sky-400", sub: compareMode ? `Antes: ${prev.rm} kcal` : "Clique para análise" }
+      ];
+
+      const rightCards = [
+        { key: "bmi", title: "IMC (AUTO)", val: `${cur.bmi}`, status: bmiStatus, statusColor: bmiStatus === "NORMAL" ? "text-emerald-400" : "text-amber-400", sub: deltaStr(cur.bmi, prev.bmi, "") },
+        { key: "muscle", title: "MÚSCULO ESQUELÉTICO", val: `${cur.muscle}%`, status: muscStatus, statusColor: "text-sky-400", sub: deltaStr(cur.muscle, prev.muscle, "%") },
+        { key: "bodyAge", title: "IDADE CORPORAL", val: `${cur.bodyAge} anos`, status: ageStatus, statusColor: ageStatus === "IDEAL" ? "text-emerald-400" : "text-amber-400", sub: compareMode ? `Antes: ${prev.bodyAge} anos` : "Clique para análise" },
+        { key: "whr", title: "CINTURA / QUADRIL", val: `${cur.waist} / ${cur.hip} cm`, status: rcqStatus, statusColor: "text-emerald-400", sub: `RCQ ${rcq} • Clique` }
+      ];
+
+      const renderCardHTML = (c) => `
+        <div onclick="selectMetricDetail('${c.key}')" class="metric-card ${selectedMetricKey === c.key ? 'active-card' : ''} rounded-xl p-2.5 sm:p-3 cursor-pointer">
+          <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">${c.title}</p>
+          <p class="text-sm sm:text-base font-extrabold text-white mono mt-0.5">${c.val}</p>
+          <p class="text-[9px] sm:text-[10px] font-extrabold uppercase mt-0.5 ${c.statusColor}">${c.status}</p>
+          <p class="text-[9px] text-slate-500 mt-0.5 truncate">${c.sub}</p>
+        </div>
+      `;
+
+      document.getElementById("leftCardsColumn").innerHTML = leftCards.map(renderCardHTML).join("");
+      document.getElementById("rightCardsColumn").innerHTML = rightCards.map(renderCardHTML).join("");
+
+      const core = document.getElementById("svgVisceralCore");
+      if (core) {
+        core.setAttribute("r", String(Math.min(18, 5 + cur.visceral * 0.8)));
+        core.setAttribute("fill", cur.visceral <= 9 ? "#34d399" : "#f43f5e");
+      }
+
+      selectMetricDetail(selectedMetricKey);
+      renderEvolutionChart(list);
+      updateGoalsBox();
+      renderClinicalAlerts(list, realAge);
+    };
+
+    window.selectMetricDetail = function(key) {
+      selectedMetricKey = key;
+      const cur = readings[readings.length - 1];
+      const fatKg = ((cur.weight * cur.fat) / 100).toFixed(1);
+      const muscKg = ((cur.weight * cur.muscle) / 100).toFixed(1);
+      const leanKg = (cur.weight - parseFloat(fatKg)).toFixed(1);
+
+      const map = {
+        weight: [`Peso Corporal — ${cur.weight} kg`, `Composição fracionada: ${leanKg} kg de massa livre de gordura e ${fatKg} kg de reserva adiposa.`],
+        fat: [`Gordura Corporal — ${cur.fat}% (${fatKg} kg)`, `Faixa saudável Omron HBF-514C (Feminino 20–39a): 21.0% a 32.9%. Seu índice atual está dentro da normalidade fisiológica.`],
+        visceral: [`Gordura Visceral — Nível ${cur.visceral}`, `Classificação Omron: 1 a 9 (Normal), 10 a 14 (Alto), 15 a 30 (Muito Alto). Nível ${cur.visceral} indica baixo risco metabólico.`],
+        rm: [`Metabolismo Basal — ${cur.rm} kcal/dia`, `Gasto energético mínimo em repouso calculado a partir da sua massa muscular esquelética (${muscKg} kg).`],
+        bmi: [`IMC (Auto) — ${cur.bmi} kg/m²`, `Índice de Massa Corporal dentro da faixa eutrófica da OMS (18.5 a 24.9 kg/m²).`],
+        muscle: [`Músculo Esquelético — ${cur.muscle}% (${muscKg} kg)`, `Percentual elevado de musculatura ativa (acima de 30.4% para referência feminina Omron), favorecendo a taxa metabólica basal.`],
+        bodyAge: [`Idade Corporal — ${cur.bodyAge} anos`, `Sua idade metabólica (${cur.bodyAge} anos) está abaixo da sua idade cronológica, refletindo boa densidade muscular.`],
+        whr: [`Cintura / Quadril — ${cur.waist} / ${cur.hip} cm`, `Relação Cintura-Quadril (RCQ) de ${(cur.waist / cur.hip).toFixed(2)}, classificada como baixo risco cardiovascular (< 0.85).`]
+      };
+
+      const info = map[key] || map.fat;
+      document.getElementById("detailMetricTitle").textContent = info[0];
+      document.getElementById("detailMetricBody").textContent = info[1];
+    };
+
+    function renderEvolutionChart(list) {
+      const ctx = document.getElementById("bioChart");
+      if (!ctx) return;
+      if (chartInst) chartInst.destroy();
+      chartInst = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: list.map(r => r.date),
+          datasets: [
+            { label: "Peso (kg)", data: list.map(r => r.weight), borderColor: "#38bdf8", tension: 0.35 },
+            { label: "Gordura (%)", data: list.map(r => r.fat), borderColor: "#f59e0b", tension: 0.35 },
+            { label: "Músculo (%)", data: list.map(r => r.muscle), borderColor: "#34d399", tension: 0.35 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: "#94a3b8", font: { size: 10 } } } },
+          scales: {
+            x: { ticks: { color: "#64748b", font: { size: 10 } }, grid: { color: "#17253d" } },
+            y: { ticks: { color: "#64748b", font: { size: 10 } }, grid: { color: "#17253d" } }
+          }
+        }
+      });
+    }
+
+    window.updateGoalsBox = function() {
+      const cur = readings[readings.length - 1];
+      const gf = parseFloat(document.getElementById("gFatSlider").value);
+      const gm = parseFloat(document.getElementById("gMuscSlider").value);
+      const gv = parseInt(document.getElementById("gViscSlider").value, 10);
+
+      document.getElementById("gFatLbl").textContent = `${gf.toFixed(1)}%`;
+      document.getElementById("gMuscLbl").textContent = `${gm.toFixed(1)}%`;
+      document.getElementById("gViscLbl").textContent = `Nível ${gv}`;
+
+      const diffFat = (cur.fat - gf).toFixed(1);
+      const diffMusc = (gm - cur.muscle).toFixed(1);
+      document.getElementById("goalsSummaryText").innerHTML =
+        `• Para atingir <b>${gf.toFixed(1)}% de gordura</b>, faltam <b>${diffFat > 0 ? diffFat + "%" : "0% (Meta atingida!)"}</b>.<br>` +
+        `• Para atingir <b>${gm.toFixed(1)}% de músculo</b>, faltam <b>${diffMusc > 0 ? "+" + diffMusc + "%" : "0% (Meta atingida!)"}</b>.<br>` +
+        `• Alvo visceral definido em <b>Nível ${gv}</b> (atual: Nível ${cur.visceral}).`;
+    };
+
+    function renderClinicalAlerts(list, realAge) {
+      const cur = list[list.length - 1];
+      const prev = list[list.length - 2] || cur;
+      const items = [];
+      if (cur.fat < prev.fat && cur.muscle >= prev.muscle) {
+        items.push("🟢 Recomposição Corporal Ativa: redução de gordura com ganho de músculo esquelético.");
+      }
+      if (cur.visceral <= 9) {
+        items.push(`🔵 Gordura Visceral Ideal (Nível ${cur.visceral}): dentro da faixa saudável de 1 a 9.`);
+      } else {
+        items.push(`🔴 Alerta Visceral (Nível ${cur.visceral}): acima do limite clínico de 9.`);
+      }
+      if (cur.bodyAge <= realAge) {
+        items.push(`🟢 Idade Corporal (${cur.bodyAge} anos) inferior à idade real (${realAge} anos).`);
+      }
+      document.getElementById("subView-alerts").innerHTML = items.map(t =>
+        `<div class="bg-[#07101f] border border-slate-800 rounded-xl p-2.5 text-slate-200">${t}</div>`
+      ).join("");
+    }
+
+    window.switchSubView = function(v) {
+      ["chart", "goals", "alerts"].forEach(k => {
+        document.getElementById("subView-" + k).classList.add("hidden");
+        document.getElementById("subBtn-" + k).className = "px-3 py-1.5 rounded-lg text-slate-400 font-semibold";
+      });
+      document.getElementById("subView-" + v).classList.remove("hidden");
+      document.getElementById("subBtn-" + v).className = "px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 font-bold";
+    };
+
+    window.openNewWeighingModal = function() {
+      const cur = readings[readings.length - 1];
+      document.getElementById("mWeight").value = cur.weight;
+      document.getElementById("mBmi").value = cur.bmi;
+      document.getElementById("mFat").value = cur.fat;
+      document.getElementById("mMuscle").value = cur.muscle;
+      document.getElementById("mVisc").value = cur.visceral;
+      document.getElementById("mBodyAge").value = cur.bodyAge;
+      document.getElementById("mRm").value = cur.rm;
+      document.getElementById("mWaist").value = cur.waist;
+      document.getElementById("mHip").value = cur.hip;
+      document.getElementById("newWeighingModal").classList.remove("hidden");
+    };
+    window.closeNewWeighingModal = () => document.getElementById("newWeighingModal").classList.add("hidden");
+
+    window.pickProto = function(p) {
+      selectedProto = p;
+      document.querySelectorAll(".proto-opt").forEach(b => {
+        b.className = b.textContent.includes(p)
+          ? "proto-opt px-2.5 py-1.5 rounded-lg border border-sky-500 bg-sky-500/15 text-sky-300 font-bold"
+          : "proto-opt px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 font-bold";
+      });
+    };
+
+    window.simulateVisorScan = function() {
+      const cur = readings[readings.length - 1];
+      document.getElementById("mWeight").value = (cur.weight - 0.2).toFixed(1);
+      document.getElementById("mFat").value = (cur.fat - 0.3).toFixed(1);
+      document.getElementById("mMuscle").value = (cur.muscle + 0.2).toFixed(1);
+    };
+
+    window.saveWeighing = async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById("btnSaveWeighing");
+      btn.disabled = true;
+      btn.textContent = "Sincronizando...";
+
+      const item = {
+        date: new Date().toISOString().split("T")[0],
+        weight: parseFloat(document.getElementById("mWeight").value),
+        bmi: parseFloat(document.getElementById("mBmi").value),
+        fat: parseFloat(document.getElementById("mFat").value),
+        muscle: parseFloat(document.getElementById("mMuscle").value),
+        visceral: parseInt(document.getElementById("mVisc").value, 10),
+        bodyAge: parseInt(document.getElementById("mBodyAge").value, 10),
+        rm: parseInt(document.getElementById("mRm").value, 10),
+        waist: parseInt(document.getElementById("mWaist").value, 10),
+        hip: parseInt(document.getElementById("mHip").value, 10),
+        protocol: selectedProto
+      };
+
+      try {
+        const ref = await addDoc(collection(db, "measurements"), { ...item, ts: serverTimestamp() });
+        item.id = ref.id;
+      } catch (err) {
+        item.id = "loc_" + Date.now();
+      }
+
+      readings.push(item);
+      populateCompareDropdown();
+      recomputeAll();
+      btn.disabled = false;
+      btn.textContent = "Salvar no Firebase (bioimpedancia-59fce)";
+      closeNewWeighingModal();
+    };
+
+    window.openReportModal = function() {
+      const first = readings[0];
+      const cur = readings[readings.length - 1];
+      document.getElementById("repAgeSpan").textContent = document.getElementById("realAgeInput").value;
+      const rows = [
+        ["Peso Corporal", `${first.weight} kg`, `${cur.weight} kg`, `${(cur.weight - first.weight).toFixed(1)} kg`, "Normal"],
+        ["Gordura Corporal", `${first.fat}%`, `${cur.fat}%`, `${(cur.fat - first.fat).toFixed(1)}%`, "Normal"],
+        ["Músculo Esquelético", `${first.muscle}%`, `${cur.muscle}%`, `+${(cur.muscle - first.muscle).toFixed(1)}%`, "Alto"],
+        ["Gordura Visceral", `Nível ${first.visceral}`, `Nível ${cur.visceral}`, `${cur.visceral - first.visceral}`, "Normal"],
+        ["IMC", first.bmi, cur.bmi, (cur.bmi - first.bmi).toFixed(1), "Normal"],
+        ["Metabolismo Basal", `${first.rm} kcal`, `${cur.rm} kcal`, `${cur.rm - first.rm} kcal`, "Ativo"],
+        ["Idade Corporal", `${first.bodyAge} anos`, `${cur.bodyAge} anos`, `${cur.bodyAge - first.bodyAge} anos`, "Ideal"],
+        ["Cintura / Quadril", `${first.waist}/${first.hip}`, `${cur.waist}/${cur.hip}`, `RCQ ${(cur.waist/cur.hip).toFixed(2)}`, "Baixo Risco"]
+      ];
+      document.getElementById("repTableRows").innerHTML = rows.map(r => `
+        <tr>
+          <td class="py-2 font-bold text-white">${r[0]}</td>
+          <td class="py-2 mono text-slate-400">${r[1]}</td>
+          <td class="py-2 mono font-bold text-white">${r[2]}</td>
+          <td class="py-2 mono text-sky-400">${r[3]}</td>
+          <td class="py-2 font-bold text-emerald-400">${r[4]}</td>
+        </tr>
+      `).join("");
+      document.getElementById("repSynthesis").textContent =
+        `Evolução de ${first.date} a ${cur.date}: redução de ${(first.weight - cur.weight).toFixed(1)} kg no peso total, queda de ${(first.fat - cur.fat).toFixed(1)}% na gordura corporal e aumento de ${(cur.muscle - first.muscle).toFixed(1)}% em músculo esquelético.`;
+      document.getElementById("reportModal").classList.remove("hidden");
+    };
+    window.closeReportModal = () => document.getElementById("reportModal").classList.add("hidden");
+
+    window.shareWhatsApp = function() {
+      const cur = readings[readings.length - 1];
+      const msg = encodeURIComponent(
+        `*BioVault Pro • Omron HBF-514C (${cur.date})*\n` +
+        `• Peso: ${cur.weight} kg | IMC: ${cur.bmi}\n` +
+        `• Gordura: ${cur.fat}% | Músculo: ${cur.muscle}%\n` +
+        `• Visceral: Nível ${cur.visceral} | Idade Corporal: ${cur.bodyAge} anos`
+      );
+      window.open(`https://wa.me/?text=${msg}`, "_blank");
+    };
+
+    loadFirebaseData();
+  </script>
+</body>
+</html>
