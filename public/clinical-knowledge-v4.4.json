@@ -1,0 +1,94 @@
+{
+  "version": "4.4.0",
+  "schema": 1,
+  "reviewedAt": "2026-11-20",
+  "language": "pt-BR",
+  "purpose": "Educação sobre resultados de bioimpedância; sem diagnóstico ou prescrição automática.",
+  "sources": {
+    "omron": {"title": "Omron HBF-514C — manual e faixas por sexo e idade", "url": "https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf"},
+    "metabolism": {"title": "Wang et al., AJCN, 2010 — gasto energético de órgãos e tecidos", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2980962/"},
+    "activity": {"title": "NIH/NIDDK — músculo, atividade física e controle do peso", "url": "https://www.niddk.nih.gov/health-information/weight-management/myths-nutrition-physical-activity"},
+    "bmi": {"title": "OMS — sobrepeso, obesidade e IMC", "url": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight"},
+    "waist": {"title": "OMS — cintura e relação cintura–quadril", "url": "https://www.who.int/publications/i/item/9789241501491"},
+    "central": {"title": "Ross et al., 2020 — cintura na avaliação clínica", "url": "https://pubmed.ncbi.nlm.nih.gov/32020062/"},
+    "bia": {"title": "Kyle et al., 2004 — princípios da bioimpedância", "url": "https://pubmed.ncbi.nlm.nih.gov/15380917/"},
+    "strength": {"title": "EWGSOP2 — avaliação clínica da força e da massa muscular", "url": "https://pubmed.ncbi.nlm.nih.gov/30312372/"},
+    "energy": {"title": "Roza e Shizgal, 1984 — estimativa de energia em repouso", "url": "https://pubmed.ncbi.nlm.nih.gov/6741850/"}
+  },
+  "metrics": {
+    "muscle": {
+      "sources": ["omron", "metabolism", "activity", "strength"],
+      "evidence": "O músculo consome energia mesmo em repouso e participa do movimento e do uso de glicose. Estudos de metabolismo estimam cerca de 13 kcal por kg de músculo por dia em repouso, contra aproximadamente 4–5 kcal por kg de tecido adiposo. Isso ilustra uma contribuição gradual, não uma previsão do seu gasto pessoal. Preservar ou ganhar músculo pode ajudar no controle do peso; perder gordura também depende do balanço energético, da atividade e da alimentação.",
+      "states": {
+        "low": {"headline": "Vamos dar atenção à sua reserva muscular", "meaning": "Uma proporção baixa pede atenção à preservação de músculo. Ela pode coexistir com gordura elevada, mesmo quando o peso da balança é alto. A proposta não é apenas pesar menos: é melhorar a composição e a capacidade para as atividades do dia a dia.", "next": "Priorize treino de força adaptado à sua condição, alimentação que atenda às suas necessidades e recuperação. Acompanhe a estimativa de músculo em kg, a força e a evolução. Fraqueza progressiva ou perda involuntária de peso merecem avaliação."},
+        "normal": {"headline": "Seu músculo está na faixa de referência: vale preservá-lo", "meaning": "Esse é um ponto favorável para acompanhar. Se seu objetivo for reduzir gordura, tente preservar a massa muscular ao longo do processo. Um resultado melhor envolve composição e função, e não só um número menor na balança.", "next": "Mantenha atividade de força regular, alimentação adequada e descanso. Observe seu desempenho e compare medições feitas em condições semelhantes."},
+        "high": {"headline": "Músculo acima da faixa costuma ser algo a preservar", "meaning": "Estar acima da faixa normal de músculo não é, por si só, algo ruim. Em geral, ter uma boa reserva muscular é favorável. Você não precisa perder músculo apenas para fazer o percentual caber na tabela. Se houver gordura a reduzir, o objetivo costuma ser preservar o músculo enquanto se trabalha a gordura.", "next": "Continue cuidando da musculatura com treino de força, recuperação e alimentação adequada. Não transforme a faixa normal em uma meta de perder músculo. Compare também a estimativa em kg e o histórico."},
+        "veryHigh": {"headline": "Muito alto não significa que você deva perder músculo", "meaning": "O percentual está bem acima da faixa normal do manual. Isso não significa que sua musculatura esteja em excesso prejudicial ou que você precise reduzi-la. Uma proporção elevada pode ser favorável, especialmente quando acompanhada de boa função e treino. A leitura precisa fazer sentido com seu histórico e suas medidas.", "next": "A prioridade costuma ser preservar a musculatura, e não reduzi-la para atingir a tabela. Se o valor subiu de repente ou parece incompatível com sua realidade, confira o perfil e repita a medição em condições semelhantes antes de tirar conclusões."},
+        "unknown": {"headline": "Vamos conferir os dados antes de classificar", "meaning": "O manual não fornece uma faixa aplicável à idade informada ou falta um valor válido. Ainda é possível acompanhar o histórico sem inventar uma classificação.", "next": "Confira sexo, idade e a leitura do visor. Depois, compare com suas medições anteriores."}
+      }
+    },
+    "fat": {
+      "sources": ["omron", "bmi", "bia", "activity"],
+      "evidence": "Gordura e músculo são partes diferentes da composição corporal. Reduzir gordura preservando músculo costuma ser mais útil do que buscar somente uma queda de peso. A hidratação e o momento da medição podem mudar a estimativa: por isso, uma sequência de leituras comparáveis informa mais do que uma leitura isolada.",
+      "states": {
+        "low": {"headline": "Aqui, reduzir mais gordura pode não ser a prioridade", "meaning": "O resultado ficou abaixo da referência. Gordura também tem funções no organismo; menor percentual não é sempre melhor. O próximo passo é entender se esse valor combina com seu histórico, sua alimentação e como você se sente.", "next": "Evite iniciar uma restrição alimentar só para baixar o percentual. Confira a medição e avalie perda involuntária de peso, alimentação insuficiente ou sintomas com um profissional."},
+        "normal": {"headline": "Sua gordura estimada está na faixa de referência", "meaning": "É um resultado favorável dentro da referência usada. Você não precisa tentar zerar a gordura: o corpo precisa dela. Vale manter o acompanhamento e olhar também músculo e cintura.", "next": "Mantenha hábitos sustentáveis e compare o histórico nas mesmas condições de medição. Uma meta pessoal deve considerar seu contexto, não somente a menor porcentagem possível."},
+        "high": {"headline": "O foco pode ser reduzir gordura preservando músculo", "meaning": "Há uma proporção de gordura acima da faixa de referência. Isso ajuda a direcionar o acompanhamento: reduzir gordura, quando indicado, sem sacrificar a musculatura. O número mostra a situação estimada, mas não explica sozinho como ela aconteceu.", "next": "Observe alimentação, movimento, treino de força, descanso e a tendência da cintura. Planeje mudanças graduais e compatíveis com sua saúde, evitando dietas muito restritivas por conta própria."},
+        "veryHigh": {"headline": "Esse resultado merece um plano de acompanhamento", "meaning": "A gordura estimada está na faixa muito alta para a referência usada. Vale dar atenção ao resultado, sem concluir uma doença pelo visor. O objetivo costuma ser diminuir gordura de forma sustentável e preservar ou desenvolver músculo.", "next": "Leve o histórico para organizar um plano de alimentação e atividade adaptado a você. Acompanhe cintura e composição; uma melhora pode acontecer mesmo quando o peso muda pouco."},
+        "unknown": {"headline": "Falta uma referência aplicável para classificar", "meaning": "A faixa de gordura do manual depende da idade e do sexo configurados. Sem uma faixa aplicável, o percentual pode ser acompanhado ao longo do tempo sem receber um rótulo de normal ou alterado.", "next": "Confira os dados do perfil e repita leituras em condições semelhantes."}
+      }
+    },
+    "visceral": {
+      "sources": ["omron", "central", "waist"],
+      "evidence": "A gordura abdominal profunda é importante para a saúde metabólica, e o índice da balança ajuda no acompanhamento. A cintura acrescenta informação. São estimativas e medidas diferentes: uma delas na faixa normal não anula uma alteração na outra.",
+      "states": {
+        "normal": {"headline": "Seu nível visceral está na faixa normal da Omron", "meaning": "É uma boa notícia dentro do que esse indicador consegue estimar. A ideia é manter essa tendência, sem tentar levar o índice a zero. Continue olhando também a cintura e os demais dados.", "next": "Mantenha hábitos sustentáveis e acompanhe a evolução. Se a cintura estiver elevada, ela continua merecendo atenção mesmo com este nível normal."},
+        "high": {"headline": "Vamos acompanhar com mais atenção a gordura abdominal", "meaning": "O nível ficou acima da faixa normal do aparelho. Se essa elevação persistir, vale cuidar da adiposidade abdominal e avaliar o conjunto da saúde metabólica. O visor não confirma, por si só, resistência à insulina ou gordura no fígado.", "next": "Compare com a cintura e o histórico. Alimentação, atividade física e sono entram no plano; uma avaliação pode contextualizar pressão arterial, glicemia e lipídios quando necessário."},
+        "veryHigh": {"headline": "O nível muito alto merece avaliação e acompanhamento", "meaning": "O resultado está no grupo muito alto da escala Omron. Ele é um sinal para organizar o acompanhamento da gordura abdominal, e não uma medida direta dos seus órgãos.", "next": "Leve as leituras e a medida da cintura para uma avaliação individual e para construir um plano sustentável de cuidado."},
+        "unknown": {"headline": "Confira o nível e a idade registrados", "meaning": "Este indicador tem escala de 1 a 30 e referência de idade definida pelo fabricante.", "next": "Revise os dados antes de interpretar o resultado."}
+      }
+    },
+    "bmi": {
+      "sources": ["bmi", "central", "omron"],
+      "evidence": "Duas pessoas com o mesmo IMC podem ter proporções diferentes de gordura e músculo. Por isso, o IMC funciona como um ponto de partida. A cintura e a composição ajudam a escolher o que acompanhar e evitam transformar todo peso corporal em gordura.",
+      "states": {
+        "low": {"headline": "Seu peso em relação à altura está abaixo da faixa", "meaning": "Aqui, emagrecer mais pode não fazer sentido. Vale entender a composição, o histórico do peso e se você está se alimentando bem, especialmente se houve perda de peso sem intenção.", "next": "Avalie alimentação, força e evolução do peso. Perda involuntária ou sintomas merecem avaliação, em vez de iniciar uma dieta para reduzir peso."},
+        "normal": {"headline": "O IMC está na faixa, e a composição completa a história", "meaning": "O peso está dentro da faixa de referência para a altura. Ainda vale olhar gordura, músculo e cintura: o IMC não mostra como o peso está distribuído.", "next": "Acompanhe os outros indicadores e o histórico, mantendo hábitos que você consiga sustentar."},
+        "high": {"headline": "O IMC subiu; vamos entender do que esse peso é feito", "meaning": "O cálculo está acima da faixa de referência. Isso pode envolver gordura, massa muscular e outros componentes. A decisão de reduzir peso deve considerar essa composição, e não apenas o IMC.", "next": "Cruze este resultado com gordura, músculo e cintura. Se houver gordura a reduzir, preservar músculo costuma ser parte importante do plano."},
+        "unknown": {"headline": "Confira peso, altura e idade", "meaning": "Esses dados precisam estar corretos antes de usar a referência de IMC para adultos.", "next": "Revise o perfil e o registro da pesagem."}
+      }
+    },
+    "bodyAge": {
+      "sources": ["omron", "bia"],
+      "evidence": "A idade corporal é uma comparação do algoritmo da Omron, influenciada pela composição e pelo metabolismo estimado. Ela pode mudar com esses dados, mas não existe uma regra fixa de quantos anos cairão após perder gordura ou ganhar músculo.",
+      "states": {
+        "high": {"headline": "A idade do visor não é a idade real do seu corpo", "meaning": "A comparação da Omron ficou acima da idade informada. Isso não significa que você tenha envelhecido essa quantidade de anos. É mais útil olhar as peças que formam o resultado: gordura, músculo e metabolismo estimado.", "next": "Acompanhe os indicadores individuais, sua condição física e seus hábitos. A meta é melhorar saúde e composição, sem perseguir um número de idade no visor."},
+        "normal": {"headline": "A comparação está igual ou abaixo da idade informada", "meaning": "Esse é o resultado produzido pelo algoritmo para a composição registrada. Pode ser agradável ver um número menor, mas ele não mede diretamente longevidade ou envelhecimento biológico.", "next": "Continue acompanhando composição, capacidade física e hábitos ao longo do tempo."},
+        "unknown": {"headline": "Confira a idade do perfil e a do visor", "meaning": "A comparação depende desses dois registros e das faixas do fabricante.", "next": "Revise os dados antes de interpretar a diferença."}
+      }
+    },
+    "whr": {
+      "sources": ["waist", "central"],
+      "evidence": "A cintura complementa o IMC na avaliação da gordura central. A RCQ usa duas medidas: ela pode mudar porque a cintura mudou, porque o quadril mudou ou por diferença na técnica. Observe também a cintura em centímetros, sempre com a mesma forma de medir.",
+      "states": {
+        "high": {"headline": "A cintura merece atenção em relação ao quadril", "meaning": "A relação alcançou o corte de referência. Isso chama atenção para a distribuição abdominal e ajuda a acompanhar o cuidado com a composição. É um marcador de acompanhamento, não uma previsão individual de infarto.", "next": "Acompanhe a cintura isoladamente e a RCQ, sem apertar a fita e usando a mesma técnica. Relacione a tendência aos demais indicadores e à sua avaliação de saúde."},
+        "normal": {"headline": "A relação está abaixo do corte de referência", "meaning": "É um resultado favorável para essa relação entre cintura e quadril. Ainda assim, vale ver a cintura em centímetros: uma razão baixa pode coexistir com uma cintura grande.", "next": "Mantenha a técnica de medida e acompanhe as mudanças no histórico."},
+        "unknown": {"headline": "Precisamos de cintura e quadril para calcular", "meaning": "Sem as duas medidas válidas, a razão não pode ser interpretada.", "next": "Registre cintura e quadril em centímetros usando a mesma técnica."}
+      }
+    },
+    "weight": {
+      "sources": ["omron", "bia", "activity"],
+      "evidence": "O peso pode oscilar por água e conteúdo intestinal, além de gordura e músculo. Mudanças rápidas de um dia para outro nem sempre significam ganho ou perda de gordura. O histórico comparável é mais útil do que julgar uma única pesagem.",
+      "states": {
+        "normal": {"headline": "Vamos olhar além do número da balança", "meaning": "Esse é o peso total registrado, que inclui gordura, músculos, água, ossos e órgãos. Se a cintura e a gordura estiverem diminuindo enquanto o músculo é preservado, pode haver uma evolução favorável mesmo com pouca mudança no peso.", "next": "Compare peso, cintura, gordura e músculo em conjunto, de preferência em condições semelhantes. Evite comparar uma leitura logo após exercício com outra em repouso."}
+      }
+    },
+    "rm": {
+      "sources": ["omron", "metabolism", "energy", "activity"],
+      "evidence": "Músculos e órgãos participam do gasto em repouso. Uma maior massa muscular pode contribuir para um gasto maior; atividade física e digestão acrescentam outras parcelas ao gasto diário. A estimativa da balança ou de uma equação não é uma medida exata das calorias que você gasta.",
+      "states": {
+        "normal": {"headline": "Seu corpo usa energia mesmo quando você está em repouso", "meaning": "Esse valor representa uma estimativa do gasto para manter as funções do organismo em repouso. O total do dia costuma ser maior, porque também envolve movimento e digestão. O número, sozinho, não é uma nota de metabolismo bom ou ruim.", "next": "Uma meta de alimentação considera gasto total, objetivo, saúde e rotina. Use este valor como uma peça da avaliação, junto com a evolução do peso e da composição."}
+      }
+    }
+  }
+}

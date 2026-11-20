@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Holographic HUD v4.3</title>
+  <title>BioVault Pro • Holographic HUD v4.4</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -377,6 +377,58 @@ body {padding-bottom:92px;background-color:#020b15;}
 @media(prefers-reduced-motion:reduce) {.holo-art-image {transition:none;}}
 @media print {#bottomNav,#holoPortrait,#biometricLinks {display:none!important;}}
 
+html {scrollbar-gutter:stable;}
+#metricDetailModal {z-index:70;background:#010712d9;backdrop-filter:blur(9px);}
+.metric-modal-shell {width:min(100%,840px);max-height:92dvh;border:1px solid #32869a80;border-radius:18px;background:#061322;box-shadow:0 25px 90px #0009;overflow:hidden;display:flex;flex-direction:column;}
+.metric-modal-heading {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 20px;border-bottom:1px solid #1c4156;color:#99cfdd;font:10px 'JetBrains Mono',monospace;letter-spacing:.1em;}
+.metric-modal-heading button {width:44px;height:44px;border:1px solid #426079;border-radius:12px;color:#d2eaf4;font-size:20px;background:#102638;}
+#metricDetailScroll {overflow-y:auto;overscroll-behavior:contain;min-height:0;}
+#metricDetailModal #selectedMetricPanel {margin:0;border:0;box-shadow:none;background:transparent;border-radius:0;padding:20px;}
+#metricDetailModal #detailMetricTitle {font-family:'Inter',sans-serif;font-size:19px;line-height:1.4;letter-spacing:0;}
+.conversation-hero {padding:17px;border-radius:13px;border:1px solid #2b7485;background:#0c2938;margin:16px 0;}
+.conversation-hero h4 {font:700 17px/1.45 'Inter',sans-serif;color:#b2f5ef;margin-bottom:9px;}
+.conversation-hero p {font:400 14px/1.8 'Inter',sans-serif;color:#e0edf4;}
+#metricDetailModal .clinical-grid {grid-template-columns:1fr;gap:12px;}
+#metricDetailModal .clinical-block {padding:16px;}
+#metricDetailModal .clinical-block h4 {font:600 12px/1.5 'Inter',sans-serif;text-transform:none;letter-spacing:0;}
+#metricDetailModal .clinical-block p {font-size:13px;line-height:1.8;}
+#metricDetailModal .clinical-reference p {font-size:11px;}
+.metric-modal-footer {display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #1c4156;padding:13px 20px;background:#071827;}
+.metric-modal-footer span {font-size:9px;color:#819fb2;}
+.metric-modal-footer button {min-height:42px;border:1px solid #1c768b;border-radius:9px;color:#b1f4ff;background:#0b3444;padding:9px 14px;font-size:12px;}
+.metric-card[data-favorable=true] .metric-status {color:#6ee7b7;}
+.chart-controls {display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:12px;}
+.chart-controls label {flex:1;min-width:130px;font:10px 'JetBrains Mono',monospace;color:#89adbf;}
+.chart-controls select {display:block;width:100%;margin-top:5px;border:1px solid #23566e;border-radius:9px;padding:10px;background:#071829;color:#bcebf6;font:11px 'Inter',sans-serif;}
+#chartPeriodNote {font-size:11px;line-height:1.6;color:#8daebe;margin:10px 0 14px;}
+#subView-chart,#quickPanelBody #subView-chart {height:auto!important;min-height:0;}
+.combined-chart {height:240px;position:relative;border:1px solid #1d4056;border-radius:12px;padding:12px;background:#03101f;}
+.combined-chart-heading {font-size:12px;color:#a9cddc;font-weight:600;margin:10px 0;}
+#metricChartGrid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;}
+.metric-chart-card {min-width:0;padding:14px;border:1px solid #235064;border-radius:12px;background:#07182a;}
+.metric-chart-card>header {display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.metric-chart-card h3 {font:600 12px 'Inter',sans-serif;color:#cae3ec;}
+.metric-chart-card>header>span {font:600 12px 'JetBrains Mono',monospace;white-space:nowrap;}
+.metric-chart-comparison {font:10px/1.7 'Inter',sans-serif;color:#8eacbd;margin:8px 0;}
+.metric-chart-canvas {height:175px;position:relative;}
+.metric-chart-empty {font-size:11px;color:#90aaba;}
+#compareChartsButton {min-height:34px;display:inline-flex;align-items:center;gap:6px;border:1px solid #21647a;border-radius:7px;padding:7px 10px;background:#0a293b;color:#a9e7f4;font-size:10px;}
+@media(max-width:600px) {
+ #metricDetailModal {padding:10px;}
+ .metric-modal-shell {max-height:94dvh;border-radius:14px;}
+ .metric-modal-heading {padding:7px 12px;font-size:8px;}
+ #metricDetailModal #selectedMetricPanel {padding:14px;}
+ #metricDetailModal #detailMetricTitle {font-size:17px;}
+ .conversation-hero {padding:13px;}
+ .conversation-hero h4 {font-size:16px;}
+ .conversation-hero p {font-size:14px;}
+ .metric-modal-footer {padding:10px 12px;}
+ #metricChartGrid {grid-template-columns:1fr;}
+ #compareChartsButton {font-size:9px;padding:6px 8px;}
+ .compare-toolbar {justify-content:space-between;}
+}
+@media print {#metricDetailModal {display:none!important;}}
+
   </style>
 </head>
 <body class="pb-20">
@@ -399,7 +451,7 @@ body {padding-bottom:92px;background-color:#020b15;}
           </div>
         </div>
         <button onclick="window.location.reload()" title="Atualizar App" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v4.3
+          ↻ v4.4
         </button>
       </div>
 
@@ -471,8 +523,8 @@ body {padding-bottom:92px;background-color:#020b15;}
             <button type="button" id="holoMode2d" data-holo-mode="2d" aria-pressed="false">2D</button>
           </div>
           <div id="holoPortrait" data-warm="false" role="img" aria-label="Ilustração holográfica. As cores representam apenas as faixas dos indicadores, sem localização medida de gordura.">
-            <img id="holoArtCool" class="holo-art-image" src="assets/hologram-cyan-v43.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async" />
-            <img id="holoArtWarm" class="holo-art-image" src="assets/hologram-amber-v43.webp" alt="" width="1024" height="1536" decoding="async" />
+            <img id="holoArtCool" class="holo-art-image" src="assets/hologram-neutral-cyan-v44.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async" />
+            <img id="holoArtWarm" class="holo-art-image" src="assets/hologram-neutral-amber-v44.webp" alt="" width="1024" height="1536" decoding="async" />
             <span id="portraitVisceralCore" class="live-visceral" aria-hidden="true"></span>
           </div>
           <div id="canvas3dContainer" class="hidden" tabindex="0" role="img" aria-label="Ilustração corporal 3D. Arraste na horizontal ou use as setas para girar."></div>
@@ -563,6 +615,7 @@ body {padding-bottom:92px;background-color:#020b15;}
           <span class="text-sky-400">⇄</span>
           <span id="compareStatusLabel">Comparar Antes × Atual: OFF</span>
         </button>
+        <button type="button" id="compareChartsButton" onclick="openQuickPanel('chart')"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Gráficos por indicador</button>
         <div class="flex items-center gap-2">
           <span class="compare-ref-label text-slate-400 text-[11px]">Referência:</span>
           <select id="compareSelect" onchange="recomputeAll()" class="bg-[#0c182d] border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-slate-200 outline-none"></select>
@@ -571,22 +624,7 @@ body {padding-bottom:92px;background-color:#020b15;}
 
     </section>
 
-    <section id="selectedMetricPanel" class="panel-dark cyber-panel rounded-2xl p-4 space-y-3 border-l-4 border-l-cyan-400">
-      <div class="flex items-start justify-between gap-2 border-b border-cyan-500/15 pb-2">
-        <div class="min-w-0">
-          <span id="detailHeaderBadge" class="text-[9px] mono font-bold uppercase tracking-widest text-cyan-400">Base de referência • Toque nos indicadores para alternar</span>
-          <h3 id="detailMetricTitle" class="hud-font text-xs sm:text-sm font-extrabold text-white mt-1">--</h3>
-        </div>
-        <span id="detailStatusTag" class="text-[10px] px-2.5 py-1 rounded-md mono font-extrabold uppercase shrink-0">--</span>
-      </div>
-      <div class="clinical-grid grid grid-cols-1 gap-2.5 text-xs text-slate-200 leading-relaxed">
-        <div class="clinical-block"><h4>1. O que é e como é estimado</h4><div id="detailPhysiology"><p id="detailWhatIs"></p></div></div>
-        <div class="clinical-block clinical-reference"><h4>2. Referências por sexo e idade</h4><div id="detailRefRanges" class="reference-ranges"></div><p id="detailReferenceNote" class="text-[10px] text-slate-400"></p></div>
-        <div id="detailWhyBox" class="clinical-block"><h4>3. Interpretação e correlações</h4><p id="detailWhyAltered"></p><p id="detailClinicalEvidence" class="mt-2 text-slate-300"></p></div>
-        <div class="clinical-block clinical-action"><h4>4. Como acompanhar</h4><p id="detailActionPlan" class="text-cyan-100"></p><div id="detailCitation" class="text-[10px] mt-3 pt-2 border-t border-cyan-500/15"></div></div>
-      </div>
-      <p class="text-[10px] text-slate-400">A bioimpedância produz estimativas. A ilustração 3D é esquemática: formas e cores não representam um exame por imagem, um mapa térmico real nem a localização individual de gordura. Os resultados não determinam causas ou diagnósticos isoladamente.</p>
-    </section>
+
 
     <!-- ABAS COMPLEMENTARES: EVOLUÇÃO, METAS E ALERTAS -->
     <section class="panel-dark cyber-panel hud-corners rounded-2xl p-4 space-y-3 no-print">
@@ -603,8 +641,11 @@ body {padding-bottom:92px;background-color:#020b15;}
         </label>
       </div>
 
-      <div id="subView-chart" class="hidden h-48 relative"><p id="chartStatus" class="text-xs text-slate-400"></p>
-        <canvas id="bioChart"></canvas>
+      <div id="subView-chart" class="hidden relative">
+        <div class="chart-controls"><label>Indicador<select id="chartMetricSelect" onchange="renderEvolutionChart()"><option value="all">Todos os indicadores</option><option value="weight">Peso corporal</option><option value="fat">Gordura corporal</option><option value="muscle">Músculo esquelético</option><option value="visceral">Gordura visceral</option><option value="bmi">IMC</option><option value="rm">Metabolismo em repouso</option><option value="bodyAge">Idade corporal</option><option value="whr">Cintura / quadril</option><option value="waist">Cintura</option><option value="hip">Quadril</option></select></label><label>Período<select id="chartPeriodSelect" onchange="renderEvolutionChart()"><option value="0">Todo o histórico</option><option value="7">7 dias</option><option value="30">30 dias</option><option value="90">3 meses (90 dias)</option><option value="180">6 meses (180 dias)</option><option value="365">12 meses (365 dias)</option></select></label></div>
+        <p id="chartPeriodNote"></p><p id="chartStatus" class="text-xs text-slate-400"></p>
+        <div id="combinedChartSection"><h3 class="combined-chart-heading">Resumo combinado • peso, gordura e músculo</h3><div class="combined-chart"><canvas id="bioChart"></canvas></div></div>
+        <div id="metricChartGrid"></div>
       </div>
 
       <div id="subView-goals" class="hidden space-y-3 text-xs">
@@ -712,6 +753,30 @@ body {padding-bottom:92px;background-color:#020b15;}
   </div>
 
 
+  <div id="metricDetailModal" class="hidden fixed inset-0 flex items-center justify-center p-4 no-print" role="dialog" aria-modal="true" aria-labelledby="detailMetricTitle">
+    <div class="metric-modal-shell">
+      <header class="metric-modal-heading"><span>SEU RESULTADO, EXPLICADO</span><button type="button" id="closeMetricDetailButton" data-metric-close aria-label="Fechar explicação">×</button></header>
+      <div id="metricDetailScroll">    <section id="selectedMetricPanel" class="panel-dark cyber-panel rounded-2xl p-4 space-y-3 border-l-4 border-l-cyan-400">
+      <div class="flex items-start justify-between gap-2 border-b border-cyan-500/15 pb-2">
+        <div class="min-w-0">
+          <span id="detailHeaderBadge" class="text-[9px] mono font-bold uppercase tracking-widest text-cyan-400">Entenda o seu resultado</span>
+          <h3 id="detailMetricTitle" class="hud-font text-xs sm:text-sm font-extrabold text-white mt-1">--</h3>
+        </div>
+        <span id="detailStatusTag" class="text-[10px] px-2.5 py-1 rounded-md mono font-extrabold uppercase shrink-0">--</span>
+      </div>
+      <div class="conversation-hero"><h4 id="detailConversationHeadline"></h4><p id="detailWhyAltered"></p></div>
+      <div class="clinical-grid grid grid-cols-1 gap-2.5 text-xs text-slate-200 leading-relaxed">
+        <div class="clinical-block"><h4>O que este indicador mede</h4><div id="detailPhysiology"><p id="detailWhatIs"></p></div></div>
+        <div class="clinical-block clinical-reference"><h4>Faixa usada na comparação</h4><div id="detailRefRanges" class="reference-ranges"></div><p id="detailReferenceNote" class="text-[10px] text-slate-400"></p></div>
+        <div id="detailWhyBox" class="clinical-block"><h4>Como entender o conjunto</h4><p id="detailClinicalEvidence" class="mt-2 text-slate-300"></p></div>
+        <div class="clinical-block clinical-action"><h4>Seu próximo passo</h4><p id="detailActionPlan" class="text-cyan-100"></p><div id="detailCitation" class="text-[10px] mt-3 pt-2 border-t border-cyan-500/15"></div></div>
+      </div>
+      <p class="text-[10px] text-slate-400">A bioimpedância produz estimativas. A ilustração 3D é esquemática: formas e cores não representam um exame por imagem, um mapa térmico real nem a localização individual de gordura. Os resultados não determinam causas ou diagnósticos isoladamente.</p>
+    </section></div>
+      <footer class="metric-modal-footer"><span id="detailKnowledgeVersion">Base científica • revisão 20/11/2026</span><button type="button" id="metricEvolutionButton" data-metric-evolution><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Ver evolução</button></footer>
+    </div>
+  </div>
+
   <div id="quickPanelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop no-print" role="dialog" aria-modal="true" aria-labelledby="quickPanelTitle">
     <section class="panel-dark cyber-panel hud-corners quick-panel-shell">
       <div class="quick-panel-heading"><h2 id="quickPanelTitle" class="hud-font text-sm text-cyan-300">Histórico</h2><button type="button" onclick="closeQuickPanel()" aria-label="Fechar painel rápido">✕</button></div>
@@ -719,7 +784,7 @@ body {padding-bottom:92px;background-color:#020b15;}
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.3</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.4</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>INÍCIO</span></button>
@@ -852,6 +917,7 @@ function metricReferenceBar(key,record,info) {
   return `<span class="metric-reference-bar" role="img" aria-label="Posição na faixa de referência: ${escapeHTML(info.status)}">${r.map(entry=>`<i data-current="${entry.current}" title="${escapeHTML(entry.label+': '+entry.value)}"></i>`).join('')}</span>`;
 }
 function openQuickPanel(view) {
+  closeMetricDetail();
   if(!['history','chart'].includes(view))return;
   if(quickPanelState)closeQuickPanel();
   const node=$('subView-'+view);
@@ -860,7 +926,7 @@ function openQuickPanel(view) {
   $('quickPanelTitle').textContent=view==='history'?'Histórico de registros biométricos':'Evolução temporal';
   $('quickPanelBody').append(node);$('quickPanelModal').classList.remove('hidden');
   $('quickPanelModal').querySelector('button').focus();
-  if(view==='chart')chartInst?.resize?.();
+  if(view==='chart'){chartInst?.resize?.();for(const chart of metricCharts)chart.resize?.();}
 }
 function closeQuickPanel() {
   if(!quickPanelState)return;
@@ -1147,26 +1213,139 @@ function initializeHoloControls() {
   document.fonts?.ready.then(scheduleBiometricLinks);
 }
 
-const clinicalSources={
-  omron:['Manual Omron HBF-514C — método e faixas','https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf'],
-  bia:['Kyle et al., 2004 — princípios e limites da bioimpedância','https://pubmed.ncbi.nlm.nih.gov/15380917/'],
-  bmi:['OMS — IMC e avaliação de adiposidade','https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight'],
-  waist:['OMS — cintura e relação cintura–quadril','https://www.who.int/publications/i/item/9789241501491'],
-  muscle:['EWGSOP2 — avaliação de força e músculo','https://pubmed.ncbi.nlm.nih.gov/30312372/'],
-  energy:['Roza e Shizgal, 1984 — equação de energia em repouso','https://pubmed.ncbi.nlm.nih.gov/6741850/']
-};
-function clinicalEvidence(key,record,info) {
-  const a=analyze(record);
-  switch(key) {
-    case 'fat':return {text:info.status==='BAIXO'?'Percentual abaixo da referência não mede diretamente gordura essencial nem confirma deficiência hormonal. A avaliação depende do contexto nutricional, sintomas e evolução.':'Percentual de gordura e IMC descrevem aspectos diferentes. Um IMC na faixa normal pode coexistir com gordura estimada elevada; isso justifica contextualizar os resultados e não estabelece um diagnóstico metabólico.',sources:['omron','bia','bmi']};
-    case 'muscle':return {text:'O percentual da balança não mede força ou capacidade funcional. A confirmação de sarcopenia envolve força reduzida e avaliação adicional da quantidade ou qualidade muscular; esse diagnóstico não pode ser feito com o percentual Omron isolado.',sources:['omron','muscle']};
-    case 'visceral':return {text:'O nível é relativo, não uma medida direta em cm². Mesmo na faixa normal, não demonstra ausência de gordura no fígado, resistência à insulina ou risco cardiovascular. Observe cintura, tendência das medidas e avaliação clínica quando indicada.',sources:['omron','waist']};
-    case 'bmi':return {text:`Neste registro: gordura ${fmt(record.fat)}% (${a.fat.status.toLowerCase()}) e músculo ${fmt(record.muscle)}% (${a.muscle.status.toLowerCase()}). O cruzamento ajuda a contextualizar o IMC, mas não permite atribuir automaticamente um valor alto à hipertrofia ou à gordura. A cintura complementa a avaliação.`,sources:['bmi','waist','bia']};
-    case 'bodyAge':return {text:'A idade corporal é uma comparação calculada pelo aparelho. Ela não é um marcador validado de longevidade individual e não há uma conversão fixa entre perder determinado percentual de gordura e reduzir anos no visor.',sources:['omron','bia']};
-    case 'whr':return {text:'A relação depende de duas medidas: pode variar por mudança na cintura, no quadril ou na técnica. Os pontos de corte são referências populacionais; a circunferência da cintura e o contexto clínico também importam.',sources:['waist']};
-    case 'weight':return {text:'A bioimpedância depende de equações e pressupostos sobre água corporal. Alterações importantes de hidratação podem afetar as estimativas de composição; comparar medidas padronizadas ajuda a reduzir esse viés.',sources:['bia','omron']};
-    default:return {text:'Metabolismo em repouso e gasto energético diário total são conceitos distintos. Uma estimativa do visor ou de uma equação não determina uma ingestão mínima segura, uma dieta ou uma causa para dificuldade de emagrecimento.',sources:record.rmMethod==='harris-benedict-1984'?['energy']:['omron']};
+// Reviewed, versioned educational knowledge; measurement documents are independent.
+const BUNDLED_CLINICAL_KNOWLEDGE = {"version":"4.4.0","schema":1,"reviewedAt":"2026-11-20","language":"pt-BR","purpose":"Educação sobre resultados de bioimpedância; sem diagnóstico ou prescrição automática.","sources":{"omron":{"title":"Omron HBF-514C — manual e faixas por sexo e idade","url":"https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf"},"metabolism":{"title":"Wang et al., AJCN, 2010 — gasto energético de órgãos e tecidos","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC2980962/"},"activity":{"title":"NIH/NIDDK — músculo, atividade física e controle do peso","url":"https://www.niddk.nih.gov/health-information/weight-management/myths-nutrition-physical-activity"},"bmi":{"title":"OMS — sobrepeso, obesidade e IMC","url":"https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight"},"waist":{"title":"OMS — cintura e relação cintura–quadril","url":"https://www.who.int/publications/i/item/9789241501491"},"central":{"title":"Ross et al., 2020 — cintura na avaliação clínica","url":"https://pubmed.ncbi.nlm.nih.gov/32020062/"},"bia":{"title":"Kyle et al., 2004 — princípios da bioimpedância","url":"https://pubmed.ncbi.nlm.nih.gov/15380917/"},"strength":{"title":"EWGSOP2 — avaliação clínica da força e da massa muscular","url":"https://pubmed.ncbi.nlm.nih.gov/30312372/"},"energy":{"title":"Roza e Shizgal, 1984 — estimativa de energia em repouso","url":"https://pubmed.ncbi.nlm.nih.gov/6741850/"}},"metrics":{"muscle":{"sources":["omron","metabolism","activity","strength"],"evidence":"O músculo consome energia mesmo em repouso e participa do movimento e do uso de glicose. Estudos de metabolismo estimam cerca de 13 kcal por kg de músculo por dia em repouso, contra aproximadamente 4–5 kcal por kg de tecido adiposo. Isso ilustra uma contribuição gradual, não uma previsão do seu gasto pessoal. Preservar ou ganhar músculo pode ajudar no controle do peso; perder gordura também depende do balanço energético, da atividade e da alimentação.","states":{"low":{"headline":"Vamos dar atenção à sua reserva muscular","meaning":"Uma proporção baixa pede atenção à preservação de músculo. Ela pode coexistir com gordura elevada, mesmo quando o peso da balança é alto. A proposta não é apenas pesar menos: é melhorar a composição e a capacidade para as atividades do dia a dia.","next":"Priorize treino de força adaptado à sua condição, alimentação que atenda às suas necessidades e recuperação. Acompanhe a estimativa de músculo em kg, a força e a evolução. Fraqueza progressiva ou perda involuntária de peso merecem avaliação."},"normal":{"headline":"Seu músculo está na faixa de referência: vale preservá-lo","meaning":"Esse é um ponto favorável para acompanhar. Se seu objetivo for reduzir gordura, tente preservar a massa muscular ao longo do processo. Um resultado melhor envolve composição e função, e não só um número menor na balança.","next":"Mantenha atividade de força regular, alimentação adequada e descanso. Observe seu desempenho e compare medições feitas em condições semelhantes."},"high":{"headline":"Músculo acima da faixa costuma ser algo a preservar","meaning":"Estar acima da faixa normal de músculo não é, por si só, algo ruim. Em geral, ter uma boa reserva muscular é favorável. Você não precisa perder músculo apenas para fazer o percentual caber na tabela. Se houver gordura a reduzir, o objetivo costuma ser preservar o músculo enquanto se trabalha a gordura.","next":"Continue cuidando da musculatura com treino de força, recuperação e alimentação adequada. Não transforme a faixa normal em uma meta de perder músculo. Compare também a estimativa em kg e o histórico."},"veryHigh":{"headline":"Muito alto não significa que você deva perder músculo","meaning":"O percentual está bem acima da faixa normal do manual. Isso não significa que sua musculatura esteja em excesso prejudicial ou que você precise reduzi-la. Uma proporção elevada pode ser favorável, especialmente quando acompanhada de boa função e treino. A leitura precisa fazer sentido com seu histórico e suas medidas.","next":"A prioridade costuma ser preservar a musculatura, e não reduzi-la para atingir a tabela. Se o valor subiu de repente ou parece incompatível com sua realidade, confira o perfil e repita a medição em condições semelhantes antes de tirar conclusões."},"unknown":{"headline":"Vamos conferir os dados antes de classificar","meaning":"O manual não fornece uma faixa aplicável à idade informada ou falta um valor válido. Ainda é possível acompanhar o histórico sem inventar uma classificação.","next":"Confira sexo, idade e a leitura do visor. Depois, compare com suas medições anteriores."}}},"fat":{"sources":["omron","bmi","bia","activity"],"evidence":"Gordura e músculo são partes diferentes da composição corporal. Reduzir gordura preservando músculo costuma ser mais útil do que buscar somente uma queda de peso. A hidratação e o momento da medição podem mudar a estimativa: por isso, uma sequência de leituras comparáveis informa mais do que uma leitura isolada.","states":{"low":{"headline":"Aqui, reduzir mais gordura pode não ser a prioridade","meaning":"O resultado ficou abaixo da referência. Gordura também tem funções no organismo; menor percentual não é sempre melhor. O próximo passo é entender se esse valor combina com seu histórico, sua alimentação e como você se sente.","next":"Evite iniciar uma restrição alimentar só para baixar o percentual. Confira a medição e avalie perda involuntária de peso, alimentação insuficiente ou sintomas com um profissional."},"normal":{"headline":"Sua gordura estimada está na faixa de referência","meaning":"É um resultado favorável dentro da referência usada. Você não precisa tentar zerar a gordura: o corpo precisa dela. Vale manter o acompanhamento e olhar também músculo e cintura.","next":"Mantenha hábitos sustentáveis e compare o histórico nas mesmas condições de medição. Uma meta pessoal deve considerar seu contexto, não somente a menor porcentagem possível."},"high":{"headline":"O foco pode ser reduzir gordura preservando músculo","meaning":"Há uma proporção de gordura acima da faixa de referência. Isso ajuda a direcionar o acompanhamento: reduzir gordura, quando indicado, sem sacrificar a musculatura. O número mostra a situação estimada, mas não explica sozinho como ela aconteceu.","next":"Observe alimentação, movimento, treino de força, descanso e a tendência da cintura. Planeje mudanças graduais e compatíveis com sua saúde, evitando dietas muito restritivas por conta própria."},"veryHigh":{"headline":"Esse resultado merece um plano de acompanhamento","meaning":"A gordura estimada está na faixa muito alta para a referência usada. Vale dar atenção ao resultado, sem concluir uma doença pelo visor. O objetivo costuma ser diminuir gordura de forma sustentável e preservar ou desenvolver músculo.","next":"Leve o histórico para organizar um plano de alimentação e atividade adaptado a você. Acompanhe cintura e composição; uma melhora pode acontecer mesmo quando o peso muda pouco."},"unknown":{"headline":"Falta uma referência aplicável para classificar","meaning":"A faixa de gordura do manual depende da idade e do sexo configurados. Sem uma faixa aplicável, o percentual pode ser acompanhado ao longo do tempo sem receber um rótulo de normal ou alterado.","next":"Confira os dados do perfil e repita leituras em condições semelhantes."}}},"visceral":{"sources":["omron","central","waist"],"evidence":"A gordura abdominal profunda é importante para a saúde metabólica, e o índice da balança ajuda no acompanhamento. A cintura acrescenta informação. São estimativas e medidas diferentes: uma delas na faixa normal não anula uma alteração na outra.","states":{"normal":{"headline":"Seu nível visceral está na faixa normal da Omron","meaning":"É uma boa notícia dentro do que esse indicador consegue estimar. A ideia é manter essa tendência, sem tentar levar o índice a zero. Continue olhando também a cintura e os demais dados.","next":"Mantenha hábitos sustentáveis e acompanhe a evolução. Se a cintura estiver elevada, ela continua merecendo atenção mesmo com este nível normal."},"high":{"headline":"Vamos acompanhar com mais atenção a gordura abdominal","meaning":"O nível ficou acima da faixa normal do aparelho. Se essa elevação persistir, vale cuidar da adiposidade abdominal e avaliar o conjunto da saúde metabólica. O visor não confirma, por si só, resistência à insulina ou gordura no fígado.","next":"Compare com a cintura e o histórico. Alimentação, atividade física e sono entram no plano; uma avaliação pode contextualizar pressão arterial, glicemia e lipídios quando necessário."},"veryHigh":{"headline":"O nível muito alto merece avaliação e acompanhamento","meaning":"O resultado está no grupo muito alto da escala Omron. Ele é um sinal para organizar o acompanhamento da gordura abdominal, e não uma medida direta dos seus órgãos.","next":"Leve as leituras e a medida da cintura para uma avaliação individual e para construir um plano sustentável de cuidado."},"unknown":{"headline":"Confira o nível e a idade registrados","meaning":"Este indicador tem escala de 1 a 30 e referência de idade definida pelo fabricante.","next":"Revise os dados antes de interpretar o resultado."}}},"bmi":{"sources":["bmi","central","omron"],"evidence":"Duas pessoas com o mesmo IMC podem ter proporções diferentes de gordura e músculo. Por isso, o IMC funciona como um ponto de partida. A cintura e a composição ajudam a escolher o que acompanhar e evitam transformar todo peso corporal em gordura.","states":{"low":{"headline":"Seu peso em relação à altura está abaixo da faixa","meaning":"Aqui, emagrecer mais pode não fazer sentido. Vale entender a composição, o histórico do peso e se você está se alimentando bem, especialmente se houve perda de peso sem intenção.","next":"Avalie alimentação, força e evolução do peso. Perda involuntária ou sintomas merecem avaliação, em vez de iniciar uma dieta para reduzir peso."},"normal":{"headline":"O IMC está na faixa, e a composição completa a história","meaning":"O peso está dentro da faixa de referência para a altura. Ainda vale olhar gordura, músculo e cintura: o IMC não mostra como o peso está distribuído.","next":"Acompanhe os outros indicadores e o histórico, mantendo hábitos que você consiga sustentar."},"high":{"headline":"O IMC subiu; vamos entender do que esse peso é feito","meaning":"O cálculo está acima da faixa de referência. Isso pode envolver gordura, massa muscular e outros componentes. A decisão de reduzir peso deve considerar essa composição, e não apenas o IMC.","next":"Cruze este resultado com gordura, músculo e cintura. Se houver gordura a reduzir, preservar músculo costuma ser parte importante do plano."},"unknown":{"headline":"Confira peso, altura e idade","meaning":"Esses dados precisam estar corretos antes de usar a referência de IMC para adultos.","next":"Revise o perfil e o registro da pesagem."}}},"bodyAge":{"sources":["omron","bia"],"evidence":"A idade corporal é uma comparação do algoritmo da Omron, influenciada pela composição e pelo metabolismo estimado. Ela pode mudar com esses dados, mas não existe uma regra fixa de quantos anos cairão após perder gordura ou ganhar músculo.","states":{"high":{"headline":"A idade do visor não é a idade real do seu corpo","meaning":"A comparação da Omron ficou acima da idade informada. Isso não significa que você tenha envelhecido essa quantidade de anos. É mais útil olhar as peças que formam o resultado: gordura, músculo e metabolismo estimado.","next":"Acompanhe os indicadores individuais, sua condição física e seus hábitos. A meta é melhorar saúde e composição, sem perseguir um número de idade no visor."},"normal":{"headline":"A comparação está igual ou abaixo da idade informada","meaning":"Esse é o resultado produzido pelo algoritmo para a composição registrada. Pode ser agradável ver um número menor, mas ele não mede diretamente longevidade ou envelhecimento biológico.","next":"Continue acompanhando composição, capacidade física e hábitos ao longo do tempo."},"unknown":{"headline":"Confira a idade do perfil e a do visor","meaning":"A comparação depende desses dois registros e das faixas do fabricante.","next":"Revise os dados antes de interpretar a diferença."}}},"whr":{"sources":["waist","central"],"evidence":"A cintura complementa o IMC na avaliação da gordura central. A RCQ usa duas medidas: ela pode mudar porque a cintura mudou, porque o quadril mudou ou por diferença na técnica. Observe também a cintura em centímetros, sempre com a mesma forma de medir.","states":{"high":{"headline":"A cintura merece atenção em relação ao quadril","meaning":"A relação alcançou o corte de referência. Isso chama atenção para a distribuição abdominal e ajuda a acompanhar o cuidado com a composição. É um marcador de acompanhamento, não uma previsão individual de infarto.","next":"Acompanhe a cintura isoladamente e a RCQ, sem apertar a fita e usando a mesma técnica. Relacione a tendência aos demais indicadores e à sua avaliação de saúde."},"normal":{"headline":"A relação está abaixo do corte de referência","meaning":"É um resultado favorável para essa relação entre cintura e quadril. Ainda assim, vale ver a cintura em centímetros: uma razão baixa pode coexistir com uma cintura grande.","next":"Mantenha a técnica de medida e acompanhe as mudanças no histórico."},"unknown":{"headline":"Precisamos de cintura e quadril para calcular","meaning":"Sem as duas medidas válidas, a razão não pode ser interpretada.","next":"Registre cintura e quadril em centímetros usando a mesma técnica."}}},"weight":{"sources":["omron","bia","activity"],"evidence":"O peso pode oscilar por água e conteúdo intestinal, além de gordura e músculo. Mudanças rápidas de um dia para outro nem sempre significam ganho ou perda de gordura. O histórico comparável é mais útil do que julgar uma única pesagem.","states":{"normal":{"headline":"Vamos olhar além do número da balança","meaning":"Esse é o peso total registrado, que inclui gordura, músculos, água, ossos e órgãos. Se a cintura e a gordura estiverem diminuindo enquanto o músculo é preservado, pode haver uma evolução favorável mesmo com pouca mudança no peso.","next":"Compare peso, cintura, gordura e músculo em conjunto, de preferência em condições semelhantes. Evite comparar uma leitura logo após exercício com outra em repouso."}}},"rm":{"sources":["omron","metabolism","energy","activity"],"evidence":"Músculos e órgãos participam do gasto em repouso. Uma maior massa muscular pode contribuir para um gasto maior; atividade física e digestão acrescentam outras parcelas ao gasto diário. A estimativa da balança ou de uma equação não é uma medida exata das calorias que você gasta.","states":{"normal":{"headline":"Seu corpo usa energia mesmo quando você está em repouso","meaning":"Esse valor representa uma estimativa do gasto para manter as funções do organismo em repouso. O total do dia costuma ser maior, porque também envolve movimento e digestão. O número, sozinho, não é uma nota de metabolismo bom ou ruim.","next":"Uma meta de alimentação considera gasto total, objetivo, saúde e rotina. Use este valor como uma peça da avaliação, junto com a evolução do peso e da composição."}}}}};
+let clinicalKnowledge = BUNDLED_CLINICAL_KNOWLEDGE;
+async function loadCloudKnowledge(sdk, database) {
+  if(typeof sdk.getDoc!=='function')return;
+  try {
+    const snapshot=await sdk.getDoc(sdk.doc(database,'clinical_knowledge','biovault-v4-4'));
+    if(!snapshot.exists())return;
+    const saved=snapshot.data();
+    // Only the reviewed payload shipped with this release is accepted as this version.
+    if(saved.version==='4.4.0'&&saved.payload===JSON.stringify(BUNDLED_CLINICAL_KNOWLEDGE)) {
+      clinicalKnowledge=JSON.parse(saved.payload);
+      if(currentReading)selectMetricDetail(selectedMetricKey,false);
+    }
+  }catch {/* The reviewed bundled copy also works offline. */}
+}
+function applyConversationalKnowledge(result,record) {
+  const p=profile(record),fr=reference('fat',p.sex,p.age),mr=reference('muscle',p.sex,p.age);
+  const high=status=>['ALTO','MUITO ALTO'].includes(status);
+  for(const [key,info]of Object.entries(result)) {
+    const entry=clinicalKnowledge.metrics[key];if(!entry)continue;
+    let state=info.neutral&&['SEM REFERÊNCIA','SEM DADOS'].includes(info.status)?'unknown':
+      info.status==='BAIXO'||info.status==='BAIXO PESO'?'low':info.status==='MUITO ALTO'?'veryHigh':
+      info.status==='ALTO'||info.status==='ACIMA DA REFERÊNCIA'||info.status==='ACIMA DA INFORMADA'||info.status==='SOBREPESO'||info.status.startsWith('OBESIDADE')?'high':'normal';
+    const selected=entry.states[state]||entry.states.high||entry.states.normal||entry.states.unknown;
+    let intro='';
+    if((key==='muscle'||key==='fat')&&(key==='muscle'?mr:fr)) {
+      const limits=key==='muscle'?mr:fr,value=number(record[key]),upper=limits[1]-.1;
+      intro=`Você registrou ${fmt(value)}%. Para ${p.sex==='F'?'mulheres':'homens'} de ${fmt(p.age,0)} anos, a faixa normal usada vai de ${fmt(limits[0])}% a ${fmt(upper)}%. `;
+      if(high(info.status))intro+=`Seu resultado está ${fmt(value-upper)} ponto(s) percentual(is) acima desse limite. `;
+      if(info.status==='BAIXO')intro+=`São ${fmt(limits[0]-value)} ponto(s) percentual(is) abaixo do início da faixa. `;
+    }else if(key==='bmi')intro=`Com ${fmt(record.weight)} kg e ${fmt(p.height)} cm, seu IMC é ${fmt(calcBmiValue(record.weight,p.height))} kg/m² (${info.status.toLowerCase()}). `;
+    else if(key==='visceral')intro=`Você registrou nível ${fmt(record.visceral,0)}; a faixa normal da Omron vai de 1 a 9. `;
+    else if(key==='bodyAge')intro=`O visor informa ${fmt(record.bodyAge,0)} anos e sua idade registrada é ${fmt(p.age,0)}. `;
+    else if(key==='whr'&&number(record.hip)>0)intro=`Sua cintura é ${fmt(record.waist)} cm e seu quadril ${fmt(record.hip)} cm: a relação é ${fmt(record.waist/record.hip,2)}. `;
+    else if(key==='weight')intro=`Sua pesagem foi de ${fmt(record.weight)} kg. `;
+    else if(key==='rm')intro=`O registro traz ${fmt(record.rm,0)} kcal por dia em repouso${record.rmMethod==='harris-benedict-1984'?', calculadas por equação':', como estimativa informada'}. `;
+    info.conversationHeadline=selected.headline;
+    info.why=intro+selected.meaning;
+    info.action=selected.next;
+    info.favorable=key==='muscle'&&high(info.status);
+    info.contextEvidence='';
+    if(key==='muscle') {
+      info.contextEvidence='O percentual pode subir tanto por ganho de músculo quanto por redução da proporção de gordura. Acompanhar a estimativa em kg ajuda a distinguir as situações; a evolução da força e das medidas completa essa leitura.';
+      if(high(result.fat.status))info.contextEvidence+=' Neste registro, a gordura também está elevada: preservar músculo e reduzir gordura são objetivos diferentes.';
+      else if(result.fat.status==='BAIXO')info.action+=' Como a gordura também ficou baixa, não busque emagrecer mais automaticamente.';
+    }else if(key==='bmi') {
+      info.contextEvidence=`Aqui, a gordura está em ${fmt(record.fat)}% (${result.fat.status.toLowerCase()}) e o músculo em ${fmt(record.muscle)}% (${result.muscle.status.toLowerCase()}). `;
+      if(high(result.muscle.status)&&result.fat.status==='NORMAL')info.contextEvidence+='Uma boa quantidade de músculo pode contribuir para o peso e para o IMC; esse contexto evita interpretar todo o peso como gordura.';
+      else if(high(result.fat.status))info.contextEvidence+='Como a gordura também está elevada, vale acompanhar a redução de gordura e a preservação muscular, junto com a cintura.';
+    }else if(key==='visceral'&&!info.altered&&result.whr.altered) {
+      info.contextEvidence='Neste registro, a RCQ está acima do corte mesmo com o visceral normal. Os indicadores observam aspectos diferentes; a cintura continua merecendo atenção.';
+    }else if(key==='whr'&&info.altered&&!result.visceral.altered) {
+      info.contextEvidence='Seu nível visceral está normal na escala Omron. Isso é um resultado favorável desse índice, mas não apaga a atenção indicada pela relação cintura–quadril.';
+    }
   }
+  return result;
+}
+
+let metricModalState=null;
+function openMetricDetailModal() {
+  if(!currentReading)return;
+  if(quickPanelState)closeQuickPanel();
+  if(!metricModalState)metricModalState={opener:document.activeElement,overflow:document.body.style.overflowY};
+  document.body.style.overflowY='hidden';
+  $('metricDetailModal').classList.remove('hidden');
+  $('closeMetricDetailButton').focus({preventScroll:true});
+  $('metricDetailScroll').scrollTop=0;
+}
+function closeMetricDetail() {
+  if(!metricModalState)return;
+  const state=metricModalState;metricModalState=null;
+  $('metricDetailModal').classList.add('hidden');document.body.style.overflowY=state.overflow;
+  if(state.opener?.isConnected)state.opener.focus?.({preventScroll:true});
+}
+function openMetricEvolution() {
+  const key=selectedMetricKey;
+  closeMetricDetail();$('chartMetricSelect').value=key;openQuickPanel('chart');
+}
+function metricDialogKeyboard(event) {
+  if(!metricModalState||event.key!=='Tab')return;
+  const nodes=[...$('metricDetailModal').querySelectorAll('button:not([disabled]),a[href],input,select,[tabindex="0"]')].filter(el=>el.getClientRects().length);
+  if(!nodes.length)return;
+  const first=nodes[0],last=nodes.at(-1);
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+}
+
+let metricCharts=[];
+const metricChartDefinitions=[
+  {key:'weight',label:'Peso corporal',unit:'kg',color:'#00f0ff',value:r=>number(r.weight)},
+  {key:'fat',label:'Gordura corporal',unit:'%',deltaUnit:'p.p.',color:'#fbbf24',value:r=>number(r.fat)},
+  {key:'muscle',label:'Músculo esquelético',unit:'%',deltaUnit:'p.p.',color:'#34d399',value:r=>number(r.muscle)},
+  {key:'visceral',label:'Gordura visceral',unit:'nível',digits:0,color:'#fb7185',value:r=>number(r.visceral)},
+  {key:'bmi',label:'IMC',unit:'kg/m²',color:'#a5b4fc',value:r=>calcBmiValue(r.weight,profile(r).height)},
+  {key:'rm',label:'Metabolismo em repouso',unit:'kcal/dia',digits:0,color:'#fcd34d',value:r=>readingBasal(r)},
+  {key:'bodyAge',label:'Idade corporal',unit:'anos',digits:0,color:'#c4b5fd',value:r=>number(r.bodyAge)},
+  {key:'whr',label:'Cintura / quadril',unit:'RCQ',digits:2,color:'#fda4af',value:r=>number(r.waist)>0&&number(r.hip)>0?number(r.waist)/number(r.hip):NaN},
+  {key:'waist',label:'Cintura',unit:'cm',color:'#fdba74',value:r=>number(r.waist)>0?number(r.waist):NaN},
+  {key:'hip',label:'Quadril',unit:'cm',color:'#67e8f9',value:r=>number(r.hip)>0?number(r.hip):NaN}
+];
+function chartPeriodReadings(list) {
+  const days=number($('chartPeriodSelect').value);
+  if(!days||!list.length)return list;
+  const dates=list.map(r=>r.date).filter(validDate).sort();if(!dates.length)return [];
+  const last=Date.parse(dates.at(-1)+'T12:00:00Z'),start=last-(days-1)*86400000;
+  return list.filter(r=>validDate(r.date)&&Date.parse(r.date+'T12:00:00Z')>=start);
+}
+function destroyMetricCharts() {for(const chart of metricCharts)chart.destroy();metricCharts=[];}
+function renderMetricGallery(list,allReadings) {
+  destroyMetricCharts();
+  const filter=$('chartMetricSelect').value;
+  const definitions=metricChartDefinitions.filter(d=>filter==='all'||filter===d.key);
+  const baseline=compareMode?allReadings.find(r=>r.id===$('compareSelect').value)||allReadings[0]:list[0];
+  const selected=currentReading||list.at(-1);
+  $('chartPeriodNote').textContent=list.length?`${list.length} pesagem(ns) de ${dateLabel(list[0].date)} a ${dateLabel(list.at(-1).date)}. ${compareMode?'Os resumos comparam a referência escolhida com a pesagem selecionada.':'Janela terminando na última pesagem; variação entre a primeira da janela e a selecionada.'}${list.length===1?' Uma pesagem mostra um ponto; registre outra para observar uma curva.':''}`:'Sem pesagens na janela selecionada.';
+  $('metricChartGrid').innerHTML=definitions.map(d=>{
+    const current=selected?d.value(selected):NaN,before=baseline?d.value(baseline):NaN,diff=current-before;
+    const value=Number.isFinite(current)?`${fmt(current,d.digits??1)} ${d.unit}`:'Sem dado';
+    const comparison=Number.isFinite(diff)?`Δ ${diff>0?'+':''}${fmt(diff,d.digits??1)} ${d.deltaUnit||d.unit}`:'Comparação indisponível';
+    return `<section class="metric-chart-card" aria-label="Gráfico de ${d.label}"><header><h3>${d.label}</h3><span style="color:${d.color}">${value}</span></header><p class="metric-chart-comparison">${comparison} • Referência ${baseline?dateLabel(baseline.date):'—'} / selecionada ${selected?dateLabel(selected.date):'—'}</p><div class="metric-chart-canvas"><canvas id="metricChart-${d.key}" role="img" aria-label="Evolução de ${d.label}, em ${d.unit}"></canvas></div><p class="metric-chart-empty" id="metricChartEmpty-${d.key}"></p></section>`;
+  }).join('');
+  for(const d of definitions) {
+    const values=list.map(r=>{const value=d.value(r);return Number.isFinite(value)?value:null;});
+    if(!values.some(v=>v!==null)){$('metricChartEmpty-'+d.key).textContent='Sem valores registrados deste indicador nesta janela.';continue;}
+    metricCharts.push(new Chart($('metricChart-'+d.key),{type:'line',data:{labels:list.map(r=>dateLabel(r.date)),datasets:[{label:`${d.label} (${d.unit})`,data:values,borderColor:d.color,backgroundColor:d.color+'22',pointRadius:list.map(r=>r.id===selectedReadingId?4:2),pointHoverRadius:5,spanGaps:false,tension:.2}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${d.label}: ${fmt(ctx.parsed.y,d.digits??1)} ${d.unit}`}}},scales:{x:{ticks:{color:'#7896a8',maxTicksLimit:4,font:{size:9}},grid:{color:'#17304455'}},y:{title:{display:true,text:d.unit,color:'#8cb1c2'},ticks:{color:'#a0bdcc',font:{size:10},precision:d.digits===0?0:undefined},grid:{color:'#17304477'}}}}}));
+  }
+}
+
+const clinicalSources=Object.fromEntries(Object.entries(clinicalKnowledge.sources).map(([key,source])=>[key,[source.title,source.url]]));
+function clinicalEvidence(key,record,info) {
+  const entry=clinicalKnowledge.metrics[key];
+  return {text:entry.evidence+(info.contextEvidence?' '+info.contextEvidence:''),sources:entry.sources};
 }
 function clinicalRanges(key,record,info) {
   record=resolveReading(record);
@@ -1176,7 +1355,7 @@ function clinicalRanges(key,record,info) {
   if(key==='fat'||key==='muscle') {
     const r=reference(key,p.sex,p.age);
     if(r)ranges=[row('Baixo',`< ${fmt(r[0])}%`,'BAIXO'),row('Normal',`${fmt(r[0])} a ${fmt(r[1]-.1)}%`,'NORMAL'),row('Alto',`${fmt(r[1])} a ${fmt(r[2]-.1)}%`,'ALTO'),row('Muito alto',`≥ ${fmt(r[2])}%`,'MUITO ALTO')];
-    note=r?`Omron HBF-514C • ${p.sex==='F'?'Feminino':'Masculino'} • ${fmt(p.age,0)} anos. Faixas para leituras com uma casa decimal. Músculo alto descreve a proporção estimada e não confirma força ou função.`:`Sem classificação Omron disponível para a idade informada. Gordura: 20–79 anos; músculo: 18–80 anos.`;
+    note=r?`Omron HBF-514C • ${p.sex==='F'?'Feminino':'Masculino'} • ${fmt(p.age,0)} anos. Faixas para leituras com uma casa decimal.`:`Sem classificação Omron disponível para a idade informada. Gordura: 20–79 anos; músculo: 18–80 anos.`;
   }else if(key==='bmi') {
     ranges=[row('Baixo peso','< 18,5','BAIXO PESO'),row('Normal','18,5 a < 25','NORMAL'),row('Sobrepeso','25 a < 30','SOBREPESO'),row('Obesidade','≥ 30',current.startsWith('OBESIDADE')?current:'OBESIDADE')];note='IMC em kg/m². Pontos de corte para adultos; o cálculo completo define a faixa antes do arredondamento.';
   }else if(key==='visceral') {
@@ -1357,7 +1536,7 @@ function analyze(cur) {
       'Tamanho corporal e composição influenciam o valor. Não é possível classificar metabolismo lento ou rápido a partir desse número isolado.',
       'A leitura não define uma meta de consumo calórico nem um limite seguro para dieta. Use avaliação individual para planejar a alimentação.')
   };
-  return result;
+  return applyConversationalKnowledge(result,cur);
 }
 function populateCompareDropdown(list = visibleReadings()) {
   const previous = $('compareSelect').value;
@@ -1379,7 +1558,7 @@ function recomputeAll() {
   currentReading = resolveReading(list.find(r => r.id === selectedReadingId) || null);
   renderHistoryList(list);
   if (!currentReading) {
-    currentAnalyses = {}; $('alertCountBadge').textContent = '0';
+    closeMetricDetail(); currentAnalyses = {}; $('alertCountBadge').textContent = '0';
     $('subView-alerts').textContent = all.length ? 'Nenhuma pesagem atende ao filtro.' : 'Nenhuma pesagem registrada.';
     $('goalsSummaryText').textContent = 'Selecione uma pesagem para acompanhar as metas.';
     renderEvolutionChart(list); updateHolo3DState(null); setSyncStatus(); return;
@@ -1414,7 +1593,7 @@ function recomputeAll() {
     const short={weight:'PESO',fat:'GORDURA',visceral:'VISCERAL',rm:'BASAL',bmi:'IMC AUTO',muscle:'MÚSCULO',bodyAge:'IDADE CORPORAL',whr:'CINT./QUADRIL'}[key];
     const primary={weight:fmt(cur.weight),fat:fmt(cur.fat),visceral:fmt(cur.visceral,0),rm:fmt(cur.rm,0),bmi:fmt(bmi),muscle:fmt(cur.muscle),bodyAge:fmt(cur.bodyAge,0),whr:number(cur.hip)>0?fmt(rcq,2):'—'}[key];
     const unit={weight:'kg',fat:'%',visceral:'nível',rm:'kcal',bmi:'',muscle:'%',bodyAge:'anos',whr:''}[key];
-    return `<button type="button" data-metric="${key}" data-compare="${compareMode}" aria-label="${title}: ${value}. ${info.status}. Abrir detalhes" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node hud-panel ${danger?'alert-danger-border':''} ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title"><span class="metric-full-label">${title}</span><span class="metric-short-label" aria-hidden="true">${short}</span><i class="fa-solid fa-${glyph} metric-glyph" aria-hidden="true"></i></span><span class="metric-value">${primary}<span class="metric-unit">${unit}</span></span>${metricReferenceBar(key,cur,info)}<span class="metric-status ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="metric-sub">${sub}</span></button>`;
+    return `<button type="button" data-metric="${key}" data-compare="${compareMode}" data-favorable="${!!info.favorable}" aria-label="${title}: ${value}. ${info.status}. Abrir detalhes" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node hud-panel ${danger?'alert-danger-border':''} ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title"><span class="metric-full-label">${title}</span><span class="metric-short-label" aria-hidden="true">${short}</span><i class="fa-solid fa-${glyph} metric-glyph" aria-hidden="true"></i></span><span class="metric-value">${primary}<span class="metric-unit">${unit}</span></span>${metricReferenceBar(key,cur,info)}<span class="metric-status ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="metric-sub">${sub}</span></button>`;
   };
   $('leftCardsColumn').innerHTML = ['weight','fat','visceral','rm'].map(card).join('');
   $('rightCardsColumn').innerHTML = ['bmi','muscle','bodyAge','whr'].map(card).join('');
@@ -1440,7 +1619,9 @@ function selectMetricDetail(key, shouldScroll = true) {
   $('detailStatusTag').className = `text-[10px] px-2 py-1 rounded-full font-extrabold ${info.altered?'bg-amber-500/20 text-amber-300':'bg-sky-500/15 text-sky-300'}`;
   $('selectedMetricPanel').style.borderLeftColor = info.altered ? '#f59e0b' : '#00f0ff';
   document.querySelectorAll('.metric-card').forEach(el => { const active = el.dataset.metric===key; el.classList.toggle('active-card',active); el.classList.toggle('active-node',active); el.setAttribute('aria-pressed',String(active)); });
-  if (shouldScroll) $('selectedMetricPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  $('detailConversationHeadline').textContent=info.conversationHeadline||'Entenda este indicador';
+  if(info.favorable)$('detailStatusTag').className='text-[10px] px-2 py-1 rounded-full font-extrabold bg-emerald-500/15 text-emerald-300';
+  if (shouldScroll) openMetricDetailModal();
 }
 function renderClinicalAlerts(keys) {
   $('alertCountBadge').textContent = keys.length;
@@ -1463,14 +1644,17 @@ async function deleteReading(id) {
 }
 function renderEvolutionChart(list = visibleReadings()) {
   if (activeTab !== 'chart') return;
+  const allReadings=list; list=chartPeriodReadings(list);
+  $('combinedChartSection').classList.toggle('hidden',$('chartMetricSelect').value!=='all');
   if (chartInst) { chartInst.destroy(); chartInst=null; }
-  if (!list.length || typeof Chart === 'undefined') { $('chartStatus').textContent = list.length ? 'Gráfico indisponível. Os registros continuam disponíveis no histórico.' : 'Sem pesagens para exibir.'; return; }
+  if (!list.length || typeof Chart === 'undefined') {destroyMetricCharts();$('metricChartGrid').replaceChildren();$('chartPeriodNote').textContent=''; $('chartStatus').textContent = list.length ? 'Gráfico indisponível. Os registros continuam disponíveis no histórico.' : 'Sem pesagens para exibir.'; return; }
   $('chartStatus').textContent='';
   chartInst = new Chart($('bioChart'),{type:'line',data:{labels:list.map(r=>dateLabel(r.date)),datasets:[
     {label:'Peso (kg)',data:list.map(r=>r.weight),borderColor:'#00f0ff',tension:.3,yAxisID:'kg'},
     {label:'Gordura (%)',data:list.map(r=>validNumber(r.fat)?r.fat:null),borderColor:'#f59e0b',tension:.3,yAxisID:'percent'},
     {label:'Músculo (%)',data:list.map(r=>validNumber(r.muscle)?r.muscle:null),borderColor:'#10b981',tension:.3,yAxisID:'percent'}
   ]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#17253d'}},kg:{position:'left',title:{display:true,text:'kg',color:'#00f0ff'},ticks:{color:'#94a3b8'},grid:{color:'#17253d'}},percent:{position:'right',title:{display:true,text:'%',color:'#94a3b8'},ticks:{color:'#94a3b8'},grid:{drawOnChartArea:false}}}}});
+  renderMetricGallery(list,allReadings);
 }
 function updateGoalsBox() {
   const fat=number($('gFatSlider').value),muscle=number($('gMuscSlider').value),visceral=number($('gViscSlider').value);
@@ -1488,6 +1672,7 @@ function switchSubView(tab) {
 }
 function autoCalcModalBmi() { const bmi=calcBmiValue($('mWeight').value,$('mHeight').value); $('mBmi').value=Number.isFinite(bmi)?bmi.toFixed(1):''; $('mBmiBadge').textContent=Number.isFinite(bmi)?classifyBmi(bmi,number($('realAgeInput').value)).label:'—'; }
 function openNewWeighingModal() {
+  closeMetricDetail();
   if (saving) return;
   $('weighingForm').reset(); $('mDate').value=localDate(); $('mHeight').value=$('heightCmInput').value;
   $('saveStatus').textContent=''; pickProto('Em jejum'); autoCalcModalBmi();
@@ -1518,6 +1703,7 @@ async function saveWeighing(event) {
   } finally {saving=false;$('btnSaveWeighing').disabled=false;$('btnSaveWeighing').textContent='Salvar pesagem';}
 }
 function openReportModal() {
+  closeMetricDetail();
   recomputeAll(); const cur=currentReading; if (!cur) return;
   const list=visibleReadings(), first=list[0], a=analyze(cur), p=profile(cur);
   $('repAgeSpan').textContent=fmt(p.age,0);$('repHeightSpan').textContent=fmt(p.height);
@@ -1568,6 +1754,7 @@ async function connectCloud() {
   try {
     const [appSDK,fireSDK]=await Promise.all([import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js'),import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js')]);
     fire=fireSDK;db=fire.getFirestore(appSDK.initializeApp(firebaseConfig));
+    void loadCloudKnowledge(fire,db);
     unsubscribe=fire.onSnapshot(fire.collection(db,'measurements'),{includeMetadataChanges:true},snapshot=>{
       const merged=new Map(snapshot.metadata.fromCache ? readings.map(r=>[r.id,r]) : []);
       for (const d of snapshot.docs) {const r=normalize(d.data(),d.id);if(r) merged.set(d.id,{...r,_sync:'synced'});}
@@ -1582,8 +1769,10 @@ async function connectCloud() {
   } catch {serverSeen=false;notify('Sem conexão com o Firebase. Novas pesagens ficam salvas neste navegador e aguardam sincronização.');}
   finally {connecting=false;setSyncStatus();}
 }
-Object.assign(window,{inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
+Object.assign(window,{renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
 document.addEventListener('click',event=>{
+  if(event.target.closest('[data-metric-close]'))closeMetricDetail();
+  if(event.target.closest('[data-metric-evolution]'))openMetricEvolution();
   const nav=event.target.closest('[data-app-nav]');if(nav)navigateApp(nav.dataset.appNav);
   const mode=event.target.closest('[data-holo-mode]');if(mode)setHoloMode(mode.dataset.holoMode);
   const turn=event.target.closest('[data-holo-turn]');if(turn)rotateHolo(turn.dataset.holoTurn);
@@ -1591,7 +1780,8 @@ document.addEventListener('click',event=>{
   const selected=event.target.closest('[data-reading-id]');if(selected)selectHistoryReading(selected.dataset.readingId);
   const remove=event.target.closest('[data-delete-id]');if(remove)void deleteReading(remove.dataset.deleteId);
 });
-document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeQuickPanel();closeNewWeighingModal();closeReportModal();}});
+document.addEventListener('keydown',event=>{metricDialogKeyboard(event);if(event.key==='Escape'){closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();}});
+$('metricDetailModal').addEventListener('click',event=>{if(event.target===$('metricDetailModal'))closeMetricDetail();});
 for (const id of ['gFatSlider','gMuscSlider','gViscSlider']) $(id).addEventListener('change',saveGoals);
 window.addEventListener('online',()=>{void connectCloud();void flushPending();});
 window.addEventListener('offline',()=>{serverSeen=false;setSyncStatus();});
