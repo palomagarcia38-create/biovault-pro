@@ -6,9 +6,10 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Cyber-Biometric 3D HUD v4.0</title>
+  <title>BioVault Pro • Biometric HUD v4.2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script id="threeSdk" async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Orbitron:wght@600;700;800;900&display=swap');
@@ -129,12 +130,104 @@
     @media print {.cyber-panel,.panel-dark {box-shadow:none;backdrop-filter:none;} }
 
     #bioMap.scanner-grid {background-image:linear-gradient(to right,rgba(0,240,255,.055) 1px,transparent 1px),linear-gradient(to bottom,rgba(0,240,255,.055) 1px,transparent 1px),linear-gradient(165deg,rgba(10,22,44,.84),rgba(4,11,24,.94));background-size:22px 22px,22px 22px,auto;}
+    /* v4.2: console layout, chamfered cards and quick telemetry panels. */
+    body {background-image:radial-gradient(circle at 50% 30%,#00f0ff12,transparent 60%),linear-gradient(to right,#00f0ff05 1px,transparent 1px),linear-gradient(to bottom,#00f0ff05 1px,transparent 1px);background-size:100% 100%,30px 30px,30px 30px;}
+    #appHeader {max-width:none;margin:0;padding:0 16px;border-bottom:1px solid #164e635c;background:#020611ed;position:sticky;top:0;z-index:40;backdrop-filter:blur(12px);}
+    #appHeader>div {max-width:1280px;margin:0 auto;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none;padding:14px 0;}
+    #appHeader>div::before,#appHeader>div::after {display:none;}
+    #appHeader .hud-font {font-weight:800;}
+    #dashboardMain {padding-top:16px;}
+    .hud-quick-button {display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;border:1px solid #00f0ff40;background:#071329d9;color:#a9eaf4;border-radius:7px;font:600 11px 'JetBrains Mono',monospace;min-height:36px;}
+    .hud-quick-button:hover {border-color:#00f0ff;background:#083344;}
+    .hud-quick-amber {color:#fbbf24;border-color:#f59e0b44;background:#451a031c;}
+    #biometricGrid {display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,1.65fr) minmax(0,1fr);gap:16px;align-items:stretch;}
+    #biometricGrid>#leftCardsColumn,#biometricGrid>#rightCardsColumn,#biometricGrid>#holoStage {grid-column:auto;min-width:0;}
+    #leftCardsColumn,#rightCardsColumn {display:flex;flex-direction:column;gap:12px;}
+    #leftCardsColumn>:not([hidden])~:not([hidden]),#rightCardsColumn>:not([hidden])~:not([hidden]) {margin-top:0;}
+    .hud-panel {position:relative;background:#040d21bf;border:1px solid #00f0ff40;clip-path:polygon(0 10px,10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px));}
+    .metric-card {flex:1;border-radius:0;padding:16px!important;display:flex;flex-direction:column;justify-content:center;min-height:130px;}
+    .metric-card .metric-title {font:600 10px 'Orbitron',sans-serif;letter-spacing:.04em;color:#a3b8c9;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+    .metric-card .metric-value {font:700 28px 'JetBrains Mono',monospace;letter-spacing:-.06em;color:#67e8f9;margin:12px 0 6px;text-shadow:0 0 8px #00f0ff4d;}
+    .metric-card .metric-title~span:not(.metric-value) {font-size:10px;}
+    .metric-card .metric-glyph {color:#00f0ff;font-size:14px;margin-left:auto;}
+    .metric-card.alert-danger-border {border-color:#ff2a5fb3;box-shadow:0 0 16px #ff2a5f26;}
+    .metric-card.alert-danger-border .metric-value {color:#ff8aa7;text-shadow:0 0 8px #ff2a5f66;}
+    .metric-card.active-card {border-color:#00f0ff!important;box-shadow:inset 0 0 15px #00f0ff22!important;transform:none;}
+    .metric-reference-bar {display:flex;gap:3px;margin:8px 0 4px;height:5px;}
+    .metric-reference-bar i {flex:1;border-radius:2px;background:#1e293b;}
+    .metric-reference-bar i[data-current=true] {background:#00f0ff;box-shadow:0 0 7px #00f0ff55;}
+    .metric-card.alert-card .metric-reference-bar i[data-current=true] {background:#f59e0b;}
+    .metric-card.alert-danger-border .metric-reference-bar i[data-current=true] {background:#ff2a5f;}
+    .metric-value-line {height:2px;margin:8px 0 4px;background:linear-gradient(90deg,#00f0ff66,transparent);}
+    .hud-body-console {position:relative;border:1px solid #00f0ff40;background:#02061188;min-height:540px;padding:16px 10px!important;border-radius:12px;justify-content:center;overflow:hidden;}
+    .hud-body-console::after {content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,#00f0ff08 3px 4px);z-index:1;}
+    .hud-body-console>div,.hud-body-console>button,.hud-body-console>p {position:relative;z-index:2;}
+    .holo-console-title {font:700 10px 'Orbitron',sans-serif;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;color:#a5f3fc;padding:8px 4px 12px;}
+    .holo-dot {height:6px;width:6px;border-radius:50%;background:#00f0ff;box-shadow:0 0 10px #00f0ff;}
+    #canvas3dContainer {height:420px;}
+    #holoFallback svg {max-height:420px;}
+    .holo-mode {margin:4px 0;}
+    .holo-rotation {margin-top:6px;}
+    .holo-auto {display:inline-block;}
+    .clinical-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+    .clinical-block {padding:20px;background:#020617b3;min-width:0;}
+    .clinical-block h4 {line-height:1.8;font-size:11px;}
+    #detailMetricTitle {font-size:16px;line-height:1.7;}
+    .modal-backdrop {background:#020611e6;backdrop-filter:blur(8px);}
+    .quick-panel-shell {width:min(100%,1100px);padding:24px;max-height:90dvh;display:flex;flex-direction:column;border-radius:16px;overflow:hidden;}
+    .quick-panel-heading {display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:16px;border-bottom:1px solid #164e63;margin-bottom:18px;}
+    .quick-panel-heading button {color:#94a3b8;min-width:32px;min-height:32px;}
+    .quick-panel-heading h2 {margin:0;}
+    #quickPanelBody {min-height:0;overflow:auto;}
+    .quick-panel-footer {display:flex;justify-content:flex-end;border-top:1px solid #1e293b;margin-top:18px;padding-top:14px;}
+    #quickPanelBody #subView-chart {height:min(55vh,420px);min-height:260px;}
+    .history-table-wrap {display:none;overflow:auto;}
+    #quickPanelBody .history-table-wrap {display:block;}
+    #quickPanelBody .history-cards {display:none;}
+    .history-telemetry {border-collapse:collapse;min-width:850px;width:100%;font:11px 'JetBrains Mono',monospace;}
+    .history-telemetry th,.history-telemetry td {padding:12px 10px;text-align:left;white-space:nowrap;border-bottom:1px solid #1e293b;}
+    .history-telemetry th {color:#67e8f9;background:#020617;position:sticky;top:0;}
+    .history-telemetry tr[data-selected=true] {background:#00f0ff10;}
+    .history-telemetry button {padding:7px 9px;border:1px solid #164e63;border-radius:5px;color:#a5f3fc;}
+    .history-telemetry button[data-delete-id] {color:#fda4af;border-color:#881337;background:#4c051926;}
+    #appFooter {max-width:1280px;margin:20px auto 0;padding:18px 16px 28px;border-top:1px solid #164e63;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#64748b;font:10px 'JetBrains Mono',monospace;}
+    ::-webkit-scrollbar {width:6px;height:6px;} ::-webkit-scrollbar-track {background:#020611;} ::-webkit-scrollbar-thumb {background:#00f0ff4d;border-radius:3px;}
+    @media(max-width:980px) {
+      #appHeader {position:relative;}
+      #biometricGrid {grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+      #biometricGrid>#holoStage {grid-column:1/-1;grid-row:1;min-height:440px;}
+      #biometricGrid>#leftCardsColumn {grid-column:1;grid-row:2;}
+      #biometricGrid>#rightCardsColumn {grid-column:2;grid-row:2;}
+      #canvas3dContainer {height:330px;}
+      #holoFallback svg {height:330px;}
+      .metric-card {padding:13px!important;min-height:130px;}
+      .metric-card .metric-value {font-size:24px;}
+      .clinical-grid {grid-template-columns:1fr;}
+    }
+    @media(max-width:480px) {
+      #appHeader {padding:0 12px;} #appHeader>div {padding:12px 0;}
+      .hud-quick-button {padding:8px 10px;font-size:10px;}
+      #bioMap {padding:12px;}
+      #biometricGrid {gap:8px;}
+      .metric-card .metric-value {font-size:21px;}
+      .metric-card .metric-title {font-size:9px;line-height:1.6;}
+      .metric-card .metric-title~span:not(.metric-value) {font-size:9px;}
+      .metric-card .metric-glyph {font-size:12px;}
+      #detailMetricTitle {font-size:13px;}
+      #detailStatusTag {max-width:40%;white-space:normal;}
+      .quick-panel-shell {padding:16px;}
+      .clinical-block {padding:14px;}
+      .holo-auto {font-size:10px;padding:8px 10px;}
+      #appFooter {font-size:9px;}
+    }
+    @media print {.hud-panel {clip-path:none;}#appHeader,#appFooter,#quickPanelModal {display:none!important;} .clinical-grid {display:block;} }
+
   </style>
 </head>
 <body class="pb-20">
 
   <!-- TOP HEADER -->
-  <header class="max-w-4xl mx-auto px-3 pt-3 pb-2 no-print">
+  <header id="appHeader" class="max-w-7xl mx-auto px-3 pt-3 pb-2 no-print">
     <div class="panel-dark cyber-panel hud-corners rounded-2xl p-3.5 space-y-3">
       <div class="flex items-start justify-between gap-2">
         <div class="flex items-center gap-2.5">
@@ -151,7 +244,7 @@
           </div>
         </div>
         <button onclick="window.location.reload()" title="Atualizar App" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v4.0
+          ↻ v4.2
         </button>
       </div>
 
@@ -164,19 +257,21 @@
 
         <div class="flex items-center gap-1.5 bg-[#081222] border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs">
           <span class="text-slate-400">Idade Real:</span>
-          <input type="number" id="realAgeInput" value="28" min="18" max="120" onchange="saveProfilePrefs(); recomputeAll()" class="w-10 bg-transparent text-white font-extrabold text-center outline-none mono" />
+          <input type="number" id="realAgeInput" required value="28" min="18" max="120" onchange="saveProfilePrefs(); recomputeAll()" class="w-10 bg-transparent text-white font-extrabold text-center outline-none mono" />
           <span class="text-slate-400">anos</span>
         </div>
 
         <label class="flex items-center gap-1 bg-[#081222] border border-sky-500/40 rounded-xl px-2.5 py-1.5 text-xs">
           <span class="text-sky-400 font-semibold">Altura:</span>
-          <input type="number" id="heightCmInput" value="165" min="100" max="220" step="0.1" onchange="saveProfilePrefs(); recomputeAll()" aria-label="Altura em centímetros" class="w-14 bg-transparent text-white font-extrabold text-center outline-none mono" />
+          <input type="number" id="heightCmInput" required value="165" min="100" max="220" step="0.1" onchange="saveProfilePrefs(); recomputeAll()" aria-label="Altura em centímetros" class="w-14 bg-transparent text-white font-extrabold text-center outline-none mono" />
           <span class="text-slate-400">cm</span>
         </label>
         <button onclick="openNewWeighingModal()" class="neon-btn text-slate-950 hud-font font-extrabold text-[11px] px-3.5 py-2 rounded-xl shadow-lg shadow-sky-500/20">
           + Nova Pesagem
         </button>
 
+        <button type="button" id="quickHistoryButton" onclick="openQuickPanel('history')" class="hud-quick-button"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Histórico</button>
+        <button type="button" id="quickChartButton" onclick="openQuickPanel('chart')" class="hud-quick-button hud-quick-amber"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Evolução</button>
         <button id="btnOpenReport" onclick="openReportModal()" class="bg-purple-500/15 hover:bg-purple-500/25 border border-purple-400/40 text-purple-200 mono font-bold text-[11px] px-3.5 py-2 rounded-xl">
           Gerar Laudo PDF
         </button>
@@ -184,8 +279,8 @@
     </div>
   </header>
 
-  <div id="appStatus" class="max-w-4xl mx-auto px-3 py-2 text-xs text-amber-300 hidden no-print" role="status" aria-live="polite"></div>
-  <div id="emptyStateBox" class="hidden max-w-4xl mx-auto px-3 no-print">
+  <div id="appStatus" class="max-w-7xl mx-auto px-3 py-2 text-xs text-amber-300 hidden no-print" role="status" aria-live="polite"></div>
+  <div id="emptyStateBox" class="hidden max-w-7xl mx-auto px-3 no-print">
     <section class="panel-dark cyber-panel hud-corners rounded-2xl p-6 text-center space-y-3">
       <div class="text-3xl" aria-hidden="true">⚖️</div>
       <h2 class="text-base font-extrabold text-white">Nenhuma pesagem registrada ainda</h2>
@@ -194,7 +289,7 @@
     </section>
   </div>
   <!-- MAPA BIOMÉTRICO INTERATIVO -->
-  <main id="dashboardMain" class="max-w-4xl mx-auto px-3 space-y-3">
+  <main id="dashboardMain" class="max-w-7xl mx-auto px-3 space-y-3">
     <p id="filterEmpty" class="hidden panel-dark cyber-panel hud-corners rounded-2xl p-4 text-sm text-slate-300">Nenhuma pesagem em jejum neste histórico. Desmarque “Só jejum” para ver as demais.</p>
     <section id="bioMap" class="panel-dark cyber-panel hud-corners scanner-grid rounded-2xl p-3.5 sm:p-4 space-y-3.5">
       <div class="flex flex-wrap items-center justify-between gap-2 border-b border-cyan-500/15 pb-2">
@@ -234,7 +329,8 @@
         <div class="col-span-4 space-y-2.5" id="leftCardsColumn"></div>
 
         <!-- 3D INTERATIVO COM A VISUALIZAÇÃO ANTERIOR DISPONÍVEL EM 2D -->
-        <div id="holoStage" class="col-span-4 flex flex-col items-center justify-center relative py-2">
+        <div id="holoStage" class="hud-body-console col-span-4 flex flex-col items-center justify-center relative py-2">
+          <div class="holo-console-title"><span class="holo-dot"></span> HOLO-BODY 3D <span class="text-slate-400 text-[9px]">ILUSTRAÇÃO</span></div>
           <div class="holo-mode no-print" role="group" aria-label="Tipo de visualização">
             <button type="button" id="holoMode3d" data-holo-mode="3d" aria-pressed="false">3D</button>
             <button type="button" id="holoMode2d" data-holo-mode="2d" aria-pressed="true">2D</button>
@@ -288,9 +384,11 @@
           <div id="holoRotationControls" class="holo-rotation hidden no-print" role="group" aria-label="Girar ilustração">
             <button type="button" data-holo-turn="left" aria-label="Girar para a esquerda">↶</button>
             <button type="button" data-holo-turn="reset" aria-label="Voltar à vista frontal">Frente</button>
+            <button type="button" data-holo-turn="back" aria-label="Mostrar vista de costas">Costas</button>
             <button type="button" data-holo-turn="right" aria-label="Girar para a direita">↷</button>
           </div>
           <button type="button" id="holoAutoRotate" class="holo-auto hidden no-print" aria-pressed="false">Ativar rotação automática</button>
+          <button type="button" id="holoScanBeam" class="holo-auto hidden no-print" aria-pressed="false" onclick="toggleHoloScan()">Ativar varredura</button>
           <p id="holoStatus" class="text-[9px] mono text-cyan-200/70 text-center mt-2" role="status">Ilustração corporal</p>
         </div>
 
@@ -396,9 +494,10 @@
 <label class="block text-[11px] text-slate-400">Músculo Esquelético (%) *<input type="number" step=".1" min="1" max="60" id="mMuscle" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
 <label class="block text-[11px] text-slate-400">Gordura Visceral (1–30) *<input type="number" step="1" min="1" max="30" id="mVisc" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
 <label class="block text-[11px] text-slate-400">Idade Corporal (anos) *<input type="number" step="1" min="1" max="120" id="mBodyAge" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
-<label class="block text-[11px] text-slate-400">Metabolismo em repouso (kcal) *<input type="number" step="1" min="1" max="10000" id="mRm" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Metabolismo em repouso (kcal, opcional)<input type="number" step="1" min="1" max="10000" id="mRm" placeholder="Do visor ou cálculo automático" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
 <label class="block text-[11px] text-slate-400">Cintura (cm) *<input type="number" step=".1" min="1" max="300" id="mWaist" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
 <label class="block text-[11px] text-slate-400">Quadril (cm) *<input type="number" step=".1" min="1" max="300" id="mHip" required class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label></div>
+        <p class="text-[10px] text-slate-400">Se o metabolismo ficar vazio, uma estimativa por equação será identificada como calculada no aplicativo e no relatório.</p>
         <p id="saveStatus" class="text-xs text-amber-300" role="status" aria-live="polite"></p>
         <button type="submit" id="btnSaveWeighing" class="w-full py-3 rounded-xl neon-btn text-slate-950 hud-font font-extrabold text-xs">Salvar pesagem</button>
       </form>
@@ -447,6 +546,16 @@
     </div>
   </div>
 
+
+  <div id="quickPanelModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop no-print" role="dialog" aria-modal="true" aria-labelledby="quickPanelTitle">
+    <section class="panel-dark cyber-panel hud-corners quick-panel-shell">
+      <div class="quick-panel-heading"><h2 id="quickPanelTitle" class="hud-font text-sm text-cyan-300">Histórico</h2><button type="button" onclick="closeQuickPanel()" aria-label="Fechar painel rápido">✕</button></div>
+      <div id="quickPanelBody"></div>
+      <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
+    </section>
+  </div>
+  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.2</span><span>Histórico local e sincronização Firebase</span></footer>
+
   <script type="module">
     const firebaseConfig = {
       apiKey: "AIzaSyBUJkLOV2b-P_Pq8dsp7rCGLV5bb-Jxgkg",
@@ -489,7 +598,7 @@ class CompatibleBodyRenderer {
     const normal=new T.Vector3(),edge=new T.Vector3(),toCamera=new T.Vector3(),center=new T.Vector3();
     scene.traverse(mesh=>{
       const geometry=mesh.geometry,material=mesh.material;
-      if(!mesh.visible||!geometry?.attributes?.position||!material||material.wireframe||material.opacity===0)return;
+      if(!mesh.isMesh||!mesh.visible||!geometry?.attributes?.position||!material||material.wireframe||material.opacity===0)return;
       const positions=geometry.attributes.position,index=geometry.index;
       const worldVertices=[],projectedVertices=[];
       for(let i=0;i<positions.count;i++){
@@ -508,7 +617,9 @@ class CompatibleBodyRenderer {
         if(material.side!==T.DoubleSide&&normal.dot(toCamera)<=0)continue;
         const diffuse=.4+.6*Math.max(0,normal.dot(light));
         const color=material.color||new T.Color(0x00f0ff),emissive=material.emissive;
-        const rgb=['r','g','b'].map(channel=>Math.min(255,Math.round((color[channel]*diffuse+(emissive?.[channel]||0)*.35)*255)));
+        const vertex=material.vertexColors?geometry.attributes.color:null;
+        const tint=vertex?['getX','getY','getZ'].map(get=>(vertex[get](ia)+vertex[get](ib)+vertex[get](ic))/3):[1,1,1];
+        const rgb=['r','g','b'].map((channel,channelIndex)=>Math.min(255,Math.round((color[channel]*tint[channelIndex]*diffuse+(emissive?.[channel]||0)*.35)*255)));
         triangles.push({a,b,c,z:(a.z+b.z+c.z)/3,order:mesh.renderOrder||0,color:`rgb(${rgb.join(',')})`,alpha:material.transparent?material.opacity:1});
       }
     });
@@ -524,10 +635,87 @@ class CompatibleBodyRenderer {
 }
 
 
+// v4.2 additions reuse the existing source of truth, selection and synchronization queue.
+let quickPanelState=null;
+function estimateRestingEnergy(weight,height,age,sex) {
+  const w=number(weight),h=number(height),a=number(age);
+  if(![w,h,a].every(Number.isFinite)||w<=0||h<=0||a<18||!['M','F'].includes(sex))return NaN;
+  const value=sex==='M'?88.362+13.397*w+4.799*h-5.677*a:447.593+9.247*w+3.098*h-4.330*a;
+  return value>0?Math.round(value):NaN;
+}
+function readingBasal(record) {
+  if(validNumber(record?.rm)&&number(record.rm)>0)return number(record.rm);
+  if(!record)return NaN;
+  const p=profile(record);return estimateRestingEnergy(record.weight,p.height,p.age,p.sex);
+}
+function resolveReading(record) {
+  if(!record)return null;
+  if(validNumber(record.rm)&&number(record.rm)>0)return record;
+  return {...record,rm:readingBasal(record),rmMethod:'harris-benedict-1984'};
+}
+function migrateLegacyCache() {
+  const imported=readJSON('bv_measurements',[]);
+  if(!Array.isArray(imported)||!imported.length)return;
+  const previous=readJSON('biovault_v42_imported_keys',[]);
+  const seen=new Set(Array.isArray(previous)?previous:[]);
+  const known=new Set(readings.map(r=>r.id));let changed=false;
+  for(const raw of imported) {
+    if(!raw||typeof raw!=='object')continue;
+    const fingerprint=raw.id?'id:'+String(raw.id):'row:'+JSON.stringify([raw.date,raw.peso,raw.gordura,raw.musculo,raw.visceral,raw.idadeBio,raw.cintura,raw.quadril,raw.basal]);
+    if(seen.has(fingerprint))continue;
+    const record=normalize(raw);if(!record)continue;
+    if(!known.has(record.id)) {
+      record._sync=raw._sync||(!raw.id||record.id.startsWith('local_')||record.id.startsWith('loc_')?'pending':'synced');
+      readings.push(record);known.add(record.id);
+    }
+    seen.add(fingerprint);changed=true;
+  }
+  // Leave the older key untouched; record the import only after the canonical cache is durable.
+  if(changed&&persist())writeJSON('biovault_v42_imported_keys',[...seen]);
+}
+function metricReferenceBar(key,record,info) {
+  if(!['fat','muscle','visceral','bmi','whr'].includes(key))return '<span class="metric-value-line" aria-hidden="true"></span>';
+  const r=clinicalRanges(key,record,info).ranges;
+  if(!r.length)return '<span class="metric-value-line" aria-hidden="true"></span>';
+  return `<span class="metric-reference-bar" role="img" aria-label="Posição na faixa de referência: ${escapeHTML(info.status)}">${r.map(entry=>`<i data-current="${entry.current}" title="${escapeHTML(entry.label+': '+entry.value)}"></i>`).join('')}</span>`;
+}
+function openQuickPanel(view) {
+  if(!['history','chart'].includes(view))return;
+  if(quickPanelState)closeQuickPanel();
+  const node=$('subView-'+view);
+  quickPanelState={node,parent:node.parentNode,next:node.nextSibling,previousTab:activeTab,opener:document.activeElement};
+  switchSubView(view);
+  $('quickPanelTitle').textContent=view==='history'?'Histórico de registros biométricos':'Evolução temporal';
+  $('quickPanelBody').append(node);$('quickPanelModal').classList.remove('hidden');
+  $('quickPanelModal').querySelector('button').focus();
+  if(view==='chart')chartInst?.resize?.();
+}
+function closeQuickPanel() {
+  if(!quickPanelState)return;
+  const state=quickPanelState;quickPanelState=null;
+  state.parent.insertBefore(state.node,state.next?.parentNode===state.parent?state.next:null);
+  $('quickPanelModal').classList.add('hidden');switchSubView(state.previousTab);
+  state.opener?.focus?.();
+}
+function toggleHoloScan() {
+  holo.scanActive=!holo.scanActive;
+  $('holoScanBeam').setAttribute('aria-pressed',String(holo.scanActive));
+  $('holoScanBeam').textContent=holo.scanActive?'Pausar varredura':'Ativar varredura';
+  if(holo.parts)holo.parts.scan.visible=holo.scanActive;
+  updateHoloLoop();drawHolo();
+}
+function historyTelemetryTable(list) {
+  return `<div class="history-table-wrap"><table class="history-telemetry"><thead><tr><th>Data</th><th>Peso</th><th>IMC</th><th>Gordura</th><th>Visceral</th><th>Músculo</th><th>RCQ</th><th>Idade corporal</th><th>Ações</th></tr></thead><tbody>${[...list].reverse().map(r=>{
+    const ratio=r.hip>0?r.waist/r.hip:NaN;
+    return `<tr data-selected="${r.id===selectedReadingId}"><td>${dateLabel(r.date)}</td><td>${fmt(r.weight)} kg</td><td>${fmt(calcBmiValue(r.weight,profile(r).height))}</td><td>${fmt(r.fat)}%</td><td>${fmt(r.visceral,0)}</td><td>${fmt(r.muscle)}%</td><td>${fmt(ratio,2)}</td><td>${fmt(r.bodyAge,0)} anos</td><td><button type="button" data-reading-id="${escapeHTML(r.id)}">Selecionar</button> <button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}">Excluir</button></td></tr>`;
+  }).join('')}</tbody></table></div>`;
+}
+
+
 // Optional visualization. A failed CDN or GPU never prevents measurements from loading.
 const holo = {renderer:null,scene:null,camera:null,body:null,materials:null,parts:null,
   target:.28,dragging:false,auto:false,mode:'3d',failed:false,reduced:false,
-  frameVisible:true,resizeObserver:null,intersectionObserver:null,previousTime:0};
+  frameVisible:true,resizeObserver:null,intersectionObserver:null,previousTime:0,scanActive:false};
 const clampHolo = (v,lo,hi) => Math.max(lo,Math.min(hi,v));
 function holoAppearance(record, analyses = analyze(record)) {
   const fatHigh = ['ALTO','MUITO ALTO'].includes(analyses.fat.status);
@@ -550,6 +738,7 @@ function setHoloMode(mode) {
   $('holoFallback').classList.toggle('hidden',enabled);
   $('holoRotationControls').classList.toggle('hidden',!enabled);
   $('holoAutoRotate').classList.toggle('hidden',!enabled);
+  $('holoScanBeam').classList.toggle('hidden',!enabled);
   $('holoMode3d').setAttribute('aria-pressed',String(enabled));
   $('holoMode2d').setAttribute('aria-pressed',String(!enabled));
   $('holoStatus').textContent=enabled ? 'Arraste na horizontal • Ilustração estimada' : 'Ilustração 2D • As demais funções continuam disponíveis';
@@ -578,13 +767,13 @@ function drawHolo() {
 function updateHoloLoop() {
   if(!holo.renderer)return;
   const visible=holo.mode==='3d' && !!currentReading && !document.hidden && holo.frameVisible && !holo.failed;
-  if(!visible || holo.reduced || !holo.auto) {holo.renderer.setAnimationLoop(null);if(visible)drawHolo();return;}
+  if(!visible || holo.reduced || (!holo.auto&&!holo.scanActive)) {holo.renderer.setAnimationLoop(null);if(visible)drawHolo();return;}
   holo.previousTime=0;
   holo.renderer.setAnimationLoop(time=>{
     if(!holo.previousTime)holo.previousTime=time;
     const dt=Math.min((time-holo.previousTime)/1000,.1);holo.previousTime=time;
-    if(!holo.dragging)holo.target+=dt*.26;
-    holo.parts.scan.position.y=.93+Math.sin(time*.0019)*1.02;
+    if(holo.auto&&!holo.dragging)holo.target+=dt*.26;
+    if(holo.scanActive)holo.parts.scan.position.y=.93+Math.sin(time*.0019)*1.02;
     const pulse=1+Math.sin(time*.0042)*.06;
     holo.parts.core.scale.setScalar(pulse);holo.parts.halo.scale.setScalar(pulse);
     drawHolo();
@@ -592,7 +781,7 @@ function updateHoloLoop() {
 }
 function rotateHolo(direction) {
   if(!holo.renderer)return;
-  holo.target=direction==='reset'?.0:holo.target+(direction==='left'?-.4:.4);
+  holo.target=direction==='reset'?0:direction==='back'?Math.PI:holo.target+(direction==='left'?-.4:.4);
   drawHolo();
 }
 function disableHolo(message='Ilustração 2D • 3D indisponível neste dispositivo') {
@@ -645,6 +834,15 @@ function initHolo3D() {
       joint(.052,side*.12,-.05,.05,base,.85,.55,1.6);
     }
     for(const part of arms)part.userData.baseX=part.position.x;
+    // Smooth continuous trunk; head, paired legs and arms retain their anatomy and controls.
+    const torsoProfile=[[0,.79],[.18,.83],[.21,.91],[.18,1.04],[.165,1.17],[.21,1.34],[.23,1.48],[.19,1.57],[.075,1.64],[0,1.65]];
+    const smoothGeometry=new T.LatheGeometry(torsoProfile.map(([r,y])=>new T.Vector2(r,y)),holo.software?16:32);
+    smoothGeometry.setAttribute('color',new T.BufferAttribute(new Float32Array(smoothGeometry.attributes.position.count*3),3));
+    smoothGeometry.userData.basePositions=new Float32Array(smoothGeometry.attributes.position.array);
+    const smoothMaterial=new T.MeshPhongMaterial({color:0xffffff,vertexColors:true,transparent:true,opacity:.78,shininess:85});
+    const sculptedTorso=new T.Mesh(smoothGeometry,smoothMaterial);body.add(sculptedTorso);
+    sculptedTorso.add(new T.Mesh(smoothGeometry,wire));
+    for(const part of [chest,torso,waist,pelvis])part.visible=false;
     const core=new T.Mesh(new T.SphereGeometry(.075,20,16),new T.MeshBasicMaterial({color:0x10b981,transparent:true,opacity:.85,depthTest:false}));
     core.position.set(0,1.04,.04);core.renderOrder=2;body.add(core);
     const halo=new T.Mesh(new T.SphereGeometry(.14,20,16),new T.MeshBasicMaterial({color:0x10b981,transparent:true,opacity:.2,depthWrite:false}));
@@ -653,9 +851,9 @@ function initHolo3D() {
       const mesh=new T.Mesh(new T.RingGeometry(inner,outer,48),new T.MeshBasicMaterial({color:0x00f0ff,side:T.DoubleSide,transparent:true,opacity}));
       mesh.rotation.x=Math.PI/2;mesh.position.y=y;parent.add(mesh);return mesh;
     };
-    const waistRing=ring(.23,.242,1.04,.65,body);ring(.42,.5,-.11,.48);
-    const scan=ring(.01,.45,1.0,.18);
-    holo.parts={chest,torso,waist,pelvis,shoulders,arms,thighs,core,halo,scan,waistRing};
+    const waistRing=ring(.23,.242,1.04,.65,body);ring(.42,.5,-.11,.48);ring(.66,.68,-.115,.25);
+    const scan=ring(.01,.45,1.0,.18);scan.visible=false;
+    holo.parts={chest,torso,waist,pelvis,sculptedTorso,shoulders,arms,thighs,core,halo,scan,waistRing};
     let previousX=0;
     container.addEventListener('pointerdown',event=>{if(event.button!==0)return;holo.dragging=true;previousX=event.clientX;container.setPointerCapture?.(event.pointerId);});
     container.addEventListener('pointermove',event=>{if(!holo.dragging)return;holo.target+=(event.clientX-previousX)*.014;previousX=event.clientX;drawHolo();});
@@ -674,6 +872,16 @@ function updateHolo3DState(record) {
   if(!record){updateHoloLoop();return;}
   if(!initHolo3D())return;
   const s=holoAppearance(record),p=holo.parts,m=holo.materials;
+  const smooth=p.sculptedTorso.geometry,positions=smooth.attributes.position,colors=smooth.attributes.color,original=smooth.userData.basePositions;
+  const cool=new window.THREE.Color(0x00f0ff),warm=new window.THREE.Color(0xf97316),vertexColor=new window.THREE.Color();
+  for(let i=0;i<positions.count;i++){
+    const y=original[i*3+1];
+    const hip=y<1.0?(s.sex==='F'?1.15:1.0):y>1.3?(s.sex==='M'?1.12:1.02):1;
+    positions.setXYZ(i,original[i*3]*s.volume*hip,y,original[i*3+2]*s.volume*.86);
+    const heat=(s.fatHigh||s.centralHigh)?Math.max(0,1-Math.abs(y-1.02)/.28):0;
+    vertexColor.copy(cool).lerp(warm,heat);colors.setXYZ(i,vertexColor.r,vertexColor.g,vertexColor.b);
+  }
+  positions.needsUpdate=true;colors.needsUpdate=true;smooth.computeVertexNormals();
   p.chest.scale.set((s.sex==='F'?1.02:1.22)*Math.min(s.volume,1.2),s.sex==='F'?.72:.76,.74*Math.min(s.volume,1.2));
   p.torso.scale.set(Math.min(s.volume,1.25),1,Math.min(s.volume,1.3));
   p.pelvis.scale.set((s.sex==='F'?1.22:1.05)*s.volume,s.sex==='F'?.68:.64,.8*s.volume);
@@ -700,6 +908,7 @@ function disposeHolo() {
 function initializeHoloControls() {
   holo.reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
   $('holoAutoRotate').disabled=holo.reduced;
+  $('holoScanBeam').disabled=holo.reduced;
   if(holo.reduced)$('holoAutoRotate').title='As animações estão reduzidas nas preferências deste dispositivo.';
   $('holoAutoRotate').addEventListener('click',()=>{holo.auto=!holo.auto;$('holoAutoRotate').setAttribute('aria-pressed',String(holo.auto));$('holoAutoRotate').textContent=holo.auto?'Pausar rotação automática':'Ativar rotação automática';updateHoloLoop();});
   $('threeSdk')?.addEventListener('load',()=>updateHolo3DState(currentReading));
@@ -713,7 +922,8 @@ const clinicalSources={
   bia:['Kyle et al., 2004 — princípios e limites da bioimpedância','https://pubmed.ncbi.nlm.nih.gov/15380917/'],
   bmi:['OMS — IMC e avaliação de adiposidade','https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight'],
   waist:['OMS — cintura e relação cintura–quadril','https://www.who.int/publications/i/item/9789241501491'],
-  muscle:['EWGSOP2 — avaliação de força e músculo','https://pubmed.ncbi.nlm.nih.gov/30312372/']
+  muscle:['EWGSOP2 — avaliação de força e músculo','https://pubmed.ncbi.nlm.nih.gov/30312372/'],
+  energy:['Roza e Shizgal, 1984 — equação de energia em repouso','https://pubmed.ncbi.nlm.nih.gov/6741850/']
 };
 function clinicalEvidence(key,record,info) {
   const a=analyze(record);
@@ -725,10 +935,11 @@ function clinicalEvidence(key,record,info) {
     case 'bodyAge':return {text:'A idade corporal é uma comparação calculada pelo aparelho. Ela não é um marcador validado de longevidade individual e não há uma conversão fixa entre perder determinado percentual de gordura e reduzir anos no visor.',sources:['omron','bia']};
     case 'whr':return {text:'A relação depende de duas medidas: pode variar por mudança na cintura, no quadril ou na técnica. Os pontos de corte são referências populacionais; a circunferência da cintura e o contexto clínico também importam.',sources:['waist']};
     case 'weight':return {text:'A bioimpedância depende de equações e pressupostos sobre água corporal. Alterações importantes de hidratação podem afetar as estimativas de composição; comparar medidas padronizadas ajuda a reduzir esse viés.',sources:['bia','omron']};
-    default:return {text:'Metabolismo em repouso e gasto energético diário total são conceitos distintos. A estimativa do visor não determina uma ingestão mínima segura, uma dieta ou uma causa para dificuldade de emagrecimento.',sources:['omron']};
+    default:return {text:'Metabolismo em repouso e gasto energético diário total são conceitos distintos. Uma estimativa do visor ou de uma equação não determina uma ingestão mínima segura, uma dieta ou uma causa para dificuldade de emagrecimento.',sources:record.rmMethod==='harris-benedict-1984'?['energy']:['omron']};
   }
 }
 function clinicalRanges(key,record,info) {
+  record=resolveReading(record);
   const p=profile(record),current=info.status;
   let ranges=[],note='';
   const row=(label,value,status=label)=>({label,value,current:current===status});
@@ -747,7 +958,7 @@ function clinicalRanges(key,record,info) {
   }else if(key==='weight') {
     const fat=number(record.weight)*number(record.fat)/100;ranges=[row('Peso registrado',`${fmt(record.weight)} kg`),row('Gordura estimada',`${fmt(fat)} kg`),row('Livre de gordura',`${fmt(number(record.weight)-fat)} kg`)];note='Massa livre de gordura inclui músculos, água, ossos e órgãos. Os compartimentos são estimados.';
   }else {
-    ranges=[row('Repouso estimado',`${fmt(record.rm,0)} kcal/dia`)];note='Sem faixa universal de normalidade. Não representa todo o gasto diário nem uma meta calórica.';
+    ranges=[row('Repouso estimado',`${fmt(record.rm,0)} kcal/dia`)];note=record.rmMethod==='harris-benedict-1984'?'Calculado por Harris–Benedict revisada (1984), sem leitura do visor. Não representa todo o gasto diário nem uma meta calórica.':'Sem faixa universal de normalidade. Não representa todo o gasto diário nem uma meta calórica.';
   }
   return {ranges,note};
 }
@@ -801,6 +1012,9 @@ function persist() { return writeJSON(CACHE_KEY, readings); }
 function normalize(r, id) {
   if (!r || typeof r !== 'object' || Array.isArray(r)) return null;
   const item = { ...r, id: String(id || r.id || ('bv_' + crypto.randomUUID())) };
+  const aliases={weight:'peso',fat:'gordura',muscle:'musculo',bodyAge:'idadeBio',waist:'cintura',hip:'quadril',rm:'basal',height:'altura',sex:'sexo',date:'data'};
+  for(const [canonical,alias] of Object.entries(aliases))if(item[canonical]==null&&item[alias]!=null)item[canonical]=item[alias];
+  if(!item.protocol)item.protocol='Não informado';
   for (const key of ['weight','height','bmi','fat','muscle','visceral','bodyAge','rm','waist','hip','age']) {
     if (validNumber(item[key])) item[key] = number(item[key]);
   }
@@ -822,6 +1036,11 @@ function setSyncStatus() {
 }
 function loadProfilePrefs() {
   const p = readJSON(PREFS_KEY, {}) || {};
+  try {
+    if(p.sex==null)p.sex=localStorage.getItem('bv_sex');
+    if(p.age==null)p.age=localStorage.getItem('bv_age');
+    if(p.height==null)p.height=localStorage.getItem('bv_height');
+  }catch{}
   if (['F','M'].includes(p.sex)) $('sexSelect').value = p.sex;
   if (validNumber(p.age) && p.age >= 18 && p.age <= 120) $('realAgeInput').value = p.age;
   if (validNumber(p.height) && p.height >= 100 && p.height <= 220) $('heightCmInput').value = p.height;
@@ -860,6 +1079,7 @@ function percentageInfo(value, limits, kind) {
   return {status, altered:kind === 'fat' ? status !== 'NORMAL' : status === 'BAIXO', neutral:kind === 'muscle' && ['ALTO','MUITO ALTO'].includes(status)};
 }
 function analyze(cur) {
+  cur=resolveReading(cur);
   const p = profile(cur), bmi = calcBmiValue(cur.weight,p.height), bi = classifyBmi(bmi,p.age);
   const fr = reference('fat',p.sex,p.age), mr = reference('muscle',p.sex,p.age);
   const fi = percentageInfo(cur.fat,fr,'fat'), mi = percentageInfo(cur.muscle,mr,'muscle');
@@ -902,8 +1122,8 @@ function analyze(cur) {
       `Massa total do corpo. Com o percentual informado, a estimativa é de ${fmt(fatKg)} kg de gordura e ${fmt(cur.weight-fatKg)} kg de massa livre de gordura (água, órgãos, ossos e músculos).`,
       'Horário, roupas, alimentação, líquidos e conteúdo intestinal podem alterar o peso e a estimativa por bioimpedância.',
       'Compare medições em condições semelhantes, conforme o manual. Evite comparar uma leitura após treino com uma leitura em repouso.'),
-    rm:make(`Metabolismo em repouso — ${fmt(cur.rm,0)} kcal/dia`,'ESTIMATIVA',neutral,
-      'Estimativa da energia gasta em repouso para manter funções vitais. Não representa todo o gasto energético diário.',
+    rm:make(`Metabolismo em repouso — ${fmt(cur.rm,0)} kcal/dia`,cur.rmMethod==='harris-benedict-1984'?'CALCULADO':'ESTIMATIVA',neutral,
+      cur.rmMethod==='harris-benedict-1984'?'Estimativa calculada pela equação de Harris–Benedict revisada (Roza e Shizgal, 1984), usando peso, altura, idade e sexo registrados. Não é uma leitura do visor Omron.':'Estimativa da energia gasta em repouso informada no registro da balança. Não representa todo o gasto energético diário.',
       'Tamanho corporal e composição influenciam o valor. Não é possível classificar metabolismo lento ou rápido a partir desse número isolado.',
       'A leitura não define uma meta de consumo calórico nem um limite seguro para dieta. Use avaliação individual para planejar a alimentação.')
   };
@@ -926,7 +1146,7 @@ function recomputeAll() {
   $('btnOpenReport').disabled = !list.length;
   populateCompareDropdown(list);
   if (!list.some(r => r.id === selectedReadingId)) selectedReadingId = list.at(-1)?.id || null;
-  currentReading = list.find(r => r.id === selectedReadingId) || null;
+  currentReading = resolveReading(list.find(r => r.id === selectedReadingId) || null);
   renderHistoryList(list);
   if (!currentReading) {
     currentAnalyses = {}; $('alertCountBadge').textContent = '0';
@@ -950,7 +1170,7 @@ function recomputeAll() {
     weight:['PESO CORPORAL',`${fmt(cur.weight)} kg`,delta(cur.weight,previous.weight,' kg')],
     fat:['GORDURA CORPORAL',`${fmt(cur.fat)}%`,delta(cur.fat,previous.fat,'%', ' p.p.')],
     visceral:['GORDURA VISCERAL',`Nível ${fmt(cur.visceral,0)}`,delta(cur.visceral,previous.visceral)],
-    rm:['METABOLISMO EM REPOUSO',`${fmt(cur.rm,0)} kcal`,delta(cur.rm,previous.rm,' kcal')],
+    rm:['METABOLISMO EM REPOUSO',`${fmt(cur.rm,0)} kcal`,delta(cur.rm,readingBasal(previous),' kcal')],
     bmi:['IMC AUTOMÁTICO',fmt(bmi),delta(bmi,prevBmi)],
     muscle:['MÚSCULO ESQUELÉTICO',`${fmt(cur.muscle)}%`,delta(cur.muscle,previous.muscle,'%', ' p.p.')],
     bodyAge:['IDADE CORPORAL',`${fmt(cur.bodyAge,0)} anos`,delta(cur.bodyAge,previous.bodyAge,' anos')],
@@ -958,7 +1178,9 @@ function recomputeAll() {
   };
   const card = key => {
     const [title,value,sub] = definitions[key], info = a[key];
-    return `<button type="button" data-metric="${key}" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400">${title}${info.altered?' ⚠':''}</span><span class="metric-value block text-sm sm:text-base font-extrabold text-white mono mt-1">${value}</span><span class="block text-[9px] sm:text-[10px] font-extrabold uppercase mt-1 ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="block text-[9px] text-slate-400 mt-1">${sub}</span></button>`;
+    const danger=info.altered && (info.status==='MUITO ALTO'||['OBESIDADE II','OBESIDADE III'].includes(info.status));
+    const glyph={weight:'weight-scale',fat:'fire-flame-curved',visceral:'atom',rm:'bolt',bmi:'calculator',muscle:'dumbbell',bodyAge:'hourglass-half',whr:'ruler-combined'}[key];
+    return `<button type="button" data-metric="${key}" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node hud-panel ${danger?'alert-danger-border':''} ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title block text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400">${title}${info.altered?' ⚠':''}<i class="fa-solid fa-${glyph} metric-glyph" aria-hidden="true"></i></span><span class="metric-value block text-sm sm:text-base font-extrabold text-white mono mt-1">${value}</span><span class="block text-[9px] sm:text-[10px] font-extrabold uppercase mt-1 ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span>${metricReferenceBar(key,cur,info)}<span class="block text-[9px] text-slate-400 mt-1">${sub}</span></button>`;
   };
   $('leftCardsColumn').innerHTML = ['weight','fat','visceral','rm'].map(card).join('');
   $('rightCardsColumn').innerHTML = ['bmi','muscle','bodyAge','whr'].map(card).join('');
@@ -992,9 +1214,11 @@ function renderClinicalAlerts(keys) {
 }
 function renderHistoryList(list) {
   $('histCountBadge').textContent = list.length;
-  $('subView-history').innerHTML = [...list].reverse().map(r => `<div class="bg-[#07101f] border ${r.id===selectedReadingId?'border-sky-500':'border-slate-800'} rounded-xl p-2.5 flex items-center justify-between gap-2"><button type="button" data-reading-id="${escapeHTML(r.id)}" class="text-left flex-1 min-w-0"><span class="block font-bold text-white mono">${dateLabel(r.date)} • ${fmt(r.weight)} kg (IMC ${fmt(calcBmiValue(r.weight,profile(r).height))})</span><span class="block text-[11px] text-slate-400">Gordura: ${fmt(r.fat)}% • Músculo: ${fmt(r.muscle)}% • Visceral: ${fmt(r.visceral,0)} • ${escapeHTML(r.protocol || 'Não informado')}${r._sync==='pending'?' • Pendente de sincronização':''}</span></button><button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}" class="px-2.5 py-2 rounded-lg bg-rose-500/15 text-rose-400 font-bold text-[11px]">Excluir</button></div>`).join('') || '<p class="text-slate-400">Nenhuma pesagem neste filtro.</p>';
+  const cards = [...list].reverse().map(r => `<div class="bg-[#07101f] border ${r.id===selectedReadingId?'border-sky-500':'border-slate-800'} rounded-xl p-2.5 flex items-center justify-between gap-2"><button type="button" data-reading-id="${escapeHTML(r.id)}" class="text-left flex-1 min-w-0"><span class="block font-bold text-white mono">${dateLabel(r.date)} • ${fmt(r.weight)} kg (IMC ${fmt(calcBmiValue(r.weight,profile(r).height))})</span><span class="block text-[11px] text-slate-400">Gordura: ${fmt(r.fat)}% • Músculo: ${fmt(r.muscle)}% • Visceral: ${fmt(r.visceral,0)} • ${escapeHTML(r.protocol || 'Não informado')}${r._sync==='pending'?' • Pendente de sincronização':''}</span></button><button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}" class="px-2.5 py-2 rounded-lg bg-rose-500/15 text-rose-400 font-bold text-[11px]">Excluir</button></div>`).join('') || '<p class="text-slate-400">Nenhuma pesagem neste filtro.</p>';
+  $('subView-history').innerHTML='<div class="history-cards">'+cards+'</div>'+historyTelemetryTable(list);
 }
-function selectHistoryReading(id) { if (!visibleReadings().some(r=>r.id===id)) return; selectedReadingId=id; recomputeAll(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function selectHistoryReading(id) { if (!visibleReadings().some(r=>r.id===id)) return; if(quickPanelState)closeQuickPanel(); selectedReadingId=id; recomputeAll(); window.scrollTo({top:0,behavior:'smooth'}); }
 async function deleteReading(id) {
   const r = readings.find(item=>item.id===id); if (!r || !confirm(`Deseja realmente excluir a pesagem de ${dateLabel(r.date)}?`)) return;
   const before = readings.map(item=>({...item}));
@@ -1043,6 +1267,8 @@ async function saveWeighing(event) {
   const fields={weight:'mWeight',height:'mHeight',fat:'mFat',muscle:'mMuscle',visceral:'mVisc',bodyAge:'mBodyAge',rm:'mRm',waist:'mWaist',hip:'mHip'};
   const item={id:'bv_'+crypto.randomUUID(),date:$('mDate').value,protocol:selectedProto,sex:$('sexSelect').value,age:number($('realAgeInput').value),createdAt:new Date().toISOString(),_sync:'pending'};
   for (const [key,id] of Object.entries(fields)) item[key]=number($(id).value);
+  if($('mRm').value===''){item.rm=estimateRestingEnergy(item.weight,item.height,item.age,item.sex);item.rmMethod='harris-benedict-1984';}
+  else item.rmMethod='reported';
   if (!validDate(item.date) || Object.keys(fields).some(k=>!Number.isFinite(item[k]) || item[k]<=0) || item.fat+item.muscle>100) { $('saveStatus').textContent='Confira a data e os valores. A soma de gordura e músculo não pode ultrapassar 100%.';return; }
   saving=true; $('btnSaveWeighing').disabled=true; $('btnSaveWeighing').textContent='Salvando…';
   try {
@@ -1062,9 +1288,9 @@ function openReportModal() {
   const list=visibleReadings(), first=list[0], a=analyze(cur), p=profile(cur);
   $('repAgeSpan').textContent=fmt(p.age,0);$('repHeightSpan').textContent=fmt(p.height);
   const definitions=[['weight','Peso corporal','kg'],['bmi','IMC automático','kg/m²'],['fat','Gordura corporal','%'],['muscle','Músculo esquelético','%'],['visceral','Gordura visceral','nível'],['rm','Metabolismo em repouso','kcal/dia'],['bodyAge','Idade corporal','anos'],['waist','Cintura','cm'],['hip','Quadril','cm'],['whr','RCQ','']];
-  const value=(r,key)=>key==='bmi'?calcBmiValue(r.weight,profile(r).height):key==='whr'?(r.hip>0?r.waist/r.hip:NaN):number(r[key]);
+  const value=(r,key)=>key==='bmi'?calcBmiValue(r.weight,profile(r).height):key==='whr'?(r.hip>0?r.waist/r.hip:NaN):key==='rm'?readingBasal(r):number(r[key]);
   $('repTableRows').innerHTML=definitions.map(([key,label,unit])=>{const x=value(first,key),y=value(cur,key),d=y-x,info=a[key],digits=key==='whr'?2:['rm','bodyAge','visceral'].includes(key)?0:1;return `<tr><td class="py-2 font-bold text-white">${label}</td><td class="py-2 mono text-slate-400">${fmt(x,digits)} ${unit}</td><td class="py-2 mono font-bold text-white">${fmt(y,digits)} ${unit}</td><td class="py-2 mono text-sky-400">${d>0?'+':''}${fmt(d,digits)} ${['fat','muscle'].includes(key)?'p.p.':unit}</td><td class="py-2 font-bold ${info?.altered?'text-amber-300':info?.neutral?'text-sky-300':'text-emerald-400'}">${info?.status||'REGISTRADO'}</td></tr>`;}).join('');
-  $('repSynthesis').textContent=`Comparação entre ${dateLabel(first.date)} e a pesagem selecionada de ${dateLabel(cur.date)} (${cur.protocol||'protocolo não informado'}). Peso ${fmt(cur.weight)} kg; IMC ${fmt(calcBmiValue(cur.weight,p.height))} kg/m²; gordura ${fmt(cur.fat)}%; músculo ${fmt(cur.muscle)}%; visceral nível ${fmt(cur.visceral,0)}.${cur._sync==='pending'?' Registro pendente de sincronização.':''}${cur.height?'':' A altura desta pesagem antiga não estava registrada; o IMC usa a altura informada no topo.'}`;
+  $('repSynthesis').textContent=`Comparação entre ${dateLabel(first.date)} e a pesagem selecionada de ${dateLabel(cur.date)} (${cur.protocol||'protocolo não informado'}). Peso ${fmt(cur.weight)} kg; IMC ${fmt(calcBmiValue(cur.weight,p.height))} kg/m²; gordura ${fmt(cur.fat)}%; músculo ${fmt(cur.muscle)}%; visceral nível ${fmt(cur.visceral,0)}.${cur._sync==='pending'?' Registro pendente de sincronização.':''}${cur.height?'':' A altura desta pesagem antiga não estava registrada; o IMC usa a altura informada no topo.'}${cur.rmMethod==='harris-benedict-1984'?' Metabolismo em repouso calculado por Harris–Benedict revisada (1984); não é leitura do visor.':''}`;
   $('reportModal').classList.remove('hidden');
 }
 function closeReportModal() { $('reportModal').classList.add('hidden'); }
@@ -1122,7 +1348,7 @@ async function connectCloud() {
   } catch {serverSeen=false;notify('Sem conexão com o Firebase. Novas pesagens ficam salvas neste navegador e aguardam sincronização.');}
   finally {connecting=false;setSyncStatus();}
 }
-Object.assign(window,{saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
+Object.assign(window,{openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
 document.addEventListener('click',event=>{
   const mode=event.target.closest('[data-holo-mode]');if(mode)setHoloMode(mode.dataset.holoMode);
   const turn=event.target.closest('[data-holo-turn]');if(turn)rotateHolo(turn.dataset.holoTurn);
@@ -1130,7 +1356,7 @@ document.addEventListener('click',event=>{
   const selected=event.target.closest('[data-reading-id]');if(selected)selectHistoryReading(selected.dataset.readingId);
   const remove=event.target.closest('[data-delete-id]');if(remove)void deleteReading(remove.dataset.deleteId);
 });
-document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeNewWeighingModal();closeReportModal();}});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeQuickPanel();closeNewWeighingModal();closeReportModal();}});
 for (const id of ['gFatSlider','gMuscSlider','gViscSlider']) $(id).addEventListener('change',saveGoals);
 window.addEventListener('online',()=>{void connectCloud();void flushPending();});
 window.addEventListener('offline',()=>{serverSeen=false;setSyncStatus();});
@@ -1138,8 +1364,9 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){void conn
 initializeHoloControls();
 loadProfilePrefs();
 const cached=readJSON(CACHE_KEY,[]);
-if (Array.isArray(cached)) readings=cached.map(r=>normalize(r)).filter(Boolean).map(r=>({...r,_sync:r._sync||(r.id.startsWith('loc_')?'pending':'synced')}));
+if (Array.isArray(cached)) readings=cached.map(r=>normalize(r)).filter(Boolean).map(r=>({...r,_sync:r._sync||(r.id.startsWith('loc_')||r.id.startsWith('local_')?'pending':'synced')}));
 else {storageBlocked=true;notify('O histórico local tem um formato inesperado e foi preservado.');}
+migrateLegacyCache();
 recomputeAll();
 void connectCloud();
 
