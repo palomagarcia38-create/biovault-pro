@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Holographic HUD v5.1.0</title>
+  <title>BIOSHAPE • Holographic HUD v5.2.0</title>
   <link rel="stylesheet" href="vendor/tailwind.css" />
   <script src="vendor/chart.umd.js"></script>
   <link rel="stylesheet" href="vendor/fontawesome.css">
@@ -223,7 +223,7 @@
     @media print {.hud-panel {clip-path:none;}#appHeader,#appFooter,#quickPanelModal {display:none!important;} .clinical-grid {display:block;} }
 
 /* v4.3 — compact holographic dashboard, with all existing tools retained. */
-body {padding-bottom:92px;background-color:#020b15;}
+body {padding-bottom:0;background-color:#020b15;}
 #appHeader {position:relative;background:#020b15;border:0;padding:0 14px;}
 #appHeader>div {padding:22px 0 8px;max-width:1100px;}
 .brand-row {display:flex;align-items:center;justify-content:center;position:relative;min-height:66px;}
@@ -315,7 +315,7 @@ body {padding-bottom:92px;background-color:#020b15;}
 .compare-toolbar #compareStatusLabel {font-size:9px;}
 .compare-toolbar select {font-size:9px;max-width:145px;}
 .compare-toolbar .compare-ref-label {font-size:9px;}
-#bottomNav {position:fixed;z-index:35;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,1100px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid #00c8df44;background:#03101df5;backdrop-filter:blur(16px);padding:9px 10px max(9px,env(safe-area-inset-bottom));box-shadow:0 -5px 30px #020611cc;}
+#bottomNav {position:static;clear:both;width:min(100%,1100px);margin:20px auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid #00c8df44;background:#03101df5;backdrop-filter:blur(16px);padding:9px 10px max(9px,env(safe-area-inset-bottom));box-shadow:0 -5px 30px #020611cc;}
 #bottomNav button {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:44px;color:#698495;font:8px 'JetBrains Mono',monospace;}
 #bottomNav i {font-size:20px;}
 #bottomNav button[aria-current=page] {color:#51dfff;text-shadow:0 0 13px #00d9ffbb;}
@@ -475,7 +475,7 @@ html {scrollbar-gutter:stable;}
 #accountEmail{flex:1;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 #updateStatus{font-size:11px;color:#91cdd6;}
 @media print{#authScreen,#accountBar{display:none!important;}}
-body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
+body.pb-20{padding-bottom:env(safe-area-inset-bottom,0px);}
 #goalRibbon{display:block;margin:8px auto 0;padding:8px 14px;border:1px solid #205264;border-radius:24px;color:#9cecf1;font-size:11px;max-width:100%;text-align:center;}
 .goal-modal.hidden{display:none;}
 .goal-modal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:12px;background:#000b;backdrop-filter:blur(8px);}
@@ -504,12 +504,27 @@ body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
 .goal-progress-card{padding:15px;background:#071522;border:1px solid #1c3c4d;border-radius:15px;}.goal-card-title{display:flex;justify-content:space-between;gap:8px;font-size:12px;}.goal-card-title span{color:#58dfde;font-size:10px;}.goal-values{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:17px 0;color:#87a9bb;font-size:9px;}.goal-values b{display:block;color:#d5edf2;font-size:16px;margin-top:4px;}.goal-track{height:6px;border-radius:9px;background:#142f40;overflow:hidden;}.goal-track i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#35bacb,#63eadb);}.goal-progress-card p{font-size:10px;color:#9eb6c6;margin-top:11px;line-height:1.6;}.goal-progress-card p.goal-achieved{color:#62e8b3;}.goal-legacy{color:#8eadbd;padding:8px 0;}.goal-legacy>summary{cursor:pointer;margin:10px 0;}.goal-empty{padding:20px;border:1px dashed #295268;border-radius:15px;line-height:1.7;}.goal-empty strong{font-size:16px;}.goal-empty p{font-size:12px;color:#8dafbe;margin:8px 0 15px;}
 @media(max-width:390px){.goal-modal-card{padding:16px;}.goal-values b{font-size:14px;}.goal-plan-heading h3{font-size:15px;}}
 
-  </style>
+
+/* Home and footer stay in document flow, leaving all indicators touchable. */
+#homeSummary{margin:18px 0 10px;padding:18px;border:1px solid #245368;border-radius:18px;background:linear-gradient(135deg,#0a2938,#06121f);}
+#homeSummary #personContext{margin:0 0 18px;display:flex;align-items:flex-start;flex-direction:column;gap:5px;}
+#homeSummary #homePersonName{font:800 24px/1.25 'Inter',sans-serif;letter-spacing:.08em;color:#c8fff7;text-transform:uppercase;overflow-wrap:anywhere;}
+#homeSummary #personContextName{font-size:11px;color:#91b9c7;}
+.home-measures{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;}.home-measures>div{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.home-measures span,.home-control>span{font:700 10px 'Inter',sans-serif;letter-spacing:.1em;color:#91b9c7;}.home-measures strong{font-size:20px;color:#d5f6fb;}.home-measures .home-current strong{font-size:28px;color:#6eeedb;}.home-measures small{font-size:11px;color:#91adbc;}
+.home-control{margin:16px 0;padding-top:14px;border-top:1px solid #254454;}.home-control p{font-size:12px;color:#b8d4de;line-height:1.6;margin-top:6px;}
+.home-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}.home-actions button{min-height:48px;padding:12px 10px;border:1px solid #45b6c0;border-radius:12px;color:#b4f6ef;background:#0b3040;font-size:12px;font-weight:700;line-height:1.5;}.home-actions .neon-btn{color:#03202d;background:linear-gradient(100deg,#6cebd7,#3bc3f2);}
+.source-fields{margin:12px 0;}.source-fields select,.person-field textarea{width:100%;margin-top:5px;background:#07101f;border:1px solid #30485d;border-radius:10px;padding:10px;color:#e3f2f7;}.person-field textarea{resize:vertical;}
+#bottomNav button{font-family:'Inter',sans-serif;font-size:10px;padding:6px 3px;line-height:1.4;min-height:58px;}#bottomNav button:focus-visible,.home-actions button:focus-visible{outline:2px solid #70ffe5;outline-offset:3px;}
+.source-notice{font-size:11px;line-height:1.6;color:#e6c99a;border:1px solid #705629;border-radius:12px;padding:10px;margin:10px 0;background:#241e14;}.training-summary{font-size:13px;line-height:1.8;color:#b7d5df;}#repNotes{white-space:pre-wrap;overflow-wrap:anywhere;}.training-summary strong{color:#75efdb;}.training-summary p{margin:12px 0;}
+@media(max-width:440px){#homeSummary{padding:14px;}#homeSummary #homePersonName{font-size:21px;}.home-actions button{font-size:11px;}.home-measures .home-current strong{font-size:25px;}}
+
+</style>
 </head>
 <body class="pb-20">
-<section id="authScreen" aria-label="Acessar BioVault">
+<section id="authScreen" aria-label="Acessar BIOSHAPE">
   <div class="auth-card">
-    <div class="auth-logo" aria-hidden="true">BV</div>
+    <div class="auth-logo" aria-hidden="true">BS</div><p class="auth-brand" style="font-size:14px;font-weight:800;letter-spacing:.12em;color:#91f4e2">BIOSHAPE</p>
     <h1>Seu corpo.<br><span>Sua evolução.</span></h1>
     <p>Entre na sua conta para acompanhar suas pesagens, com seu perfil sempre pronto.</p>
     <div class="auth-tabs" role="tablist" aria-label="Tipo de acesso">
@@ -536,43 +551,48 @@ body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
       <div class="brand-row">
         <div class="flex items-center gap-2.5">
           <div class="brand-icon w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 via-sky-500 to-indigo-600 flex items-center justify-center font-black text-slate-950 text-sm shadow-lg shadow-sky-500/25">
-            BV
+            BS
           </div>
           <div class="brand-copy">
             <div class="brand-line flex items-center gap-2 flex-wrap">
-              <h1 class="hud-font font-extrabold text-sm sm:text-base text-white tracking-wider">BioVault <span class="text-cyan-400">Pro</span></h1>
-              <span class="model-label">OMRON HBF-514C</span>
+              <h1 class="hud-font font-extrabold text-sm sm:text-base text-white tracking-wider">BIO<span class="text-cyan-400">SHAPE</span></h1>
+              <span class="model-label">BIOIMPEDÂNCIA MULTIMARCA</span>
               <span id="syncPill" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-medium">● Conectando...</span>
             </div>
             <p class="brand-description text-[11px] text-slate-400 mt-0.5">Holograma • Composição e evolução</p>
           </div>
         </div>
         <button onclick="checkForAppUpdate()" id="updateAppButton" title="Buscar atualização" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v5.1.0
+          ↻ v5.2.0
         </button>
       </div>
 
       <div id="accountBar"><span id="accountEmail">Uso neste aparelho</span><button id="accountLoginButton" type="button" onclick="showAccountLogin()">Entrar</button><button id="accountLogoutButton" type="button" onclick="logoutAccount()" hidden>Sair</button><button id="importDeviceButton" type="button" onclick="importDeviceHistory()" hidden>Trazer histórico deste aparelho</button><span id="updateStatus" role="status"></span></div>
       <!-- CONTROLES SUPERIORES -->
-      <div id="personContext"><strong id="personContextName">Seu acompanhamento</strong><span id="personContextMeta">Comece pelo seu nome e sua altura</span></div>
+      <section id="homeSummary" aria-label="Resumo da pessoa ativa">
+        <div id="personContext"><span id="personContextName">Seu acompanhamento</span><strong id="homePersonName">SEU PERFIL</strong><span id="personContextMeta">Comece pelo seu nome e sua altura</span></div>
+        <div class="home-measures"><div class="home-current"><span>PESO ATUAL</span><strong id="homeWeight">Sem pesagem</strong><small id="homeWeightDate">Adicione sua primeira pesagem</small></div><div><span>ALTURA</span><strong id="homeHeight">Não informada</strong></div></div>
+        <div class="home-control"><span>CONTROLE DO PESO</span><p id="homeWeightControl">Seu acompanhamento começa na primeira pesagem.</p></div>
+        <div class="home-actions"><button type="button" id="homeAddWeighing" class="neon-btn" data-home-action="weighing"><i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar nova pesagem</button><button type="button" id="homeAddGoal" data-home-action="goal"><i class="fa-solid fa-bullseye" aria-hidden="true"></i> Adicionar nova meta</button></div>
+      </section>
       <button type="button" id="goalRibbon" onclick="openGoalPlan()">◎ Vamos definir suas metas?</button>
       <details id="profileDrawer"><summary><i class="fa-solid fa-sliders" aria-hidden="true"></i> Perfil e ferramentas <i class="fa-solid fa-angle-down" aria-hidden="true"></i></summary>
       <div id="profileControls" class="flex flex-wrap items-center gap-2">
         <label class="person-name-control">Seu nome<input id="profileNameInput" type="text" maxlength="80" autocomplete="name" placeholder="Como você se chama?" onchange="saveProfilePrefs(); renderPersonContext()" /></label>
         <select id="sexSelect" onchange="saveProfilePrefs(); recomputeAll()" class="bg-[#081222] border border-slate-700/80 text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 outline-none">
-          <option value="F" selected>Sexo: Feminino (Ref. Omron)</option>
-          <option value="M">Sexo: Masculino (Ref. Omron)</option>
+          <option value="" selected>Sexo de referência</option><option value="F">Sexo: Feminino</option>
+          <option value="M">Sexo: Masculino</option>
         </select>
 
         <div class="flex items-center gap-1.5 bg-[#081222] border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs">
           <span class="text-slate-400">Idade Real:</span>
-          <input type="number" id="realAgeInput" required value="28" min="18" max="120" onchange="saveProfilePrefs(); recomputeAll()" class="w-10 bg-transparent text-white font-extrabold text-center outline-none mono" />
+          <input type="number" id="realAgeInput" required value="" min="18" max="120" onchange="saveProfilePrefs(); recomputeAll()" class="w-10 bg-transparent text-white font-extrabold text-center outline-none mono" />
           <span class="text-slate-400">anos</span>
         </div>
 
         <label class="flex items-center gap-1 bg-[#081222] border border-sky-500/40 rounded-xl px-2.5 py-1.5 text-xs">
           <span class="text-sky-400 font-semibold">Altura:</span>
-          <input type="number" id="heightCmInput" required value="165" min="100" max="220" step="0.1" onchange="saveProfilePrefs(); recomputeAll()" aria-label="Altura em centímetros" class="w-14 bg-transparent text-white font-extrabold text-center outline-none mono" />
+          <input type="number" id="heightCmInput" required value="" min="100" max="220" step="0.1" onchange="saveProfilePrefs(); recomputeAll()" aria-label="Altura em centímetros" class="w-14 bg-transparent text-white font-extrabold text-center outline-none mono" />
           <span class="text-slate-400">cm</span>
         </label>
         <button onclick="openNewWeighingModal()" class="neon-btn text-slate-950 hud-font font-extrabold text-[11px] px-3.5 py-2 rounded-xl shadow-lg shadow-sky-500/20">
@@ -611,6 +631,7 @@ body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
         <span id="activeReadingBadge" class="text-[11px] text-slate-400 mono">--/--/----</span>
       </div>
 
+      <p id="comparisonSourceNotice" class="source-notice" role="status" hidden></p>
       <!-- GRID CENTRAL -->
       <div id="biometricGrid" class="grid grid-cols-12 gap-1.5 sm:gap-3 items-center pt-1">
         <canvas id="biometricLinks" aria-hidden="true"></canvas>
@@ -793,28 +814,31 @@ body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
 <label class="person-field">Seu nome<input id="mPersonName" type="text" maxlength="80" autocomplete="name" placeholder="Ex.: Paloma" required /></label>
 <div class="person-form-grid"><label class="person-field">Idade (anos)<input id="mAge" type="number" min="18" max="120" step="1" required oninput="autoCalcModalBmi()" /></label>
 <label class="person-field">Sexo de referência<select id="mSex" required><option value="">Selecione</option><option value="F">Feminino</option><option value="M">Masculino</option></select></label></div>
-<p class="form-hint">Seu nome fica salvo neste aparelho. A idade e o sexo de referência são usados nas faixas do manual.</p>
+<p class="form-hint">Seu perfil fica vinculado à conta ou a este aparelho no modo local. Idade e sexo são usados somente nas referências aplicáveis ao registro.</p>
 </fieldset><fieldset class="measurement-section"><legend>2. Sua nova medição</legend>
-<p class="form-hint">Omron HBF-514C • Digite os valores do visor. Além de peso e altura, preencha apenas os dados que você tiver.</p>
+<p class="form-hint">Transcreva os resultados da sua balança ou laudo. Além de peso e altura, preencha apenas o que estiver disponível; confirme as unidades.
+</p><div class="source-fields"><label class="person-field">Equipamento / referência<select id="mEquipmentProfile" onchange="updateMeasurementSourceForm()"><option value="unspecified">Não informado (opcional)</option><option value="omron">Omron HBF-514C</option><option value="other">Outra balança ou exame</option></select></label><label class="person-field" id="mEquipmentNameField" hidden>Marca e modelo / laboratório (opcional)<input id="mEquipment" type="text" maxlength="120" placeholder="Ex.: InBody 270, Tanita, exame na clínica" /></label></div><p id="measurementReferenceNote" class="form-hint">Sem equipamento informado: valores registrados sem aplicar faixas de outro fabricante.</p>
         <div class="grid grid-cols-3 gap-2">
           <label class="block text-[11px] text-slate-400">Data<input type="date" id="mDate" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-slate-700 text-white" /></label>
-          <label class="block text-[11px] text-slate-400">Peso (kg) *<input type="number" step=".1" min="1" max="150" id="mWeight" oninput="autoCalcModalBmi()" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-sky-500/50 font-bold mono text-white" /></label>
+          <label class="block text-[11px] text-slate-400">Peso (kg) *<input type="number" step=".1" min="1" max="500" id="mWeight" oninput="autoCalcModalBmi()" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-sky-500/50 font-bold mono text-white" /></label>
           <label class="block text-[11px] text-sky-400">Altura (cm) *<input type="number" step=".1" min="100" max="220" id="mHeight" oninput="autoCalcModalBmi()" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-sky-500/50 font-bold mono text-white" /></label>
         </div>
         <div class="rounded-xl bg-sky-500/10 border border-sky-500/30 px-3 py-2 flex flex-wrap items-center justify-between gap-2">
           <span class="text-[11px] text-sky-300">IMC calculado automaticamente:</span>
           <div class="flex items-center gap-2"><input type="number" id="mBmi" readonly aria-label="IMC calculado" class="w-16 bg-transparent text-right font-extrabold mono text-white" /><span id="mBmiBadge" class="text-[10px] px-2 py-1 rounded-md">--</span></div>
         </div>
-        <div class="grid grid-cols-2 gap-2.5"><label class="block text-[11px] text-slate-400">Gordura Corporal (%)<input type="number" step=".1" min="1" max="60" id="mFat" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
-<label class="block text-[11px] text-slate-400">Músculo Esquelético (%)<input type="number" step=".1" min="1" max="60" id="mMuscle" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
-<label class="block text-[11px] text-slate-400">Gordura Visceral (1–30)<input type="number" step="1" min="1" max="30" id="mVisc" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+        <div class="person-form-grid source-fields"><label class="person-field">Tipo de músculo<select id="mMuscleKind" onchange="updateMeasurementSourceForm()"><option value="skeletal">Músculo esquelético</option><option value="total">Massa muscular total</option></select></label><label class="person-field">Unidade do músculo<select id="mMuscleUnit" onchange="updateMeasurementSourceForm()"><option value="percent">% do peso corporal</option><option value="kg">kg</option></select></label><label class="person-field">Unidade visceral<select id="mVisceralUnit" onchange="updateMeasurementSourceForm()"><option value="index">Índice / nível do equipamento</option><option value="cm2">Área estimada · cm²</option></select></label></div>
+        <p class="form-hint">Copie somente o percentual do peso corporal; “% do ideal” e massa magra não equivalem a músculo. Resultados adicionais podem ser preservados nas observações.</p>
+        <div class="grid grid-cols-2 gap-2.5"><label class="block text-[11px] text-slate-400">Gordura Corporal (%)<input type="number" step=".1" min="1" max="100" id="mFat" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400"><span id="mMuscleLabel">Músculo</span><input type="number" step=".1" min="0.1" max="500" id="mMuscle" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400"><span id="mVisceralLabel">Gordura visceral</span><input type="number" step="0.1" min="0.1" max="1000" id="mVisc" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
 <label class="block text-[11px] text-slate-400">Idade Corporal (anos)<input type="number" step="1" min="1" max="120" id="mBodyAge" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
-<label class="block text-[11px] text-slate-400">Metabolismo em repouso (kcal, opcional)<input type="number" step="1" min="1" max="10000" id="mRm" placeholder="Do visor ou cálculo automático" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
+<label class="block text-[11px] text-slate-400">Metabolismo em repouso (kcal, opcional)<input type="number" step="1" min="1" max="10000" id="mRm" placeholder="Do laudo ou cálculo automático" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
 <label class="block text-[11px] text-slate-400">Cintura (cm)<input type="number" step=".1" min="1" max="300" id="mWaist" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label>
 <label class="block text-[11px] text-slate-400">Quadril (cm)<input type="number" step=".1" min="1" max="300" id="mHip" class="w-full mt-1 px-3 py-2 rounded-xl bg-[#07101f] border border-slate-700 font-bold mono text-white" /></label></div>
         <p class="text-[10px] text-slate-400">Se o metabolismo ficar vazio, uma estimativa por equação será identificada como calculada no aplicativo e no relatório.</p>
         </fieldset>
-        <p id="saveStatus" class="text-xs text-amber-300" role="status" aria-live="polite"></p>
+        <label class="person-field">Observações / outros resultados do exame (opcional)<textarea id="mNotes" maxlength="2000" rows="3" placeholder="Copie o indicador, valor, unidade e referência do laudo. Não há classificação automática deste texto."></textarea></label><p id="saveStatus" class="text-xs text-amber-300" role="status" aria-live="polite"></p>
         <button type="submit" id="btnSaveWeighing" class="w-full py-3 rounded-xl neon-btn text-slate-950 hud-font font-extrabold text-xs">Salvar pesagem</button>
       </form>
     </div>
@@ -825,7 +849,7 @@ body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
     <div class="panel-dark cyber-panel hud-corners rounded-2xl w-full max-w-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex items-start justify-between border-b border-slate-800 pb-3">
         <div>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400">Relatório • Omron HBF-514C</span>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400">BIOSHAPE • Relatório de bioimpedância</span>
           <h3 class="font-extrabold text-base text-white">Relatório de Bioimpedância e Evolução</h3>
           <p id="repPersonName" class="report-person"></p>
           <p class="text-xs text-slate-400">Idade: <span id="repAgeSpan">--</span> anos • Altura: <span id="repHeightSpan">--</span> cm</p>
@@ -848,10 +872,11 @@ body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
 
       <div class="bg-[#07101f] border border-slate-800 rounded-xl p-3 text-xs space-y-1">
         <p class="font-bold text-sky-400">Síntese dos registros:</p>
-        <p id="repSynthesis" class="text-slate-300 leading-relaxed"></p>
+        <p id="repEquipment" class="text-xs text-amber-200"></p><p id="repNotes" class="text-xs text-slate-300"></p>
+      <p id="repSynthesis" class="text-slate-300 leading-relaxed"></p>
       </div>
 
-      <p class="text-[10px] text-slate-400">Relatório de acompanhamento com estimativas da Omron; não substitui avaliação individual. Referências: <a href="https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf" target="_blank" rel="noopener noreferrer">Manual Omron HBF-514C</a>; <a href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight" target="_blank" rel="noopener noreferrer">OMS — IMC</a>; <a href="https://www.who.int/publications/i/item/9789241501491" target="_blank" rel="noopener noreferrer">OMS — Cintura e RCQ</a>.</p>
+      <p class="text-[10px] text-slate-400">Relatório de acompanhamento de bioimpedância. Os algoritmos e as referências variam por equipamento; estimativas não são diagnóstico. O holograma é ilustrativo e não reconstrói anatomia nem gordura regional. Faixas Omron se aplicam somente aos registros compatíveis com esse modelo. Referências: <a href="https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf" target="_blank" rel="noopener noreferrer">Manual Omron HBF-514C</a>; <a href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight" target="_blank" rel="noopener noreferrer">OMS — IMC</a>; <a href="https://www.who.int/publications/i/item/9789241501491" target="_blank" rel="noopener noreferrer">OMS — Cintura e RCQ</a>; <a href="https://pubmed.ncbi.nlm.nih.gov/15380917/" target="_blank" rel="noopener noreferrer">Princípios e limites da bioimpedância</a>.</p>
       <div class="flex gap-2 no-print">
         <button onclick="printReport()" class="flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs">
           🖨️ Imprimir / Salvar PDF (A4)
@@ -895,15 +920,16 @@ body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v5.1.0</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.2.0</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
-    <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>INÍCIO</span></button>
-    <button type="button" data-app-nav="scan"><i class="fa-solid fa-expand" aria-hidden="true"></i><span>NOVA LEITURA</span></button>
-    <button type="button" data-app-nav="history"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span>HISTÓRICO</span></button>
-    <button type="button" data-app-nav="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i><span>FERRAMENTAS</span></button>
+    <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Inicial</span></button>
+    <button type="button" data-app-nav="chart"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Comparações gráficas</span></button>
+    <button type="button" data-app-nav="training"><i class="fa-solid fa-dumbbell" aria-hidden="true"></i><span>Treino</span></button>
+    <button type="button" data-app-nav="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i><span>Configuração</span></button>
   </nav>
 
+<div id="trainingModal" class="hidden goal-modal no-print" role="dialog" aria-modal="true" aria-labelledby="trainingTitle"><div class="goal-modal-card"><div class="goal-modal-top"><span>COMPOSIÇÃO E TREINO</span><button type="button" onclick="closeTraining()" aria-label="Fechar treino">✕</button></div><h2 id="trainingTitle">Seu acompanhamento para o treino</h2><p class="goal-intro">Músculo, gordura e metas que você definiu, para revisar junto com seu acompanhamento profissional.</p><div id="trainingSummary" class="training-summary"></div><div class="home-actions"><button type="button" onclick="closeTraining(); document.getElementById('chartMetricSelect').value='muscle'; openQuickPanel('chart')">Comparar músculo</button><button type="button" onclick="closeTraining(); openGoalPlan()">Definir minha meta</button></div><p class="goal-help">Bioimpedância estima composição; não mede força nem desempenho. Esta tela não prescreve exercícios ou alimentação e não prevê resultados.</p></div></div>
 <div id="importBackupModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 no-print" role="dialog" aria-modal="true" aria-labelledby="importBackupTitle"><div class="panel-dark cyber-panel rounded-2xl p-5 w-full max-w-lg space-y-4"><div class="flex justify-between gap-4"><h2 id="importBackupTitle">Revisar restauração do backup</h2><button id="closeImportButton" type="button" onclick="closeImportBackup()" aria-label="Fechar restauração">✕</button></div><p id="importBackupSummary" role="status"></p><button id="confirmImportButton" type="button" class="neon-btn rounded-xl p-3 w-full" onclick="confirmImportBackup()" disabled>Adicionar registros revisados</button></div></div>
 <div id="goalPlanModal" class="hidden goal-modal no-print" role="dialog" aria-modal="true" aria-labelledby="goalPlanHeading">
   <div class="goal-modal-card">
@@ -918,15 +944,16 @@ body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
         <label><input type="radio" name="goalObjective" value="maintain" required />Manter meus resultados</label>
       </fieldset>
       <h3>Onde você quer chegar?</h3><p class="goal-help">Preencha os indicadores que quer acompanhar. Basta definir um deles.</p>
+      <div class="person-form-grid source-fields"><label class="person-field">Indicador muscular da meta<select id="goalMuscleKind" onchange="updateGoalUnits()"><option value="skeletal">Músculo esquelético</option><option value="total">Massa muscular total</option></select></label><label class="person-field">Unidade muscular da meta<select id="goalMuscleUnit" onchange="updateGoalUnits()"><option value="percent">% do peso corporal</option><option value="kg">kg</option></select></label><label class="person-field">Unidade visceral da meta<select id="goalVisceralUnit" onchange="updateGoalUnits()"><option value="index">Índice / nível do equipamento</option><option value="cm2">Área estimada · cm²</option></select></label></div>
       <div class="goal-input-grid">
-        <label>Peso desejado · kg<input id="goalTargetWeight" type="number" inputmode="decimal" min="5" max="150" step="0.1" /></label>
-        <label>Gordura corporal · %<input id="goalTargetFat" type="number" inputmode="decimal" min="5" max="60" step="0.1" /></label>
-        <label>Músculo esquelético · %<input id="goalTargetMuscle" type="number" inputmode="decimal" min="5" max="60" step="0.1" /></label>
-        <label>Gordura visceral · nível<input id="goalTargetVisceral" type="number" inputmode="numeric" min="1" max="30" step="1" /></label>
+        <label>Peso desejado · kg<input id="goalTargetWeight" type="number" inputmode="decimal" min="5" max="500" step="0.1" /></label>
+        <label>Gordura corporal · %<input id="goalTargetFat" type="number" inputmode="decimal" min="0.1" max="100" step="0.1" /></label>
+        <label><span id="goalMuscleLabel">Músculo esquelético · % do peso</span><input id="goalTargetMuscle" type="number" inputmode="decimal" min="0.1" max="100" step="0.1" /></label>
+        <label><span id="goalVisceralLabel">Gordura visceral · nível</span><input id="goalTargetVisceral" type="number" inputmode="decimal" min="0.1" max="1000" step="0.1" /></label>
       </div>
       <h3>Em quanto tempo?</h3><div class="goal-date-shortcuts"><button type="button" onclick="setGoalWeeks(4)">4 semanas</button><button type="button" onclick="setGoalWeeks(8)">8 semanas</button><button type="button" onclick="setGoalWeeks(12)">12 semanas</button></div>
       <label class="goal-date-label">Data desejada · opcional<input id="goalDeadline" type="date" /></label>
-      <p id="goalBaselineNote" class="goal-help"></p>
+      <p class="goal-help">Escolha a mesma definição e unidade do seu laudo. Músculo esquelético e massa muscular total são acompanhados separadamente. Índices viscerais só são comparados no mesmo equipamento; não há conversão automática entre unidades.</p><p id="goalBaselineNote" class="goal-help"></p>
       <p class="goal-help">Você pode ajustar o plano depois. O prazo ajuda a acompanhar sua evolução, sem prever automaticamente o resultado.</p>
       <div id="goalFormStatus" role="status" aria-live="polite"></div>
       <button type="submit" class="goal-save">Salvar minhas metas</button>
@@ -1053,6 +1080,76 @@ function migrateLegacyCache() {
   // Leave the older key untouched; record the import only after the canonical cache is durable.
   if(changed&&persist())writeJSON('biovault_v42_imported_keys',[...seen]);
 }
+
+// Absent metadata means an earlier Omron-only record, never a new unspecified source.
+function equipmentInfo(record={}) {
+  const legacy=record.measurementSchema==null&&!Object.prototype.hasOwnProperty.call(record,'equipment');
+  const name=String(record.equipment||'').replace(/[\u0000-\u001f\u007f]/g,'').trim().replace(/\s+/g,' ').slice(0,120);
+  const label=name||(legacy?'Omron HBF-514C':'Equipamento não informado');
+  return {label,known:!!name||legacy,legacy,omron:/^omron\s+hbf[ -]?514c$/i.test(label),key:(name|| (legacy?'Omron HBF-514C':'')).toLocaleLowerCase('pt-BR').replace(/\s+/g,' ').trim()};
+}
+function muscleUnit(record={}){return record.muscleUnit==='kg'?'kg':'percent';}
+function muscleKind(record={}){return record.muscleKind==='total'?'total':'skeletal';}
+function visceralUnit(record={}){return record.visceralUnit==='cm2'?'cm2':'index';}
+function metricUnit(record,key){return key==='muscle'?(muscleUnit(record)==='kg'?'kg':'%'):key==='visceral'?(visceralUnit(record)==='cm2'?'cm²':'nível'):({weight:'kg',fat:'%',bodyAge:'anos',rm:'kcal/dia',waist:'cm',hip:'cm',bmi:'kg/m²',whr:'RCQ'}[key]||'');}
+function muscleLabel(record){return muscleKind(record)==='total'?'Massa muscular total':'Músculo esquelético';}
+function omronReference(record,key){return equipmentInfo(record).omron&&(key!=='muscle'||(muscleUnit(record)==='percent'&&muscleKind(record)==='skeletal'))&&(key!=='visceral'||visceralUnit(record)==='index');}
+function comparableMetric(a,b,key){
+  if(!a||!b)return false;
+  if(key==='muscle')return muscleUnit(a)===muscleUnit(b)&&muscleKind(a)===muscleKind(b);
+  if(key==='visceral'||key==='bodyAge'){const x=equipmentInfo(a),y=equipmentInfo(b);return x.known&&y.known&&x.key===y.key&&(key!=='visceral'||visceralUnit(a)===visceralUnit(b));}
+  return true;
+}
+function sourceNotice(list){
+  if(!list.length)return '';
+  const sources=list.map(equipmentInfo),known=new Set(sources.filter(x=>x.known).map(x=>x.key));
+  if(known.size>1)return 'Equipamento alterado: '+[...new Set(sources.map(x=>x.label))].join(' → ')+'. Algoritmos e condições podem diferir; diferenças não comprovam mudança corporal. Índices e unidades incompatíveis não são comparados.';
+  if(sources.some(x=>!x.known))return 'Há pesagem sem equipamento informado. Não é possível confirmar a comparabilidade; confira o laudo, as unidades e as condições de medição.';
+  return '';
+}
+function sourceChartLines(list){return !sourceNotice(list);}
+function updateMeasurementSourceForm(){
+  const omron=$('mEquipmentProfile').value==='omron';
+  $('mEquipmentNameField').hidden=$('mEquipmentProfile').value!=='other';
+  for(const id of ['mMuscleKind','mMuscleUnit','mVisceralUnit'])$(id).disabled=omron;
+  if(omron){$('mMuscleKind').value='skeletal';$('mMuscleUnit').value='percent';$('mVisceralUnit').value='index';}
+  const kg=$('mMuscleUnit').value==='kg',area=$('mVisceralUnit').value==='cm2';
+  $('mMuscleLabel').textContent=($('mMuscleKind').value==='total'?'Massa muscular total':'Músculo esquelético')+(kg?' (kg)':' (% do peso)');
+  $('mVisceralLabel').textContent=area?'Área visceral estimada (cm²)':omron?'Gordura visceral (1–30)':'Gordura visceral (índice)';
+  $('mFat').max=omron?'60':'100';$('mMuscle').max=omron?'60':kg?'500':'100';$('mVisc').max=omron?'30':'1000';$('mVisc').min=omron?'1':'0.1';$('mVisc').step=omron?'1':'0.1';
+  $('measurementReferenceNote').textContent=omron?'Faixas do manual Omron HBF-514C, conforme sexo e idade. Não são diagnóstico.':'Faixas de gordura, músculo, visceral e idade corporal dependem do equipamento. O app preserva os valores e não aplica a tabela Omron.';
+}
+function validSourceFields(record){
+  if(record.measurementSchema!=null&&record.measurementSchema!==2)return false;
+  if(record.equipment!=null&&(typeof record.equipment!=='string'||record.equipment.length>120))return false;
+  if(record.notes!=null&&(typeof record.notes!=='string'||record.notes.length>2000))return false;
+  if(record.muscleUnit!=null&&!['percent','kg'].includes(record.muscleUnit))return false;
+  if(record.muscleKind!=null&&!['skeletal','total'].includes(record.muscleKind))return false;
+  if(record.visceralUnit!=null&&!['index','cm2'].includes(record.visceralUnit))return false;
+  if(muscleUnit(record)==='kg'&&validNumber(record.muscle)&&number(record.muscle)>number(record.weight))return false;
+  if(muscleUnit(record)==='percent'&&validNumber(record.muscle)&&number(record.muscle)>100)return false;
+  if(validNumber(record.fat)&&number(record.fat)>100)return false;
+  if(muscleUnit(record)==='percent'&&validNumber(record.fat)&&validNumber(record.muscle)&&number(record.fat)+number(record.muscle)>100)return false;
+  if(omronReference(record,'fat')&&validNumber(record.fat)&&record.fat>60)return false;
+  if(omronReference(record,'muscle')&&validNumber(record.muscle)&&record.muscle>60)return false;
+  if(omronReference(record,'visceral')&&validNumber(record.visceral)&&(record.visceral>30||!Number.isInteger(number(record.visceral))))return false;
+  return true;
+}
+function closeTraining(){ $('trainingModal').classList.add('hidden');trainingOpener?.focus?.(); }
+let trainingOpener=null;
+function openTraining(){
+  closeMetricDetail();closeQuickPanel();trainingOpener=document.activeElement;
+  const r=allVisible().at(-1),plan=readJSON(GOALS_KEY,{})||{};
+  $('trainingSummary').replaceChildren();
+  for(const text of r?[
+    'Última pesagem: '+dateLabel(r.date)+' · '+equipmentInfo(r).label,
+    muscleLabel(r)+': '+fmt(r.muscle)+' '+metricUnit(r,'muscle'),
+    'Gordura corporal: '+fmt(r.fat)+'%',
+    goalConfigured(plan)?'Seu objetivo: '+GOAL_OBJECTIVES[plan.objective]+'. Consulte os valores e o prazo em Metas.':'Você ainda não definiu uma meta pessoal.'
+  ]:['Adicione uma pesagem para acompanhar músculo e gordura junto das suas metas.']){const p=document.createElement('p');p.textContent=text;$('trainingSummary').append(p);}
+  $('trainingModal').classList.remove('hidden');$('trainingModal').querySelector('button').focus();
+}
+
 function metricReferenceBar(key,record,info) {
   if(!['fat','muscle','visceral','bmi','whr'].includes(key))return '<span class="metric-value-line" aria-hidden="true"></span>';
   const r=clinicalRanges(key,record,info).ranges;
@@ -1088,7 +1185,7 @@ function toggleHoloScan() {
 function historyTelemetryTable(list) {
   return `<div class="history-table-wrap"><table class="history-telemetry"><thead><tr><th>Data</th><th>Peso</th><th>IMC</th><th>Gordura</th><th>Visceral</th><th>Músculo</th><th>RCQ</th><th>Idade corporal</th><th>Ações</th></tr></thead><tbody>${[...list].reverse().map(r=>{
     const ratio=r.hip>0?r.waist/r.hip:NaN;
-    return `<tr data-selected="${r.id===selectedReadingId}"><td>${dateLabel(r.date)}<br><small>${escapeHTML(recordPersonName(r))}</small></td><td>${fmt(r.weight)} kg</td><td>${fmt(calcBmiValue(r.weight,profile(r).height))}</td><td>${fmt(r.fat)}%</td><td>${fmt(r.visceral,0)}</td><td>${fmt(r.muscle)}%</td><td>${fmt(ratio,2)}</td><td>${fmt(r.bodyAge,0)} anos</td><td><button type="button" data-reading-id="${escapeHTML(r.id)}">Selecionar</button> <button type="button" data-edit-id="${escapeHTML(r.id)}">Editar</button> <button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}">Excluir</button></td></tr>`;
+    return `<tr data-selected="${r.id===selectedReadingId}"><td>${dateLabel(r.date)}<br><small>${escapeHTML(recordPersonName(r))}</small></td><td>${fmt(r.weight)} kg</td><td>${fmt(calcBmiValue(r.weight,profile(r).height))}</td><td>${fmt(r.fat)}%</td><td>${fmt(r.visceral,visceralUnit(r)==='cm2'?1:0)} ${metricUnit(r,'visceral')}</td><td>${fmt(r.muscle)} ${metricUnit(r,'muscle')}</td><td>${fmt(ratio,2)}</td><td>${fmt(r.bodyAge,0)} anos</td><td><button type="button" data-reading-id="${escapeHTML(r.id)}">Selecionar</button> <button type="button" data-edit-id="${escapeHTML(r.id)}">Editar</button> <button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}">Excluir</button></td></tr>`;
   }).join('')}</tbody></table></div>`;
 }
 
@@ -1152,11 +1249,16 @@ function inspectCurrentReading() {
   selectMetricDetail(key,true);
 }
 function navigateApp(destination) {
-  if(destination==='home'){$('bioMap').scrollIntoView({behavior:'smooth',block:'start'});return;}
+  closeTraining();if(!['chart','history'].includes(destination))closeQuickPanel();
+  for(const button of document.querySelectorAll('#bottomNav [data-app-nav]')){if(button.dataset.appNav===destination)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}
+  if(destination==='home'){closeQuickPanel();window.scrollTo({top:0,behavior:'smooth'});return;}
   if(destination==='scan'){openNewWeighingModal();return;}
   if(destination==='history'){openQuickPanel('history');return;}
+  if(destination==='chart'){openQuickPanel('chart');return;}
+  if(destination==='training'){openTraining();return;}
   if(destination==='settings'){$('profileDrawer').open=true;$('profileDrawer').scrollIntoView({behavior:'smooth',block:'start'});}
 }
+
 function setHoloMode(mode) {
   holo.mode='portrait';$('holoStage').dataset.view='portrait';$('holoPortrait').classList.remove('hidden');
   for(const id of ['canvas3dContainer','holoFallback','holoRotationControls','holoAutoRotate','holoScanBeam'])$(id).classList.add('hidden');
@@ -1321,6 +1423,7 @@ function applyConversationalKnowledge(result,record) {
   const high=status=>['ALTO','MUITO ALTO'].includes(status);
   for(const [key,info]of Object.entries(result)) {
     const entry=clinicalKnowledge.metrics[key];if(!entry)continue;
+    if(['fat','muscle','visceral','bodyAge'].includes(key)&&!omronReference(record,key))continue;
     let state=info.neutral&&['SEM REFERÊNCIA','SEM DADOS'].includes(info.status)?'unknown':
       info.status==='BAIXO'||info.status==='BAIXO PESO'?'low':info.status==='MUITO ALTO'?'veryHigh':
       info.status==='ALTO'||info.status==='ACIMA DA REFERÊNCIA'||info.status==='ACIMA DA INFORMADA'||info.status==='SOBREPESO'||info.status.startsWith('OBESIDADE')?'high':'normal';
@@ -1347,12 +1450,12 @@ function applyConversationalKnowledge(result,record) {
       if(high(result.fat.status))info.contextEvidence+=' Neste registro, a gordura também está elevada: preservar músculo e reduzir gordura são objetivos diferentes.';
       else if(result.fat.status==='BAIXO')info.action+=' Como a gordura também ficou baixa, não busque emagrecer mais automaticamente.';
     }else if(key==='bmi') {
-      info.contextEvidence=`Aqui, a gordura está em ${fmt(record.fat)}% (${result.fat.status.toLowerCase()}) e o músculo em ${fmt(record.muscle)}% (${result.muscle.status.toLowerCase()}). `;
+      info.contextEvidence=`Aqui, a gordura está em ${fmt(record.fat)}% (${result.fat.status.toLowerCase()}) e o músculo em ${fmt(record.muscle)} ${metricUnit(record,'muscle')} (${result.muscle.status.toLowerCase()}). `;
       if(high(result.muscle.status)&&result.fat.status==='NORMAL')info.contextEvidence+='Uma boa quantidade de músculo pode contribuir para o peso e para o IMC; esse contexto evita interpretar todo o peso como gordura.';
       else if(high(result.fat.status))info.contextEvidence+='Como a gordura também está elevada, vale acompanhar a redução de gordura e a preservação muscular, junto com a cintura.';
-    }else if(key==='visceral'&&!info.altered&&result.whr.altered) {
+    }else if(key==='visceral'&&info.status==='NORMAL'&&result.whr.altered) {
       info.contextEvidence='Neste registro, a RCQ está acima do corte mesmo com o visceral normal. Os indicadores observam aspectos diferentes; a cintura continua merecendo atenção.';
-    }else if(key==='whr'&&info.altered&&!result.visceral.altered) {
+    }else if(key==='whr'&&info.altered&&result.visceral.status==='NORMAL') {
       info.contextEvidence='Seu nível visceral está normal na escala Omron. Isso é um resultado favorável desse índice, mas não apaga a atenção indicada pela relação cintura–quadril.';
     }
   }
@@ -1412,31 +1515,42 @@ function destroyMetricCharts() {for(const chart of metricCharts)chart.destroy();
 function renderMetricGallery(list,allReadings) {
   destroyMetricCharts();
   const filter=$('chartMetricSelect').value;
-  const definitions=metricChartDefinitions.filter(d=>filter==='all'||filter===d.key);
   const baseline=compareMode?allReadings.find(r=>r.id===$('compareSelect').value)||allReadings[0]:list[0];
   const selected=currentReading||list.at(-1);
-  $('chartPeriodNote').textContent=list.length?`${list.length} pesagem(ns) de ${dateLabel(list[0].date)} a ${dateLabel(list.at(-1).date)}. ${compareMode?'Os resumos comparam a referência escolhida com a pesagem selecionada.':'Janela terminando na última pesagem; variação entre a primeira da janela e a selecionada.'}${list.length===1?' Uma pesagem mostra um ponto; registre outra para observar uma curva.':''}`:'Sem pesagens na janela selecionada.';
+  const definitions=metricChartDefinitions.filter(d=>filter==='all'||filter===d.key).map(d=>({...d,
+    unit:metricUnit(selected||{},d.key),label:d.key==='muscle'?muscleLabel(selected||{}):d.label,
+    digits:d.key==='visceral'&&visceralUnit(selected||{})==='cm2'?1:d.digits,
+    deltaUnit:['fat','muscle'].includes(d.key)&&metricUnit(selected||{},d.key)==='%'?'p.p.':metricUnit(selected||{},d.key)
+  }));
+  const warning=sourceNotice(list);
+  $('chartPeriodNote').textContent=list.length?`${list.length} pesagem(ns) de ${dateLabel(list[0].date)} a ${dateLabel(list.at(-1).date)}. ${compareMode?'Os resumos comparam a referência escolhida com a pesagem selecionada.':'Janela terminando na última pesagem; variação entre a primeira da janela e a selecionada.'}${list.length===1?' Uma pesagem mostra um ponto; registre outra para observar uma curva.':''} ${warning}`:'Sem pesagens na janela selecionada.';
   $('metricChartGrid').innerHTML=definitions.map(d=>{
-    const current=selected?d.value(selected):NaN,before=baseline?d.value(baseline):NaN,diff=current-before;
+    const current=selected?d.value(selected):NaN,before=baseline?d.value(baseline):NaN;
+    const diff=comparableMetric(selected,baseline,d.key)?current-before:NaN;
     const value=Number.isFinite(current)?`${fmt(current,d.digits??1)} ${d.unit}`:'Sem dado';
-    const comparison=Number.isFinite(diff)?`Δ ${diff>0?'+':''}${fmt(diff,d.digits??1)} ${d.deltaUnit||d.unit}`:'Comparação indisponível';
-    return `<section class="metric-chart-card" aria-label="Gráfico de ${d.label}"><header><h3>${d.label}</h3><span style="color:${d.color}">${value}</span></header><p class="metric-chart-comparison">${comparison} • Referência ${baseline?dateLabel(baseline.date):'—'} / selecionada ${selected?dateLabel(selected.date):'—'}</p><div class="metric-chart-canvas"><canvas id="metricChart-${d.key}" role="img" aria-label="Evolução de ${d.label}, em ${d.unit}"></canvas></div><p class="metric-chart-empty" id="metricChartEmpty-${d.key}"></p></section>`;
+    const comparison=Number.isFinite(diff)?`Δ ${diff>0?'+':''}${fmt(diff,d.digits??1)} ${d.deltaUnit}`:'Comparação indisponível (dados, unidades ou equipamento)';
+    const excluded=list.filter(r=>!comparableMetric(selected,r,d.key)).length;
+    return `<section class="metric-chart-card" aria-label="Gráfico de ${d.label}"><header><h3>${d.label}</h3><span style="color:${d.color}">${value}</span></header><p class="metric-chart-comparison">${comparison} • Referência ${baseline?dateLabel(baseline.date):'—'} / selecionada ${selected?dateLabel(selected.date):'—'}${excluded?` • ${excluded} registro(s) incompatível(is), preservado(s) no histórico.`:''}</p><div class="metric-chart-canvas"><canvas id="metricChart-${d.key}" role="img" aria-label="Evolução de ${d.label}, em ${d.unit}"></canvas></div><p class="metric-chart-empty" id="metricChartEmpty-${d.key}"></p></section>`;
   }).join('');
   for(const d of definitions) {
-    const values=list.map(r=>{const value=d.value(r);return Number.isFinite(value)?value:null;});
-    if(!values.some(v=>v!==null)){$('metricChartEmpty-'+d.key).textContent='Sem valores registrados deste indicador nesta janela.';continue;}
-    metricCharts.push(new Chart($('metricChart-'+d.key),{type:'line',data:{labels:list.map(r=>dateLabel(r.date)),datasets:[{label:`${d.label} (${d.unit})`,data:values,borderColor:d.color,backgroundColor:d.color+'22',pointRadius:list.map(r=>r.id===selectedReadingId?4:2),pointHoverRadius:5,spanGaps:false,tension:.2}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${d.label}: ${fmt(ctx.parsed.y,d.digits??1)} ${d.unit}`}}},scales:{x:{ticks:{color:'#7896a8',maxTicksLimit:4,font:{size:9}},grid:{color:'#17304455'}},y:{title:{display:true,text:d.unit,color:'#8cb1c2'},ticks:{color:'#a0bdcc',font:{size:10},precision:d.digits===0?0:undefined},grid:{color:'#17304477'}}}}}));
+    const values=list.map(r=>{const value=comparableMetric(selected,r,d.key)?d.value(r):NaN;return Number.isFinite(value)?value:null;});
+    if(!values.some(v=>v!==null)){$('metricChartEmpty-'+d.key).textContent='Sem valores comparáveis deste indicador nesta janela.';continue;}
+    const deviceMetric=['fat','muscle','visceral','bodyAge'].includes(d.key);
+    metricCharts.push(new Chart($('metricChart-'+d.key),{type:'line',data:{labels:list.map(r=>dateLabel(r.date)),datasets:[{label:`${d.label} (${d.unit})`,data:values,borderColor:d.color,backgroundColor:d.color+'22',pointRadius:list.map(r=>r.id===selectedReadingId?4:3),pointHoverRadius:5,showLine:!deviceMetric||sourceChartLines(list),spanGaps:false,tension:.2}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${d.label}: ${fmt(ctx.parsed.y,d.digits??1)} ${d.unit} • ${equipmentInfo(list[ctx.dataIndex]).label}`}}},scales:{x:{ticks:{color:'#7896a8',maxTicksLimit:4,font:{size:9}},grid:{color:'#17304455'}},y:{title:{display:true,text:d.unit,color:'#8cb1c2'},ticks:{color:'#a0bdcc',font:{size:10},precision:d.digits===0?0:undefined},grid:{color:'#17304477'}}}}}));
   }
 }
 
 const clinicalSources=Object.fromEntries(Object.entries(clinicalKnowledge.sources).map(([key,source])=>[key,[source.title,source.url]]));
+clinicalSources.inbody=['InBody — parâmetros e unidades dos laudos','https://research.inbody.com/result-sheet-interpretation-parameter-keynote/'];
 function clinicalEvidence(key,record,info) {
   const entry=clinicalKnowledge.metrics[key];
+  if(['fat','muscle','visceral','bodyAge'].includes(key)&&!omronReference(record,key))return {text:'Bioimpedância estima composição por algoritmos do equipamento. Músculo esquelético, massa muscular total e massa magra são indicadores diferentes. Hidratação, protocolo e equipamento podem alterar os resultados. Use as faixas do laudo; o holograma é apenas ilustrativo.',sources:key==='muscle'?['bia','inbody','strength']:['bia','inbody']};
   return {text:entry.evidence+(info.contextEvidence?' '+info.contextEvidence:''),sources:entry.sources};
 }
 function clinicalRanges(key,record,info) {
   record=resolveReading(record);
   const p=profile(record),current=info.status;
+  if(['fat','muscle','visceral','bodyAge'].includes(key)&&!omronReference(record,key))return {ranges:[],note:'Sem faixa aplicável cadastrada para '+equipmentInfo(record).label+'. Valor em '+metricUnit(record,key)+'. Consulte a referência específica do exame. Ausência de classificação não significa resultado normal.'};
   let ranges=[],note='';
   const row=(label,value,status=label)=>({label,value,current:current===status});
   if(key==='fat'||key==='muscle') {
@@ -1448,6 +1562,7 @@ function clinicalRanges(key,record,info) {
   }else if(key==='visceral') {
     ranges=[row('Normal','1 a 9','NORMAL'),row('Alto','10 a 14','ALTO'),row('Muito alto','15 a 30','MUITO ALTO')];note='Níveis relativos do aparelho. Não equivalem a uma área individual medida por tomografia.';
   }else if(key==='whr') {
+    if(!['F','M'].includes(p.sex)||!Number.isFinite(p.age)||p.age<18)return {ranges:[],note:'Informe idade e sexo de referência para avaliar a RCQ em adultos.'};
     const cut=p.sex==='F'?'.85':'.90';ranges=[row('Abaixo do corte',`< 0,${cut.slice(1)}`,'ABAIXO DO CORTE'),row('No corte ou acima',`≥ 0,${cut.slice(1)}`,'ACIMA DA REFERÊNCIA')];note=`Referência para ${p.sex==='F'?'mulheres':'homens'}. Calcule a razão antes de arredondar. Considere o protocolo e a população.`;
   }else if(key==='bodyAge') {
     ranges=[row('Idade informada',`${fmt(p.age,0)} anos`),row('Idade do visor',`${fmt(record.bodyAge,0)} anos`)];note='Comparação produzida pela Omron. Não há faixas clínicas de normalidade nem garantia de reversão em anos.';
@@ -1469,14 +1584,14 @@ function renderClinicalReference(key,record,info) {
 }
 
 
-// BioVault Pro: real records, stable selection and recoverable synchronization.
+// BIOSHAPE: real records, stable selection and recoverable synchronization.
 const $ = id => document.getElementById(id);
 let CACHE_KEY = 'biovault_local_readings';
 let PREFS_KEY = 'biovault_prefs';
 let GOALS_KEY = 'biovault_goals';
 let authSDK=null,authSession=null,currentUser=null,authReady=false,sdkPromise=null,accountEpoch=0,profileUnsubscribe=null;
 let authMode='login',authBusy=false,pendingSignupName='',guestMode=false;
-const APP_VERSION='5.1.0';
+const APP_VERSION='5.2.0';
 const UPDATE_MANIFEST='https://palomagarcia38-create.github.io/biovault-pro/public/updates/latest.json';
 let readings = [], selectedReadingId = null, compareMode = false;
 let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
@@ -1586,16 +1701,16 @@ function percentageInfo(value, limits, kind) {
 function analyze(cur) {
   cur=resolveReading(cur);
   const p = profile(cur), bmi = calcBmiValue(cur.weight,p.height), bi = classifyBmi(bmi,p.age);
-  const fr = reference('fat',p.sex,p.age), mr = reference('muscle',p.sex,p.age);
+  const fr = omronReference(cur,'fat')?reference('fat',p.sex,p.age):null, mr = omronReference(cur,'muscle')?reference('muscle',p.sex,p.age):null;
   const fi = percentageInfo(cur.fat,fr,'fat'), mi = percentageInfo(cur.muscle,mr,'muscle');
-  const validVisceral = validNumber(cur.visceral) && cur.visceral >= 1 && cur.visceral <= 30 && p.age >= 18 && p.age <= 80;
+  const validVisceral = omronReference(cur,'visceral') && validNumber(cur.visceral) && cur.visceral >= 1 && cur.visceral <= 30 && p.age >= 18 && p.age <= 80;
   const vi = {status:!validVisceral ? 'SEM REFERÊNCIA' : cur.visceral <= 9 ? 'NORMAL' : cur.visceral <= 14 ? 'ALTO' : 'MUITO ALTO',altered:validVisceral && cur.visceral > 9,neutral:!validVisceral};
   const ratio = validNumber(cur.waist) && validNumber(cur.hip) && cur.waist > 0 && cur.hip > 0 ? cur.waist / cur.hip : NaN;
-  const rcqLimit = p.sex === 'F' ? .85 : .9, ratioAltered = Number.isFinite(ratio) && ratio >= rcqLimit;
-  const ageValid = validNumber(cur.bodyAge) && cur.bodyAge >= 18 && cur.bodyAge <= 80 && Number.isFinite(p.age) && p.age >= 18 && p.age <= 80;
+  const rcqLimit = p.sex === 'F' ? .85 : .9, ratioReference=['F','M'].includes(p.sex)&&Number.isFinite(p.age)&&p.age>=18, ratioAltered = ratioReference && Number.isFinite(ratio) && ratio >= rcqLimit;
+  const ageValid = omronReference(cur,'bodyAge') && validNumber(cur.bodyAge) && cur.bodyAge >= 18 && cur.bodyAge <= 80 && Number.isFinite(p.age) && p.age >= 18 && p.age <= 80;
   const ageDiff = ageValid ? cur.bodyAge - p.age : NaN;
   const fatKg = validNumber(cur.fat) ? cur.weight * cur.fat / 100 : NaN;
-  const muscleKg = validNumber(cur.muscle) ? cur.weight * cur.muscle / 100 : NaN;
+  const muscleKg = validNumber(cur.muscle) ? muscleUnit(cur)==='kg'?number(cur.muscle):cur.weight * cur.muscle / 100 : NaN;
   const neutral = {altered:false,neutral:true};
   const make = (title,status,info,whatIs,why,action) => ({title,status,...info,whatIs,why,action});
   const result = {
@@ -1619,7 +1734,7 @@ function analyze(cur) {
       'Indicador da Omron derivado da estimativa de metabolismo em repouso e da composição corporal. Não mede envelhecimento biológico.',
       ageValid ? `Diferença de ${ageDiff > 0 ? '+' : ''}${ageDiff} ano(s) em relação à idade registrada. Essa comparação não representa diagnóstico nem expectativa de vida.` : 'A referência da balança para esse indicador abrange 18–80 anos.',
       'Acompanhe os indicadores individuais. Mudanças de peso, gordura e músculo podem influenciar a estimativa.'),
-    whr:make(`Cintura / quadril — ${fmt(cur.waist)} / ${fmt(cur.hip)} cm (RCQ ${fmt(ratio,2)})`,!Number.isFinite(ratio) ? 'SEM DADOS' : ratioAltered ? 'ACIMA DA REFERÊNCIA' : 'ABAIXO DO CORTE',{altered:ratioAltered,neutral:!Number.isFinite(ratio)},
+    whr:make(`Cintura / quadril — ${fmt(cur.waist)} / ${fmt(cur.hip)} cm (RCQ ${fmt(ratio,2)})`,!Number.isFinite(ratio) ? 'SEM DADOS' : !ratioReference?'SEM REFERÊNCIA':ratioAltered ? 'ACIMA DA REFERÊNCIA' : 'ABAIXO DO CORTE',{altered:ratioAltered,neutral:!Number.isFinite(ratio)||!ratioReference},
       `Relação entre cintura e quadril, em centímetros. Corte de referência utilizado: ${p.sex === 'F' ? '0,85 para mulheres' : '0,90 para homens'}.`,
       !Number.isFinite(ratio) ? 'Informe medidas positivas para cintura e quadril.' : ratioAltered ? 'A relação atingiu ou ultrapassou o ponto de corte para adiposidade central. O cálculo usa a razão completa, antes do arredondamento.' : 'A razão está abaixo do ponto de corte. Isso não exclui cintura elevada nem outros fatores de risco.',
       'Meça cintura e quadril com a mesma técnica e acompanhe também a cintura isoladamente. Os cortes dependem da população e do protocolo.'),
@@ -1632,6 +1747,8 @@ function analyze(cur) {
       'Tamanho corporal e composição influenciam o valor. Não é possível classificar metabolismo lento ou rápido a partir desse número isolado.',
       'A leitura não define uma meta de consumo calórico nem um limite seguro para dieta. Use avaliação individual para planejar a alimentação.')
   };
+  if(muscleUnit(cur)==='kg')result.muscle.title=muscleLabel(cur)+' — '+fmt(cur.muscle)+' kg';
+  for(const key of ['fat','muscle','visceral','bodyAge'])if(!omronReference(cur,key)){const info=result[key];Object.assign(info,{title:(key==='muscle'?muscleLabel(cur):key==='fat'?'Gordura corporal':key==='visceral'?'Gordura visceral':'Idade corporal')+' — '+fmt(cur[key],key==='bodyAge'?0:1)+' '+metricUnit(cur,key),status:validNumber(cur[key])?'SEM REFERÊNCIA':'SEM DADOS',altered:false,neutral:true,whatIs:'Resultado informado em '+metricUnit(cur,key)+'. A definição, o método e as faixas dependem do equipamento ou laudo. Não há conversão automática entre índices, área e percentuais.',why:'Equipamento: '+equipmentInfo(cur).label+'. A referência Omron não se aplica a este indicador.',action:'Confira o indicador, a unidade e as referências do laudo. Compare em condições semelhantes e leve seu histórico à avaliação profissional.',conversationHeadline:'Seu registro, com a referência do equipamento'});}
   return applyConversationalKnowledge(result,cur);
 }
 function populateCompareDropdown(list = visibleReadings()) {
@@ -1644,6 +1761,7 @@ function populateCompareDropdown(list = visibleReadings()) {
 function recomputeAll() {
   renderPersonContext();
   const all = allVisible(), list = visibleReadings();
+  $('comparisonSourceNotice').textContent='';$('comparisonSourceNotice').hidden=true;
   $('emptyStateBox').classList.toggle('hidden', !!all.length);
   $('dashboardMain').classList.toggle('hidden', !all.length);
   $('filterEmpty').classList.toggle('hidden', !!list.length);
@@ -1663,7 +1781,8 @@ function recomputeAll() {
   const cur = currentReading, previous = list.find(r => r.id === $('compareSelect').value) || list[0];
   currentAnalyses = analyze(cur);
   const a = currentAnalyses, altered = Object.keys(a).filter(k => a[k].altered);
-  $('activeReadingBadge').textContent = `${dateLabel(cur.date)} • ${recordPersonName(cur)}`;
+  $('activeReadingBadge').textContent = `${dateLabel(cur.date)} • ${recordPersonName(cur)} • ${equipmentInfo(cur).label}`;
+  $('comparisonSourceNotice').textContent=sourceNotice(compareMode?[previous,cur]:[cur]);$('comparisonSourceNotice').hidden=!$('comparisonSourceNotice').textContent;
   $('phenotypeTitle').textContent = altered.length ? `${altered.length} indicador(es) em atenção` : 'Indicadores nas faixas avaliadas';
   $('phenotypeDesc').textContent = altered.length ? 'Toque nos cards destacados ou nos alertas para entender cada resultado.' : 'Veja as referências e as limitações ao tocar nos indicadores.';
   $('inspectionDock').dataset.alert=String(altered.length>0);
@@ -1676,11 +1795,11 @@ function recomputeAll() {
   const definitions = {
     weight:['PESO CORPORAL',`${fmt(cur.weight)} kg`,delta(cur.weight,previous.weight,' kg')],
     fat:['GORDURA CORPORAL',`${fmt(cur.fat)}%`,delta(cur.fat,previous.fat,'%', ' p.p.')],
-    visceral:['GORDURA VISCERAL',`Nível ${fmt(cur.visceral,0)}`,delta(cur.visceral,previous.visceral)],
+    visceral:['GORDURA VISCERAL',`${fmt(cur.visceral,visceralUnit(cur)==='cm2'?1:0)} ${metricUnit(cur,'visceral')}`,comparableMetric(cur,previous,'visceral')?delta(cur.visceral,previous.visceral,' '+metricUnit(cur,'visceral')):'Índice / equipamento não comparável'],
     rm:['METABOLISMO EM REPOUSO',`${fmt(cur.rm,0)} kcal`,delta(cur.rm,readingBasal(previous),' kcal')],
     bmi:['IMC AUTOMÁTICO',fmt(bmi),delta(bmi,prevBmi)],
-    muscle:['MÚSCULO ESQUELÉTICO',`${fmt(cur.muscle)}%`,delta(cur.muscle,previous.muscle,'%', ' p.p.')],
-    bodyAge:['IDADE CORPORAL',`${fmt(cur.bodyAge,0)} anos`,delta(cur.bodyAge,previous.bodyAge,' anos')],
+    muscle:[muscleLabel(cur).toUpperCase(),`${fmt(cur.muscle)} ${metricUnit(cur,'muscle')}`,comparableMetric(cur,previous,'muscle')?delta(cur.muscle,previous.muscle,metricUnit(cur,'muscle'),muscleUnit(cur)==='percent'?' p.p.':' kg'):'Unidade ou tipo de músculo diferente'],
+    bodyAge:['IDADE CORPORAL',`${fmt(cur.bodyAge,0)} anos`,comparableMetric(cur,previous,'bodyAge')?delta(cur.bodyAge,previous.bodyAge,' anos'):'Algoritmo / equipamento não comparável'],
     whr:['CINTURA / QUADRIL',`${fmt(cur.waist)} / ${fmt(cur.hip)} cm`,'Toque para detalhes']
   };
   const card = key => {
@@ -1689,13 +1808,13 @@ function recomputeAll() {
     const glyph={weight:'weight-scale',fat:'fire-flame-curved',visceral:'atom',rm:'bolt',bmi:'calculator',muscle:'dumbbell',bodyAge:'hourglass-half',whr:'ruler-combined'}[key];
     const short={weight:'PESO',fat:'GORDURA',visceral:'VISCERAL',rm:'BASAL',bmi:'IMC AUTO',muscle:'MÚSCULO',bodyAge:'IDADE CORPORAL',whr:'CINT./QUADRIL'}[key];
     const primary={weight:fmt(cur.weight),fat:fmt(cur.fat),visceral:fmt(cur.visceral,0),rm:fmt(cur.rm,0),bmi:fmt(bmi),muscle:fmt(cur.muscle),bodyAge:fmt(cur.bodyAge,0),whr:number(cur.hip)>0?fmt(rcq,2):'—'}[key];
-    const unit={weight:'kg',fat:'%',visceral:'nível',rm:'kcal',bmi:'',muscle:'%',bodyAge:'anos',whr:''}[key];
+    const unit={weight:'kg',fat:'%',visceral:metricUnit(cur,'visceral'),rm:'kcal',bmi:'',muscle:metricUnit(cur,'muscle'),bodyAge:'anos',whr:''}[key];
     return `<button type="button" data-metric="${key}" data-compare="${compareMode}" data-favorable="${!!info.favorable}" aria-label="${title}: ${value}. ${info.status}. Abrir detalhes" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node hud-panel ${danger?'alert-danger-border':''} ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title"><span class="metric-full-label">${title}</span><span class="metric-short-label" aria-hidden="true">${short}</span><i class="fa-solid fa-${glyph} metric-glyph" aria-hidden="true"></i></span><span class="metric-value">${primary}<span class="metric-unit">${unit}</span></span>${metricReferenceBar(key,cur,info)}<span class="metric-status ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="metric-sub">${sub}</span></button>`;
   };
   $('leftCardsColumn').innerHTML = ['weight','fat','visceral','rm'].map(card).join('');
   $('rightCardsColumn').innerHTML = ['bmi','muscle','bodyAge','whr'].map(card).join('');
-  $('svgVisceralCore').setAttribute('r',String(validNumber(cur.visceral) ? Math.min(18,5+cur.visceral*.8) : 5));
-  $('svgVisceralCore').setAttribute('fill',a.visceral.altered ? '#ff2a5f' : '#10b981');
+  $('svgVisceralCore').setAttribute('r',String(omronReference(cur,'visceral')&&validNumber(cur.visceral)?Math.min(18,5+cur.visceral*.8):5));
+  $('svgVisceralCore').setAttribute('fill',a.visceral.altered ? '#ff2a5f' : a.visceral.neutral?'#94a3b8':'#10b981');
   updateHolo3DState(cur);
   selectMetricDetail(selectedMetricKey,false); renderClinicalAlerts(altered); updateGoalsBox(); renderEvolutionChart(list); setSyncStatus();
 }
@@ -1726,7 +1845,7 @@ function renderClinicalAlerts(keys) {
 }
 function renderHistoryList(list) {
   $('histCountBadge').textContent = list.length;
-  const cards = [...list].reverse().map(r => `<div class="bg-[#07101f] border ${r.id===selectedReadingId?'border-sky-500':'border-slate-800'} rounded-xl p-2.5 flex items-center justify-between gap-2"><button type="button" data-reading-id="${escapeHTML(r.id)}" class="text-left flex-1 min-w-0"><span class="block font-bold text-white mono">${dateLabel(r.date)} • ${fmt(r.weight)} kg (IMC ${fmt(calcBmiValue(r.weight,profile(r).height))})</span><span class="block text-[11px] text-slate-400">Gordura: ${fmt(r.fat)}% • Músculo: ${fmt(r.muscle)}% • Visceral: ${fmt(r.visceral,0)} • ${escapeHTML(recordPersonName(r))}${r._sync==='pending'?' • Pendente de sincronização':''}</span></button><button type="button" data-edit-id="${escapeHTML(r.id)}">Editar</button> <button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}" class="px-2.5 py-2 rounded-lg bg-rose-500/15 text-rose-400 font-bold text-[11px]">Excluir</button></div>`).join('') || '<p class="text-slate-400">Nenhuma pesagem neste filtro.</p>';
+  const cards = [...list].reverse().map(r => `<div class="bg-[#07101f] border ${r.id===selectedReadingId?'border-sky-500':'border-slate-800'} rounded-xl p-2.5 flex items-center justify-between gap-2"><button type="button" data-reading-id="${escapeHTML(r.id)}" class="text-left flex-1 min-w-0"><span class="block font-bold text-white mono">${dateLabel(r.date)} • ${fmt(r.weight)} kg (IMC ${fmt(calcBmiValue(r.weight,profile(r).height))})</span><span class="block text-[11px] text-slate-400">Gordura: ${fmt(r.fat)}% • Músculo: ${fmt(r.muscle)} ${metricUnit(r,'muscle')} • Visceral: ${fmt(r.visceral,visceralUnit(r)==='cm2'?1:0)} ${metricUnit(r,'visceral')} • ${escapeHTML(equipmentInfo(r).label)} • ${escapeHTML(recordPersonName(r))}${r._sync==='pending'?' • Pendente de sincronização':''}</span></button><button type="button" data-edit-id="${escapeHTML(r.id)}">Editar</button> <button type="button" data-delete-id="${escapeHTML(r.id)}" aria-label="Excluir pesagem de ${dateLabel(r.date)}" class="px-2.5 py-2 rounded-lg bg-rose-500/15 text-rose-400 font-bold text-[11px]">Excluir</button></div>`).join('') || '<p class="text-slate-400">Nenhuma pesagem neste filtro.</p>';
   $('subView-history').innerHTML='<div class="history-cards">'+cards+'</div>'+historyTelemetryTable(list);
 }
 
@@ -1745,11 +1864,11 @@ function renderEvolutionChart(list = visibleReadings()) {
   $('combinedChartSection').classList.toggle('hidden',$('chartMetricSelect').value!=='all');
   if (chartInst) { chartInst.destroy(); chartInst=null; }
   if (!list.length || typeof Chart === 'undefined') {destroyMetricCharts();$('metricChartGrid').replaceChildren();$('chartPeriodNote').textContent=''; $('chartStatus').textContent = list.length ? 'Gráfico indisponível. Os registros continuam disponíveis no histórico.' : 'Sem pesagens para exibir.'; return; }
-  $('chartStatus').textContent='';
+  $('chartStatus').textContent=(list.some(r=>muscleUnit(r)==='kg'||muscleKind(r)==='total')?'O resumo conjunto usa somente músculo esquelético em %. Os outros registros aparecem no gráfico individual e no histórico. ':'')+(sourceNotice(list)?'Pontos de composição não são ligados quando a origem mudou ou não foi informada.':'');
   chartInst = new Chart($('bioChart'),{type:'line',data:{labels:list.map(r=>dateLabel(r.date)),datasets:[
     {label:'Peso (kg)',data:list.map(r=>r.weight),borderColor:'#00f0ff',tension:.3,yAxisID:'kg'},
-    {label:'Gordura (%)',data:list.map(r=>validNumber(r.fat)?r.fat:null),borderColor:'#f59e0b',tension:.3,yAxisID:'percent'},
-    {label:'Músculo (%)',data:list.map(r=>validNumber(r.muscle)?r.muscle:null),borderColor:'#10b981',tension:.3,yAxisID:'percent'}
+    {label:'Gordura (%)',showLine:sourceChartLines(list),spanGaps:false,data:list.map(r=>validNumber(r.fat)?r.fat:null),borderColor:'#f59e0b',tension:.3,yAxisID:'percent'},
+    {label:'Músculo esquelético (%)',showLine:sourceChartLines(list),spanGaps:false,data:list.map(r=>muscleUnit(r)==='percent'&&muscleKind(r)==='skeletal'&&validNumber(r.muscle)?r.muscle:null),borderColor:'#10b981',tension:.3,yAxisID:'percent'}
   ]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#17253d'}},kg:{position:'left',title:{display:true,text:'kg',color:'#00f0ff'},ticks:{color:'#94a3b8'},grid:{color:'#17253d'}},percent:{position:'right',title:{display:true,text:'%',color:'#94a3b8'},ticks:{color:'#94a3b8'},grid:{drawOnChartArea:false}}}}});
   renderMetricGallery(list,allReadings);
 }
@@ -1757,7 +1876,22 @@ const GOAL_OBJECTIVES={lose_weight:'Perder peso',gain_muscle:'Ganhar massa muscu
 let goalDraftBaseline=null,goalOpener=null,goalUnsubscribe=null,goalSyncEpoch=null;
 function goalTargets(plan={}){return plan.targets||{weight:null,fat:plan.fat??null,muscle:plan.muscle??null,visceral:plan.visceral??null};}
 function goalConfigured(plan=readJSON(GOALS_KEY,{})){plan=plan||{};return plan.schema===2&&!!GOAL_OBJECTIVES[plan.objective]&&Object.values(goalTargets(plan)).some(validNumber);}
-function goalBaseline(record){return record?{id:String(record.id),date:record.date,weight:validNumber(record.weight)?number(record.weight):null,fat:validNumber(record.fat)?number(record.fat):null,muscle:validNumber(record.muscle)?number(record.muscle):null,visceral:validNumber(record.visceral)?number(record.visceral):null}:null;}
+function goalBaseline(record){return record?{id:String(record.id),date:record.date,weight:validNumber(record.weight)?number(record.weight):null,fat:validNumber(record.fat)?number(record.fat):null,muscle:validNumber(record.muscle)?number(record.muscle):null,visceral:validNumber(record.visceral)?number(record.visceral):null,measurementSchema:2,equipment:equipmentInfo(record).known?equipmentInfo(record).label:null,muscleUnit:muscleUnit(record),muscleKind:muscleKind(record),visceralUnit:visceralUnit(record)}:null;}
+function goalUnits(plan={}){return {muscle:plan.units?.muscle==='kg'?'kg':'percent',visceral:plan.units?.visceral==='cm2'?'cm2':'index',muscleKind:plan.muscleKind==='total'?'total':'skeletal'};}
+function goalUnit(plan,key){const units=goalUnits(plan);return key==='muscle'?(units.muscle==='kg'?'kg':'%'):key==='visceral'?(units.visceral==='cm2'?'cm²':'nível'):metricUnit({},key);}
+function updateGoalUnits(){
+  const kg=$('goalMuscleUnit').value==='kg',area=$('goalVisceralUnit').value==='cm2';
+  $('goalMuscleLabel').textContent=($('goalMuscleKind').value==='total'?'Massa muscular total':'Músculo esquelético')+(kg?' · kg':' · % do peso');
+  $('goalVisceralLabel').textContent='Gordura visceral'+(area?' · cm²':' · índice do equipamento');
+  $('goalTargetMuscle').max=kg?'500':'100';
+}
+function goalComparisonCompatible(base,record,key,plan={}){
+  if(!base||!record)return false;const units=goalUnits(plan);
+  if(key==='muscle')return muscleUnit(base)===units.muscle&&muscleUnit(record)===units.muscle&&muscleKind(base)===units.muscleKind&&muscleKind(record)===units.muscleKind;
+  if(key==='visceral')return visceralUnit(base)===units.visceral&&visceralUnit(record)===units.visceral&&comparableMetric(base,record,key);
+  return true;
+}
+
 function goalMetricProgress(start,current,target,key='weight'){
   if(!validNumber(target)||!validNumber(current)||!validNumber(start))return {available:false,reached:false,progress:null};
   start=number(start);current=number(current);target=number(target);
@@ -1775,26 +1909,27 @@ function updateGoalsBox(){
   $('goalRibbon').textContent=configured?'◎ Minhas metas · '+GOAL_OBJECTIVES[plan.objective]:'◎ Vamos definir suas metas?';
   if(!configured){
     $('goalPlanOverview').innerHTML='<div class="goal-empty"><strong>Seu próximo passo começa com uma meta.</strong><p>Escolha seu objetivo, os indicadores que quer acompanhar e um prazo.</p><button type="button" onclick="openGoalPlan()">Definir minhas metas</button></div>';
-    if(r)$('goalsSummaryText').textContent=`Metas rápidas ajustáveis: gordura ${fmt(fat)}% (atual ${fmt(r.fat)}%); músculo ${fmt(muscle)}% (atual ${fmt(r.muscle)}%); visceral nível ${visceral} (atual ${fmt(r.visceral,0)}).`;
+    $('goalsSummaryText').textContent=(r?'Gordura atual '+fmt(r.fat)+'%; músculo atual '+fmt(r.muscle)+' '+metricUnit(r,'muscle')+'. ':'')+'Você ainda não definiu metas. Escolha seus próprios alvos e, se desejar, um prazo.';
     return;
   }
   const targets=goalTargets(plan),base=plan.baseline;
-  const definitions=[['weight','Peso','kg',1],['fat','Gordura corporal','%',1],['muscle','Músculo esquelético','%',1],['visceral','Gordura visceral','nível',0]];
+  const definitions=[['weight','Peso','kg',1],['fat','Gordura corporal','%',1],['muscle',goalUnits(plan).muscleKind==='total'?'Massa muscular total':'Músculo esquelético',goalUnit(plan,'muscle'),1],['visceral','Gordura visceral',goalUnit(plan,'visceral'),goalUnits(plan).visceral==='cm2'?1:0]];
   let active=0,reached=0;
   const cards=definitions.filter(([key])=>validNumber(targets[key])).map(([key,label,unit,digits])=>{
-    active++;const result=goalMetricProgress(base?.[key],r?.[key],targets[key],key);if(result.reached)reached++;
-    const achieved=allVisible().filter(x=>!base||x.date>=base.date).filter(x=>!r||x.date<=r.date).find(x=>goalMetricProgress(base?.[key],x[key],targets[key],key).reached);
-    const state=!r?'Aguardando sua primeira pesagem':!validNumber(r[key])?'Indicador não informado nesta pesagem':!validNumber(base?.[key])?'Sem este indicador na pesagem de partida':result.reached?'Meta atingida':result.direction==='maintain'?'Fora da faixa de manutenção':`Faltam ${fmt(result.remaining,digits)} ${['fat','muscle'].includes(key)?'p.p.':unit}`;
-    return `<article class="goal-progress-card"><div class="goal-card-title"><strong>${label}</strong><span>${result.available?Math.round(result.progress)+'% do caminho':'Sem comparação'}</span></div><div class="goal-values"><span>Partida<b>${fmt(base?.[key],digits)} ${unit}</b></span><span>Selecionada<b>${fmt(r?.[key],digits)} ${unit}</b></span><span>Meta<b>${fmt(targets[key],digits)} ${unit}</b></span></div><div class="goal-track" role="progressbar" aria-label="Progresso da meta de ${label}" ${result.available?`aria-valuenow="${Math.round(result.progress)}" aria-valuemin="0" aria-valuemax="100"`:'aria-valuetext="Sem dados suficientes"'}><i style="width:${result.progress??0}%"></i></div><p class="${result.reached?'goal-achieved':''}">${state}${achieved?' · Primeiro registro no alvo: '+dateLabel(achieved.date):''}</p></article>`;
+    active++;const compatible=goalComparisonCompatible(base,r,key,plan),result=goalMetricProgress(compatible?base?.[key]:null,r?.[key],targets[key],key);if(result.reached)reached++;
+    const achieved=allVisible().filter(x=>!base||x.date>=base.date).filter(x=>!r||x.date<=r.date).find(x=>goalComparisonCompatible(base,x,key,plan)&&goalMetricProgress(base?.[key],x[key],targets[key],key).reached);
+    const state=!r?'Aguardando sua primeira pesagem':!validNumber(r[key])?'Indicador não informado nesta pesagem':!validNumber(base?.[key])?'Sem este indicador na pesagem de partida':!compatible?'Unidade, tipo ou equipamento incompatível com a meta':result.reached?'Meta atingida':result.direction==='maintain'?'Fora da faixa de manutenção':`Faltam ${fmt(result.remaining,digits)} ${['fat','muscle'].includes(key)&&unit==='%'?'p.p.':unit}`;
+    return `<article class="goal-progress-card"><div class="goal-card-title"><strong>${label}</strong><span>${result.available?Math.round(result.progress)+'% do caminho':'Sem comparação'}</span></div><div class="goal-values"><span>Partida<b>${fmt(base?.[key],digits)} ${base?metricUnit(base,key):unit}</b></span><span>Selecionada<b>${fmt(r?.[key],digits)} ${r?metricUnit(r,key):unit}</b></span><span>Meta<b>${fmt(targets[key],digits)} ${unit}</b></span></div><div class="goal-track" role="progressbar" aria-label="Progresso da meta de ${label}" ${result.available?`aria-valuenow="${Math.round(result.progress)}" aria-valuemin="0" aria-valuemax="100"`:'aria-valuetext="Sem dados suficientes"'}><i style="width:${result.progress??0}%"></i></div><p class="${result.reached?'goal-achieved':''}">${state}${achieved?' · Primeiro registro no alvo: '+dateLabel(achieved.date):''}</p></article>`;
   }).join('');
   let timing='Sem prazo definido';
   if(validDate(plan.deadline)){const days=goalDays(localDate(),plan.deadline);timing=dateLabel(plan.deadline)+' · '+(days>0?'faltam '+days+' dias':days===0?'prazo hoje':'prazo encerrado há '+Math.abs(days)+' dias');}
-  $('goalPlanOverview').innerHTML=`<div class="goal-plan-heading"><div><span>MEU PLANO</span><h3>${GOAL_OBJECTIVES[plan.objective]}</h3><p>${timing}</p></div><button type="button" onclick="openGoalPlan()">Editar metas</button></div><p class="goal-comparison-note">${r?'Comparação com a pesagem selecionada de '+dateLabel(r.date)+'.':'A comparação começa na primeira pesagem.'} ${reached} de ${active} alvo(s) atingido(s).</p><div class="goal-progress-grid">${cards}</div>`;
-  $('goalsSummaryText').textContent='O prazo organiza seu acompanhamento; não é uma previsão automática de resultado. Percentuais de gordura e músculo são estimativas da balança. Ao manter um valor, o acompanhamento usa uma faixa de ±0,5 kg ou ponto percentual.';
+  $('goalPlanOverview').innerHTML=`<div class="goal-plan-heading"><div><span>MEU PLANO</span><h3>${GOAL_OBJECTIVES[plan.objective]}</h3><p>${timing}</p></div><button type="button" onclick="openGoalPlan()">Editar metas</button></div><p class="goal-comparison-note">${r?'Comparação com a pesagem selecionada de '+dateLabel(r.date)+'.':'A comparação começa na primeira pesagem.'} ${reached} de ${active} alvo(s) atingido(s). ${escapeHTML(base&&r?sourceNotice([base,r]):'')}</p><div class="goal-progress-grid">${cards}</div>`;
+  $('goalsSummaryText').textContent='O prazo organiza seu acompanhamento; não é uma previsão automática de resultado. Valores de composição são estimativas do equipamento; unidades e definições incompatíveis ficam sem comparação. Ao manter peso ou músculo, a faixa de acompanhamento é ±0,5 kg ou ponto percentual; para o visceral, usa o alvo informado.';
 }
 function goalPayload(plan){plan=plan||{};return Object.fromEntries(Object.entries(plan).filter(([key])=>!key.startsWith('_')));}
 function saveGoals(){
   const old=readJSON(GOALS_KEY,{})||{};
+  if(goalUnits(old).muscle!=='percent'||goalUnits(old).visceral!=='index'||goalUnits(old).muscleKind!=='skeletal'){openGoalPlan();notify('Ajuste as metas nas unidades do seu plano. Os controles rápidos usam % esquelético e nível.');return;}
   const plan={...old,schema:2,objective:old.objective||'recomposition',targets:{...goalTargets(old),fat:number($('gFatSlider').value),muscle:number($('gMuscSlider').value),visceral:number($('gViscSlider').value)},baseline:old.baseline||goalBaseline(currentReading),deadline:old.deadline||null,startedAt:old.startedAt||localDate(),updatedAt:new Date().toISOString(),_pending:true,_revision:crypto.randomUUID()};
   if(writeJSON(GOALS_KEY,plan)){updateGoalsBox();void syncAccountGoals();}
 }
@@ -1802,9 +1937,11 @@ function openGoalPlan(){
   closeMetricDetail();const plan=readJSON(GOALS_KEY,{})||{},targets=goalTargets(plan);
   goalOpener=document.activeElement;goalDraftBaseline=plan.baseline||goalBaseline(currentReading||allVisible().at(-1));
   $('goalPlanForm').reset();
+  const units=goalConfigured(plan)?goalUnits(plan):{muscle:muscleUnit(goalDraftBaseline||{}),visceral:visceralUnit(goalDraftBaseline||{}),muscleKind:muscleKind(goalDraftBaseline||{})};
+  $('goalMuscleUnit').value=units.muscle;$('goalVisceralUnit').value=units.visceral;$('goalMuscleKind').value=units.muscleKind;updateGoalUnits();
   for(const input of document.querySelectorAll('input[name="goalObjective"]'))input.checked=input.value===plan.objective;
   for(const [key,id]of Object.entries({weight:'goalTargetWeight',fat:'goalTargetFat',muscle:'goalTargetMuscle',visceral:'goalTargetVisceral'})){
-    $(id).value=validNumber(targets[key])?targets[key]:'';$(id).placeholder=validNumber(currentReading?.[key])?'Atual: '+fmt(currentReading[key]):'Opcional';
+    $(id).value=validNumber(targets[key])?targets[key]:'';$(id).placeholder=validNumber(currentReading?.[key])?'Atual: '+fmt(currentReading[key])+' '+metricUnit(currentReading,key):'Opcional';
   }
   $('goalDeadline').value=validDate(plan.deadline)?plan.deadline:'';
   $('goalPlanHeading').textContent=goalConfigured(plan)?'Vamos ajustar suas metas?':'Quais são suas metas?';
@@ -1825,12 +1962,12 @@ function saveGoalPlan(event){
   if(!GOAL_OBJECTIVES[objective]){$('goalFormStatus').textContent='Escolha seu objetivo principal.';return;}
   const targets={};for(const [key,id]of Object.entries({weight:'goalTargetWeight',fat:'goalTargetFat',muscle:'goalTargetMuscle',visceral:'goalTargetVisceral'}))targets[key]=$(id).value===''?null:number($(id).value);
   if(!Object.values(targets).some(validNumber)){$('goalFormStatus').textContent='Defina pelo menos um alvo de peso, gordura, músculo ou gordura visceral.';return;}
-  if(validNumber(targets.fat)&&validNumber(targets.muscle)&&targets.fat+targets.muscle>100){$('goalFormStatus').textContent='A soma das metas de gordura e músculo não pode ultrapassar 100%.';return;}
+  if($('goalMuscleUnit').value==='percent'&&validNumber(targets.fat)&&validNumber(targets.muscle)&&targets.fat+targets.muscle>100){$('goalFormStatus').textContent='A soma das metas de gordura e músculo não pode ultrapassar 100%.';return;}
   const deadline=$('goalDeadline').value||null;
   if(deadline&&(!validDate(deadline)||(goalDraftBaseline?.date&&deadline<goalDraftBaseline.date))){$('goalFormStatus').textContent='Escolha um prazo válido, a partir da pesagem de partida.';return;}
   const old=readJSON(GOALS_KEY,{})||{},history=[...(Array.isArray(old.history)?old.history:[])];
   if(goalConfigured(old)){const previous=goalPayload(old);delete previous.history;history.push(previous);}
-  const plan={schema:2,objective,targets,baseline:goalDraftBaseline,deadline,startedAt:old.startedAt||localDate(),updatedAt:new Date().toISOString(),history:history.slice(-20),dismissed:false,_pending:true,_revision:crypto.randomUUID()};
+  const plan={schema:2,objective,targets,units:{muscle:$('goalMuscleUnit').value,visceral:$('goalVisceralUnit').value},muscleKind:$('goalMuscleKind').value,baseline:goalDraftBaseline,deadline,startedAt:old.startedAt||localDate(),updatedAt:new Date().toISOString(),history:history.slice(-20),dismissed:false,_pending:true,_revision:crypto.randomUUID()};
   if(!writeJSON(GOALS_KEY,plan)){$('goalFormStatus').textContent='Não foi possível guardar suas metas. Os campos foram mantidos.';return;}
   for(const [key,id]of Object.entries({fat:'gFatSlider',muscle:'gMuscSlider',visceral:'gViscSlider'}))if(validNumber(targets[key]))$(id).value=targets[key];
   hideGoalPlan();updateGoalsBox();setSyncStatus();notify('Metas salvas. Você pode ajustá-las em Metas a qualquer momento.');void syncAccountGoals();
@@ -1877,7 +2014,7 @@ function openNewWeighingModal() {
   $('mPersonName').closest('label').hidden=!!currentUser;
   $('mAge').value=prefs.age??currentReading?.age??'';$('mSex').value=prefs.sex||currentReading?.sex||'';
   $('mHeight').value=prefs.height??currentReading?.height??'';
-  $('saveStatus').textContent='';autoCalcModalBmi();$('newWeighingModal').classList.remove('hidden');
+  $('saveStatus').textContent='';updateMeasurementSourceForm();autoCalcModalBmi();$('newWeighingModal').classList.remove('hidden');
   ($('mPersonName').value?$('mWeight'):$('mPersonName')).focus();
 }
 function closeNewWeighingModal() { if (!saving) {$('newWeighingModal').classList.add('hidden');editingReadingId=null;} }
@@ -1888,12 +2025,12 @@ async function saveWeighing(event) {
   const old=editingReadingId?readings.find(r=>r.id===editingReadingId&&!r._deleted):null;
   if(editingReadingId&&(!old||inFlight.has(old.id))){$('saveStatus').textContent='Aguarde a sincronização ou reabra a medição antes de editar.';return;}
   const fields={weight:'mWeight',height:'mHeight',fat:'mFat',muscle:'mMuscle',visceral:'mVisc',bodyAge:'mBodyAge',rm:'mRm',waist:'mWaist',hip:'mHip'};
-  const item={...old,id:old?.id||'bv_'+crypto.randomUUID(),date:$('mDate').value,personName,personId:old?.personId||profilePersonId||'person_'+crypto.randomUUID(),sex:$('mSex').value,age:number($('mAge').value),equipment:old?.equipment||'Omron HBF-514C',entryMethod:'manual',createdAt:old?.createdAt||new Date().toISOString(),_sync:'pending',_revision:crypto.randomUUID()};
+  const item={...old,id:old?.id||'bv_'+crypto.randomUUID(),date:$('mDate').value,personName,personId:old?.personId||profilePersonId||'person_'+crypto.randomUUID(),sex:$('mSex').value,age:number($('mAge').value),measurementSchema:2,equipment:$('mEquipmentProfile').value==='omron'?'Omron HBF-514C':$('mEquipmentProfile').value==='other'?$('mEquipment').value.trim().slice(0,120)||null:null,muscleUnit:$('mMuscleUnit').value,muscleKind:$('mMuscleKind').value,visceralUnit:$('mVisceralUnit').value,notes:$('mNotes').value.trim(),entryMethod:'manual',createdAt:old?.createdAt||new Date().toISOString(),_sync:'pending',_revision:crypto.randomUUID()};
   for(const [key,id]of Object.entries(fields))item[key]=$(id).value===''?null:number($(id).value);
   if(item.rm==null){item.rm=estimateRestingEnergy(item.weight,item.height,item.age,item.sex);item.rmMethod='harris-benedict-1984';}else item.rmMethod='reported';
   const optional=['fat','muscle','visceral','bodyAge','waist','hip'];
-  if(!validDate(item.date)||!validNumber(item.weight)||!validNumber(item.height)||item.weight<=0||item.height<=0||optional.some(k=>item[k]!=null&&(!validNumber(item[k])||item[k]<=0))||(validNumber(item.fat)&&validNumber(item.muscle)&&item.fat+item.muscle>100)){
-    $('saveStatus').textContent='Confira os valores. A soma de gordura e músculo não pode ultrapassar 100%.';return;
+  if(!validDate(item.date)||!validNumber(item.weight)||!validNumber(item.height)||item.weight<=0||item.weight>500||item.height<=0||optional.some(k=>item[k]!=null&&(!validNumber(item[k])||item[k]<=0))||!validSourceFields(item)){
+    $('saveStatus').textContent='Confira valores e unidades. Percentuais de gordura e músculo não podem somar mais de 100%; músculo em kg não pode superar o peso.';return;
   }
   if(old){const previous={...old};delete previous.revisions;delete previous.ts;for(const key of Object.keys(previous))if(key.startsWith('_'))delete previous[key];item.revisions=[...(old.revisions||[]),{editedAt:new Date().toISOString(),previous}].slice(-20);item.updatedAt=new Date().toISOString();}
   saving=true;$('btnSaveWeighing').disabled=true;$('btnSaveWeighing').textContent='Salvando…';
@@ -1909,22 +2046,30 @@ async function saveWeighing(event) {
 }
 function openReportModal() {
   closeMetricDetail();
-  recomputeAll(); const cur=currentReading; if (!cur) return;
-  const list=visibleReadings(), first=list[0], a=analyze(cur), p=profile(cur);
+  recomputeAll(); const cur=currentReading;if(!cur)return;
+  const list=visibleReadings(),first=list[0],a=analyze(cur),p=profile(cur);
   $('repPersonName').textContent=recordPersonName(cur);
   $('repAgeSpan').textContent=fmt(p.age,0);$('repHeightSpan').textContent=fmt(p.height);
-  const definitions=[['weight','Peso corporal','kg'],['bmi','IMC automático','kg/m²'],['fat','Gordura corporal','%'],['muscle','Músculo esquelético','%'],['visceral','Gordura visceral','nível'],['rm','Metabolismo em repouso','kcal/dia'],['bodyAge','Idade corporal','anos'],['waist','Cintura','cm'],['hip','Quadril','cm'],['whr','RCQ','']];
-  const value=(r,key)=>key==='bmi'?calcBmiValue(r.weight,profile(r).height):key==='whr'?(r.hip>0?r.waist/r.hip:NaN):key==='rm'?readingBasal(r):number(r[key]);
-  $('repTableRows').innerHTML=definitions.map(([key,label,unit])=>{const x=value(first,key),y=value(cur,key),d=y-x,info=a[key],digits=key==='whr'?2:['rm','bodyAge','visceral'].includes(key)?0:1;return `<tr><td class="py-2 font-bold text-white">${label}</td><td class="py-2 mono text-slate-400">${fmt(x,digits)} ${unit}</td><td class="py-2 mono font-bold text-white">${fmt(y,digits)} ${unit}</td><td class="py-2 mono text-sky-400">${d>0?'+':''}${fmt(d,digits)} ${['fat','muscle'].includes(key)?'p.p.':unit}</td><td class="py-2 font-bold ${info?.altered?'text-amber-300':info?.neutral?'text-sky-300':'text-emerald-400'}">${info?.status||'REGISTRADO'}</td></tr>`;}).join('');
-  $('repSynthesis').textContent=`Comparação entre ${dateLabel(first.date)} e a pesagem selecionada de ${dateLabel(cur.date)} • ${recordPersonName(cur)}. Peso ${fmt(cur.weight)} kg; IMC ${fmt(calcBmiValue(cur.weight,p.height))} kg/m²; gordura ${fmt(cur.fat)}%; músculo ${fmt(cur.muscle)}%; visceral nível ${fmt(cur.visceral,0)}.${cur._sync==='pending'?' Registro pendente de sincronização.':''}${cur.height?'':' A altura desta pesagem antiga não estava registrada; o IMC usa a altura informada no topo.'}${cur.rmMethod==='harris-benedict-1984'?' Metabolismo em repouso calculado por Harris–Benedict revisada (1984); não é leitura do visor.':''}`;
+  const definitions=[['weight','Peso corporal'],['bmi','IMC automático'],['fat','Gordura corporal'],['muscle',muscleLabel(cur)],['visceral','Gordura visceral'],['rm','Metabolismo em repouso'],['bodyAge','Idade corporal'],['waist','Cintura'],['hip','Quadril'],['whr','RCQ']];
+  const value=(r,key)=>key==='bmi'?calcBmiValue(r.weight,profile(r).height):key==='whr'?(r.hip>0&&r.waist>0?r.waist/r.hip:NaN):key==='rm'?readingBasal(r):number(r[key]);
+  $('repTableRows').innerHTML=definitions.map(([key,label])=>{
+    const x=value(first,key),y=value(cur,key),d=comparableMetric(first,cur,key)?y-x:NaN,info=a[key],digits=key==='whr'?2:['rm','bodyAge'].includes(key)||key==='visceral'&&visceralUnit(cur)==='index'?0:1;
+    const deltaUnit=['fat','muscle'].includes(key)&&metricUnit(cur,key)==='%'?'p.p.':metricUnit(cur,key);
+    return `<tr><td class="py-2 font-bold text-white">${label}${key==='muscle'&&muscleKind(first)!==muscleKind(cur)?' (tipo alterado)':''}</td><td class="py-2 mono text-slate-400">${fmt(x,digits)} ${metricUnit(first,key)}</td><td class="py-2 mono font-bold text-white">${fmt(y,digits)} ${metricUnit(cur,key)}</td><td class="py-2 mono text-sky-400">${Number.isFinite(d)?(d>0?'+':'')+fmt(d,digits)+' '+deltaUnit:'Sem comparação'}</td><td class="py-2 font-bold ${info?.altered?'text-amber-300':info?.neutral?'text-sky-300':'text-emerald-400'}">${info?.status||'REGISTRADO'}</td></tr>`;
+  }).join('');
+  $('repEquipment').textContent='Equipamento inicial: '+equipmentInfo(first).label+' · Selecionado: '+equipmentInfo(cur).label+'. '+sourceNotice([first,cur]);
+  $('repNotes').textContent=cur.notes?'Observações transcritas, sem interpretação automática: '+cur.notes:'';
+  $('repSynthesis').textContent=`Comparação entre ${dateLabel(first.date)} e a pesagem selecionada de ${dateLabel(cur.date)} • ${recordPersonName(cur)}. Peso ${fmt(cur.weight)} kg; IMC ${fmt(calcBmiValue(cur.weight,p.height))} kg/m²; gordura ${fmt(cur.fat)}%; ${muscleLabel(cur).toLowerCase()} ${fmt(cur.muscle)} ${metricUnit(cur,'muscle')}; visceral ${fmt(cur.visceral)} ${metricUnit(cur,'visceral')}.${cur._sync==='pending'?' Registro pendente de sincronização.':''}${cur.height?'':' A altura desta pesagem antiga não estava registrada; o IMC usa a altura informada no topo.'}${cur.rmMethod==='harris-benedict-1984'?' Metabolismo em repouso calculado por Harris–Benedict revisada (1984); não é leitura do equipamento.':''}`;
   $('reportModal').classList.remove('hidden');
 }
+
 function closeReportModal() { $('reportModal').classList.add('hidden'); }
 function shareWhatsApp() {
-  if (!currentReading) return; const r=currentReading,p=profile(r);
-  const message=`${recordPersonName(r)} • BioVault Pro • Omron HBF-514C (${dateLabel(r.date)})\n• Peso: ${fmt(r.weight)} kg | Altura: ${fmt(p.height)} cm | IMC: ${fmt(calcBmiValue(r.weight,p.height))}\n• Gordura: ${fmt(r.fat)}% | Músculo: ${fmt(r.muscle)}%\n• Visceral: nível ${fmt(r.visceral,0)} | Idade corporal: ${fmt(r.bodyAge,0)} anos`;
+  if(!currentReading)return;const r=currentReading,p=profile(r);
+  const message=`${recordPersonName(r)} • BIOSHAPE • ${equipmentInfo(r).label} (${dateLabel(r.date)})\n• Peso: ${fmt(r.weight)} kg | Altura: ${fmt(p.height)} cm | IMC: ${fmt(calcBmiValue(r.weight,p.height))}\n• Gordura: ${fmt(r.fat)}% | ${muscleLabel(r)}: ${fmt(r.muscle)} ${metricUnit(r,'muscle')}\n• Visceral: ${fmt(r.visceral)} ${metricUnit(r,'visceral')} | Idade corporal: ${fmt(r.bodyAge,0)} anos\nEstimativas do equipamento; sem diagnóstico.`;
   window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
 }
+
 async function flushPending() {
   const user=currentUser,epoch=accountEpoch;
   if (!user || !db || !navigator.onLine) {setSyncStatus();return;}
@@ -1956,7 +2101,7 @@ async function flushPending() {
   }
 }
 async function getFirebaseSDKs(){
-  if(!sdkPromise)sdkPromise=Promise.all([import('./vendor/firebase-app.js?v=50100.1'),import('./vendor/firebase-firestore.js?v=50100.1'),import('./vendor/firebase-auth.js?v=50100.1')]).then(([appSDK,fireSDK,identitySDK])=>{
+  if(!sdkPromise)sdkPromise=Promise.all([import('./vendor/firebase-app.js?v=50200.1'),import('./vendor/firebase-firestore.js?v=50200.1'),import('./vendor/firebase-auth.js?v=50200.1')]).then(([appSDK,fireSDK,identitySDK])=>{
     fire=fireSDK;authSDK=identitySDK;const app=appSDK.getApps().length?appSDK.getApp():appSDK.initializeApp(firebaseConfig);
     db=fire.getFirestore(app);void loadCloudKnowledge(fire,db);authSession=authSDK.getAuth(app);authSession.languageCode='pt-BR';
     authSDK.onAuthStateChanged(authSession,user=>{authReady=true;switchAccount(user);});
@@ -1967,7 +2112,7 @@ async function getFirebaseSDKs(){
 async function connectCloud() {
   if(connecting)return;connecting=true;
   try {await getFirebaseSDKs();if(currentUser&&!unsubscribe)subscribeAccount();}
-  catch(error) {console.error('BioVault startup:',error?.code||error?.message||'unknown');if(!guestMode)$('authStatus').textContent='Sem conexão com o serviço de acesso. Você pode consultar os dados salvos neste aparelho.';}
+  catch(error) {console.error('BIOSHAPE startup:',error?.code||error?.message||'unknown');if(!guestMode)$('authStatus').textContent='Sem conexão com o serviço de acesso. Você pode consultar os dados salvos neste aparelho.';}
   finally {connecting=false;setSyncStatus();}
 }
 function subscribeAccount(){
@@ -2005,10 +2150,19 @@ async function syncAccountProfile(){
 function cleanPersonName(value){return String(value||'').replace(/[\u0000-\u001f\u007f]/g,'').trim().replace(/\s+/g,' ').slice(0,80);}
 function recordPersonName(record){return cleanPersonName(record?.personName||record?.nome)||'Sem nome (registro anterior)';}
 function renderPersonContext(){
-  const name=cleanPersonName($('profileNameInput').value);
+  const all=allVisible(),latest=all.at(-1),before=all.at(-2),prefs=readJSON(PREFS_KEY,{})||{};
+  const name=cleanPersonName($('profileNameInput').value||currentUser?.displayName||latest?.personName);
   $('personContextName').textContent=name?'Oi, '+name.split(' ')[0]+'!':'Seu acompanhamento';
-  $('personContextMeta').textContent=name?'Vamos fazer seu acompanhamento • '+fmt($('heightCmInput').value)+' cm':'Comece pelo seu nome e sua altura';
+  $('homePersonName').textContent=name||'SEU PERFIL';
+  $('personContextMeta').textContent=currentUser?'Histórico da sua conta':'Seu acompanhamento neste aparelho';
+  const height=validNumber(prefs.height)?prefs.height:latest?.height;
+  $('homeHeight').textContent=validNumber(height)?fmt(height)+' cm':'Não informada';
+  $('homeWeight').textContent=latest?fmt(latest.weight)+' kg':'Sem pesagem';
+  $('homeWeightDate').textContent=latest?'Pesagem de '+dateLabel(latest.date):'Adicione sua primeira pesagem';
+  const diff=latest&&before?number(latest.weight)-number(before.weight):NaN;
+  $('homeWeightControl').textContent=!latest?'Seu acompanhamento começa na primeira pesagem.':!before?'Primeira pesagem registrada. Adicione outra para comparar a variação.':(diff===0?'Peso sem variação':(diff>0?'+':'')+fmt(diff)+' kg')+' desde '+dateLabel(before.date)+'. '+all.length+' pesagens registradas. '+sourceNotice([before,latest]);
 }
+
 function editReading(id){
   const record=readings.find(r=>r.id===id&&!r._deleted);if(!record||inFlight.has(id)){notify('Aguarde a sincronização desta medição antes de editar.');return;}
   if(quickPanelState)closeQuickPanel();
@@ -2016,6 +2170,7 @@ function editReading(id){
   $('weighingModalTitle').textContent='Editar medição';
   $('btnSaveWeighing').textContent='Salvar alterações';
   $('mPersonName').value=cleanPersonName(record.personName||record.nome)||$('profileNameInput').value;
+  const source=equipmentInfo(record);$('mEquipmentProfile').value=source.omron?'omron':source.known?'other':'unspecified';$('mEquipment').value=record.equipment||'';$('mMuscleUnit').value=muscleUnit(record);$('mMuscleKind').value=muscleKind(record);$('mVisceralUnit').value=visceralUnit(record);$('mNotes').value=record.notes||'';updateMeasurementSourceForm();
   const p=profile(record);$('mSex').value=p.sex;$('mAge').value=p.age;
   const fields={date:'mDate',weight:'mWeight',height:'mHeight',fat:'mFat',muscle:'mMuscle',visceral:'mVisc',bodyAge:'mBodyAge',rm:'mRm',waist:'mWaist',hip:'mHip'};
   for(const [key,id]of Object.entries(fields))$(id).value=record[key]??(key==='height'?p.height:'');
@@ -2037,9 +2192,9 @@ function restoreLocalIdentity(remote,local){
   return merged;
 }
 function buildCsv(list=visibleReadings()){
-  const headers=['Nome','Data','Sexo de referência','Idade (anos)','Altura (cm)','Peso (kg)','Gordura (%)','Músculo (%)','Visceral (nível)','Idade corporal (anos)','Repouso (kcal/dia)','Origem do repouso','Cintura (cm)','Quadril (cm)','IMC (kg/m²)','RCQ','Equipamento','Identificador'];
+  const headers=['Nome','Data','Sexo de referência','Idade (anos)','Altura (cm)','Peso (kg)','Gordura (%)','Músculo (valor)','Visceral (valor)','Idade corporal (anos)','Repouso (kcal/dia)','Origem do repouso','Cintura (cm)','Quadril (cm)','IMC (kg/m²)','RCQ','Equipamento','Identificador','Unidade do músculo','Tipo de músculo','Unidade visceral','Observações'];
   const cell=value=>{let s=value==null?'':String(value);if(typeof value==='string'&&/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';};
-  const rows=list.map(r=>{const p=profile(r);return [recordPersonName(r),r.date,p.sex,p.age,p.height,r.weight,r.fat,r.muscle,r.visceral,r.bodyAge,readingBasal(r),r.rmMethod||'reported',r.waist,r.hip,Number.isFinite(calcBmiValue(r.weight,p.height))?Number(calcBmiValue(r.weight,p.height).toFixed(2)):null,r.waist>0&&r.hip>0?Number((r.waist/r.hip).toFixed(4)):null,r.equipment||'Omron HBF-514C',r.id];});
+  const rows=list.map(r=>{const p=profile(r);return [recordPersonName(r),r.date,p.sex,p.age,p.height,r.weight,r.fat,r.muscle,r.visceral,r.bodyAge,readingBasal(r),r.rmMethod||'reported',r.waist,r.hip,Number.isFinite(calcBmiValue(r.weight,p.height))?Number(calcBmiValue(r.weight,p.height).toFixed(2)):null,r.waist>0&&r.hip>0?Number((r.waist/r.hip).toFixed(4)):null,equipmentInfo(r).label,r.id,metricUnit(r,'muscle'),muscleKind(r),metricUnit(r,'visceral'),r.notes||''];});
   return '\ufeff'+[headers,...rows].map(row=>row.map(v=>typeof v==='number'&&!Number.isFinite(v)?'':cell(v)).join(';')).join('\r\n');
 }
 function buildBackup(){return {format:'biovault-backup',schema:1,exportedAt:new Date().toISOString(),profile:readJSON(PREFS_KEY,{}),goals:goalPayload(readJSON(GOALS_KEY,{})),measurements:readings};}
@@ -2047,16 +2202,16 @@ function downloadFile(contents,type,name){
   if(window.BioVaultNative?.saveFile){const bytes=new TextEncoder().encode(contents);let binary='';for(const byte of bytes)binary+=String.fromCharCode(byte);window.BioVaultNative.saveFile(btoa(binary),name,type);return;}
   const url=URL.createObjectURL(new Blob([contents],{type}));const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function exportCsv(){downloadFile(buildCsv(),'text/csv;charset=utf-8','BioVault_medicoes_'+localDate()+'.csv');}
-function exportBackup(){downloadFile(JSON.stringify(buildBackup(),null,2),'application/json','BioVault_backup_'+localDate()+'.json');}
+function exportCsv(){downloadFile(buildCsv(),'text/csv;charset=utf-8','BIOSHAPE_medicoes_'+localDate()+'.csv');}
+function exportBackup(){downloadFile(JSON.stringify(buildBackup(),null,2),'application/json','BIOSHAPE_backup_'+localDate()+'.json');}
 function validateBackup(input){
-  if(!input||input.format!=='biovault-backup'||input.schema!==1||!Array.isArray(input.measurements)||input.measurements.length>5000)throw Error('Use um backup JSON exportado pelo BioVault (até 5.000 registros).');
+  if(!input||input.format!=='biovault-backup'||input.schema!==1||!Array.isArray(input.measurements)||input.measurements.length>5000)throw Error('Use um backup JSON exportado pelo BIOSHAPE (até 5.000 registros).');
   const known=new Set(readings.map(r=>r.id));const added=[];let skipped=0;
   for(const raw of input.measurements){
-    if(!raw||typeof raw!=='object'||Array.isArray(raw)||typeof raw.id!=='string'||!/^[a-zA-Z0-9_-]{1,150}$/.test(raw.id)||!validDate(raw.date)||!validNumber(raw.weight)||raw.weight<=0||raw.weight>150)throw Error('O arquivo contém uma medição inválida. Nada foi importado.');
-    const bounds={height:[100,220],age:[18,120],fat:[1,60],muscle:[1,60],visceral:[1,30],bodyAge:[1,120],rm:[1,10000],waist:[1,300],hip:[1,300]};
+    if(!raw||typeof raw!=='object'||Array.isArray(raw)||typeof raw.id!=='string'||!/^[a-zA-Z0-9_-]{1,150}$/.test(raw.id)||!validDate(raw.date)||!validNumber(raw.weight)||raw.weight<=0||raw.weight>500)throw Error('O arquivo contém uma medição inválida. Nada foi importado.');
+    const bounds={height:[100,220],age:[18,120],fat:[0.1,100],muscle:[0.1,500],visceral:[0.1,1000],bodyAge:[1,120],rm:[1,10000],waist:[1,300],hip:[1,300]};
     for(const [key,[lo,hi]]of Object.entries(bounds))if(raw[key]!=null&&(!validNumber(raw[key])||raw[key]<lo||raw[key]>hi))throw Error('Valor inválido no backup: '+key+'. Nada foi importado.');
-    if(validNumber(raw.fat)&&validNumber(raw.muscle)&&number(raw.fat)+number(raw.muscle)>100)throw Error('Composição inválida no backup. Nada foi importado.');
+    if(!validSourceFields(raw))throw Error('Composição inválida no backup. Nada foi importado.');
     if(known.has(raw.id)||raw._deleted){skipped++;continue;}
     const item=normalize(raw);for(const key of Object.keys(item))if(key.startsWith('_'))delete item[key];
     item.personName=cleanPersonName(item.personName||item.nome);item._sync='pending';item._revision=crypto.randomUUID();
@@ -2120,13 +2275,14 @@ async function resetAccountPassword(){
   finally{authBusy=false;$('accountSubmit').disabled=false;}
 }
 function resetAccountView(){
-  closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();
+  closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();closeTraining();
   hideGoalPlan();
   readings=[];selectedReadingId=null;currentReading=null;serverSeen=false;profilePersonId=null;storageBlocked=false;
-  $('profileNameInput').value='';$('sexSelect').value='F';$('realAgeInput').value='28';$('heightCmInput').value='165';
+  $('profileNameInput').value='';$('sexSelect').value='';$('realAgeInput').value='';$('heightCmInput').value='';$('trainingSummary').replaceChildren();
   $('gFatSlider').value='25';$('gMuscSlider').value='32';$('gViscSlider').value='9';
 }
 function switchAccount(user){
+  closeTraining();
   // A late auth-null event must not overwrite an explicitly selected local mode.
   if(!user&&guestMode)return;
   accountEpoch++;unsubscribe?.();profileUnsubscribe?.();goalUnsubscribe?.();unsubscribe=null;profileUnsubscribe=null;goalUnsubscribe=null;inFlight.clear();
@@ -2182,10 +2338,11 @@ async function checkForAppUpdate(){
 function printReport(){if(window.BioVaultNative?.printReport)window.BioVaultNative.printReport();else window.print();}
 
 
-Object.assign(window,{openGoalPlan,saveGoalPlan,deferGoalPlan,setGoalWeeks,setAuthMode,submitAccountForm,resetAccountPassword,continueOnDevice,showAccountLogin,logoutAccount,checkForAppUpdate,printReport,importDeviceHistory,renderPersonContext,editReading,exportCsv,exportBackup,previewBackupFile,closeImportBackup,confirmImportBackup,renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
+Object.assign(window,{updateGoalUnits,updateMeasurementSourceForm,openTraining,closeTraining,openGoalPlan,saveGoalPlan,deferGoalPlan,setGoalWeeks,setAuthMode,submitAccountForm,resetAccountPassword,continueOnDevice,showAccountLogin,logoutAccount,checkForAppUpdate,printReport,importDeviceHistory,renderPersonContext,editReading,exportCsv,exportBackup,previewBackupFile,closeImportBackup,confirmImportBackup,renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
 document.addEventListener('click',event=>{
   if(event.target.closest('[data-metric-close]'))closeMetricDetail();
   if(event.target.closest('[data-metric-evolution]'))openMetricEvolution();
+  const homeAction=event.target.closest('[data-home-action]');if(homeAction?.dataset.homeAction==='weighing')openNewWeighingModal();else if(homeAction?.dataset.homeAction==='goal')openGoalPlan();
   const nav=event.target.closest('[data-app-nav]');if(nav)navigateApp(nav.dataset.appNav);
   const mode=event.target.closest('[data-holo-mode]');if(mode)setHoloMode(mode.dataset.holoMode);
   const turn=event.target.closest('[data-holo-turn]');if(turn)rotateHolo(turn.dataset.holoTurn);
@@ -2194,13 +2351,14 @@ document.addEventListener('click',event=>{
   const edit=event.target.closest('[data-edit-id]');if(edit)editReading(edit.dataset.editId);
   const remove=event.target.closest('[data-delete-id]');if(remove)void deleteReading(remove.dataset.deleteId);
 });
-document.addEventListener('keydown',event=>{metricDialogKeyboard(event);if(event.key==='Escape'){closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();}});
+document.addEventListener('keydown',event=>{metricDialogKeyboard(event);if(event.key==='Escape'){closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();closeTraining();}});
 $('metricDetailModal').addEventListener('click',event=>{if(event.target===$('metricDetailModal'))closeMetricDetail();});
 for (const id of ['gFatSlider','gMuscSlider','gViscSlider']) $(id).addEventListener('change',saveGoals);
 window.addEventListener('online',()=>{void connectCloud();void flushPending();});
 window.addEventListener('offline',()=>{serverSeen=false;setSyncStatus();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){void connectCloud();void flushPending();}});
-$('goalPlanModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.stopPropagation();deferGoalPlan();}if(event.key==='Tab'){const items=[...$('goalPlanModal').querySelectorAll('input,button')].filter(el=>!el.disabled&&!el.closest('[hidden]'));const first=items[0],last=items.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
+$('goalPlanModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.stopPropagation();deferGoalPlan();}if(event.key==='Tab'){const items=[...$('goalPlanModal').querySelectorAll('input,select,button')].filter(el=>!el.disabled&&!el.closest('[hidden]'));const first=items[0],last=items.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
+$('trainingModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.stopPropagation();closeTraining();}if(event.key==='Tab'){const nodes=[...$('trainingModal').querySelectorAll('button')],first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
 $('backupFileInput').addEventListener('change',event=>void previewBackupFile(event.target.files[0]));
 initializeHoloControls();
 loadProfilePrefs();

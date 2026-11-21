@@ -116,13 +116,13 @@ public final class MainActivity extends Activity {
   private void updateStatus(String message){runOnUiThread(()->{if(!isFinishing())web.evaluateJavascript("document.getElementById('updateStatus').textContent="+JSONObject.quote(message),null);});}
   public final class Bridge {
     @JavascriptInterface public void printReport(){runOnUiThread(()->{
-      PrintManager printer=(PrintManager)getSystemService(PRINT_SERVICE);printer.print("BioVault Pro — acompanhamento",web.createPrintDocumentAdapter("BioVault Pro"),null);
+      PrintManager printer=(PrintManager)getSystemService(PRINT_SERVICE);printer.print("BIOSHAPE — acompanhamento",web.createPrintDocumentAdapter("BIOSHAPE"),null);
     });}
     @JavascriptInterface public void saveFile(String base64,String name,String type){
       if(base64==null||base64.length()>12*1024*1024)return;
       if(!"application/json".equals(type)&&!"text/csv;charset=utf-8".equals(type))return;
       final byte[] bytes;try{bytes=Base64.decode(base64,Base64.DEFAULT);}catch(IllegalArgumentException error){return;}
-      final String filename=name==null?"BioVault_backup.json":name.replaceAll("[^A-Za-z0-9_.-]","_");
+      final String filename=name==null?"BIOSHAPE_backup.json":name.replaceAll("[^A-Za-z0-9_.-]","_");
       runOnUiThread(()->{
         if(pendingExport!=null){toast("Conclua o salvamento anterior.");return;}
         pendingExport=bytes;Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -152,7 +152,7 @@ public final class MainActivity extends Activity {
         long version=release.getLong("versionCode");String label=release.getString("version"),url=release.getString("apkUrl"),sha=release.getString("sha256");
         if(version<=versionCode(getPackageManager().getPackageInfo(getPackageName(),0))){updateStatus("Você está na versão mais recente.");return;}
         if(!url.startsWith(UPDATES)||!sha.matches("[a-fA-F0-9]{64}"))throw new SecurityException();
-        runOnUiThread(()->new AlertDialog.Builder(this).setTitle("BioVault "+label).setMessage("Atualizar o aplicativo agora? Seu perfil e suas pesagens serão mantidos.")
+        runOnUiThread(()->new AlertDialog.Builder(this).setTitle("BIOSHAPE "+label).setMessage("Atualizar o aplicativo agora? Seu perfil e suas pesagens serão mantidos.")
           .setNegativeButton("Depois",(dialog,which)->updateStatus("Atualização disponível."))
           .setPositiveButton("Atualizar",(dialog,which)->downloadUpdate(url,sha,version)).show());
       }catch(Exception error){updateStatus("Não foi possível consultar agora. Tente com internet.");}
@@ -183,7 +183,7 @@ public final class MainActivity extends Activity {
   private void installUpdate(){
     if(!updateVerified)return;
     if(!getPackageManager().canRequestPackageInstalls()){
-      new AlertDialog.Builder(this).setTitle("Permitir atualização do BioVault").setMessage("O Android precisa da sua permissão para instalar a atualização. Ative a permissão para o BioVault e volte. Cada instalação continuará pedindo sua confirmação.")
+      new AlertDialog.Builder(this).setTitle("Permitir atualização do BIOSHAPE").setMessage("O Android precisa da sua permissão para instalar a atualização. Ative a permissão para o BioVault e volte. Cada instalação continuará pedindo sua confirmação.")
         .setNegativeButton("Cancelar",(dialog,which)->updateStatus("Atualização baixada. Toque em atualizar quando quiser."))
         .setPositiveButton("Abrir permissão",(dialog,which)->startActivityForResult(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:"+getPackageName())),UNKNOWN_SOURCES)).show();return;
     }
@@ -202,7 +202,7 @@ public final class MainActivity extends Activity {
   }
   @Override public void onBackPressed(){web.evaluateJavascript("(() => {const ids=['goalPlanModal','newWeighingModal','reportModal','importBackupModal','metricDetailModal','quickPanelModal'];return ids.some(id=>!document.getElementById(id)?.classList.contains('hidden'));})()",visible->{
     if("true".equals(visible))web.evaluateJavascript("if(!document.getElementById('goalPlanModal').classList.contains('hidden'))deferGoalPlan();else{closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();}",null);
-    else new AlertDialog.Builder(this).setTitle("Sair do BioVault?").setMessage("Suas pesagens continuarão salvas.").setNegativeButton("Continuar",null).setPositiveButton("Sair",(dialog,which)->finish()).show();
+    else new AlertDialog.Builder(this).setTitle("Sair do BIOSHAPE?").setMessage("Suas pesagens continuarão salvas.").setNegativeButton("Continuar",null).setPositiveButton("Sair",(dialog,which)->finish()).show();
   });}
   @Override protected void onDestroy(){if(fileCallback!=null)fileCallback.onReceiveValue(null);web.removeJavascriptInterface("BioVaultNative");web.destroy();worker.shutdownNow();super.onDestroy();}
 }

@@ -7,8 +7,8 @@ const projectRoot=path.resolve(__dirname,'..');
 const legacyMarkup=name=>JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures',name+'.json'),'utf8')).map(id=>'<div id="'+id+'"></div>').join('');
 const html=fs.readFileSync(path.join(projectRoot,'public/index.html'),'utf8');
 let source=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
-source=source.replace("import('./vendor/firebase-app.js?v=50100.1')","window.__appModule()").replace("import('./vendor/firebase-firestore.js?v=50100.1')","window.__fireModule()");
-source=source.replace("import('./vendor/firebase-auth.js?v=50100.1')","window.__authModule()");
+source=source.replace("import('./vendor/firebase-app.js?v=50200.1')","window.__appModule()").replace("import('./vendor/firebase-firestore.js?v=50200.1')","window.__fireModule()");
+source=source.replace("import('./vendor/firebase-auth.js?v=50200.1')","window.__authModule()");
 source+=`\nwindow.__inspect={analyze,profile,calcBmiValue,classifyBmi,reference,validDate,holoAppearance,clinicalRanges,estimateRestingEnergy,chartPeriodReadings,buildCsv,buildBackup,validateBackup,getKnowledge:()=>clinicalKnowledge,getMetricCharts:()=>metricCharts,getHolo:()=>holo,getSelected:()=>currentReading,getCacheKey:()=>CACHE_KEY,getCurrentUser:()=>currentUser,getReadings:()=>readings,getChart:()=>chartInst};`;
 const tick=()=>new Promise(r=>setTimeout(r,30));
 const sample=(id,date,protocol='Em jejum',more={})=>({id,date,weight:64,height:165,fat:28,muscle:29,visceral:6,bodyAge:28,rm:1450,waist:74,hip:98,sex:'F',age:28,protocol,_sync:'synced',...more});
@@ -56,7 +56,7 @@ async function setup(data=[],cloud=null,opts={}){
 }
 async function fill(w,values={}){
   w.openNewWeighingModal();
-  const inputs={mPersonName:'Paloma',mAge:'28',mSex:'F',mDate:'2026-11-19',mWeight:'65',mHeight:'165',mFat:'28',mMuscle:'29',mVisc:'6',mBodyAge:'28',mRm:'1450',mWaist:'74.5',mHip:'98.5',...values};
+  const inputs={mEquipmentProfile:'omron',mPersonName:'Paloma',mAge:'28',mSex:'F',mDate:'2026-11-19',mWeight:'65',mHeight:'165',mFat:'28',mMuscle:'29',mVisc:'6',mBodyAge:'28',mRm:'1450',mWaist:'74.5',mHip:'98.5',...values};
   for(const[id,value]of Object.entries(inputs))w.document.getElementById(id).value=value;
   await w.saveWeighing({preventDefault(){}});await tick();
 }
@@ -182,11 +182,11 @@ async function run(name,test){await test();results.push(name);console.log('PASS'
   w.selectHistoryReading('low');assert.equal(w.document.getElementById('holoPortrait').dataset.warm,'false');assert.equal(w.document.getElementById('portraitVisceralCore').style.color,'rgb(255, 42, 95)');
   assert.equal(w.__cloud.writes.length,0);assert.equal(w.__cloud.deletions.length,0);assert.deepEqual(errors,[]);dom.window.close();
  });
- await run('new navigation reuses history, manual form and profile controls without writing records',async()=>{
+ await run('home actions and retained history/profile controls never write records on navigation',async()=>{
   const {w,dom,errors}=await setup(rows,{records:rows});
   w.document.querySelector('[data-app-nav="settings"]').click();assert(w.document.getElementById('profileDrawer').open);
-  w.document.querySelector('[data-app-nav="scan"]').click();assert(visible(w,'newWeighingModal'));w.closeNewWeighingModal();
-  w.document.querySelector('[data-app-nav="history"]').click();assert(visible(w,'quickPanelModal'));assert(w.document.querySelector('#quickPanelBody #subView-history'));w.closeQuickPanel();
+  w.document.getElementById('homeAddWeighing').click();assert(visible(w,'newWeighingModal'));w.closeNewWeighingModal();
+  w.openQuickPanel('history');assert(visible(w,'quickPanelModal'));assert(w.document.querySelector('#quickPanelBody #subView-history'));w.closeQuickPanel();
   w.document.getElementById('inspectReadingButton').click();assert(text(w,'detailMetricTitle').length>0);
   assert.equal(w.__cloud.writes.length,0);assert.equal(w.__cloud.deletions.length,0);assert.deepEqual(errors,[]);dom.window.close();
  });

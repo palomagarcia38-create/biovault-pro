@@ -4,14 +4,30 @@ service cloud.firestore {
     function owns(uid) {
       return request.auth != null && request.auth.uid == uid;
     }
+    // Older snapshots keep their original shape. New source metadata has explicit units.
+    function validMeasurementSource(data) {
+      return data.get('measurementSchema', null) == null || (
+        data.measurementSchema == 2
+        && (data.get('equipment', null) == null || (data.equipment is string && data.equipment.size() <= 120))
+        && (data.get('notes', null) == null || (data.notes is string && data.notes.size() <= 2000))
+        && data.get('muscleUnit', 'percent') in ['percent', 'kg']
+        && data.get('muscleKind', 'skeletal') in ['skeletal', 'total']
+        && data.get('visceralUnit', 'index') in ['index', 'cm2']
+        && (data.get('muscle', null) == null || (data.muscle is number && data.muscle > 0
+          && (data.get('muscleUnit', 'percent') == 'kg' ? data.muscle <= data.weight : data.muscle <= 100)))
+        && (data.get('fat', null) == null || (data.fat is number && data.fat > 0 && data.fat <= 100))
+        && (data.get('visceral', null) == null || (data.visceral is number && data.visceral > 0 && data.visceral <= 1000))
+      );
+    }
     match /users/{uid}/measurements/{measurementId} {
       allow read, delete: if owns(uid);
       allow create, update: if owns(uid)
         && request.resource.data.weight is number
         && request.resource.data.weight > 0
-        && request.resource.data.weight <= 150
+        && request.resource.data.weight <= 500
         && request.resource.data.date is string
-        && request.resource.data.personId == uid;
+        && request.resource.data.personId == uid
+        && validMeasurementSource(request.resource.data);
     }
     match /users/{uid}/profile/main {
       allow read, delete: if owns(uid);
@@ -28,15 +44,20 @@ service cloud.firestore {
     match /users/{uid}/goals/active {
       allow read, delete: if owns(uid);
       allow create, update: if owns(uid)
-        && request.resource.data.keys().hasOnly(['schema','objective','targets','baseline','deadline','startedAt','updatedAt','history','dismissed'])
+        && request.resource.data.keys().hasOnly(['schema','objective','targets','baseline','deadline','startedAt','updatedAt','history','dismissed','units','muscleKind'])
         && request.resource.data.schema == 2
         && (request.resource.data.get('dismissed', false) == true || request.resource.data.objective in ['lose_weight','gain_muscle','recomposition','maintain'])
         && request.resource.data.targets is map
         && request.resource.data.targets.keys().hasOnly(['weight','fat','muscle','visceral'])
-        && validGoalTarget(request.resource.data.targets, 'weight', 5, 150)
-        && validGoalTarget(request.resource.data.targets, 'fat', 5, 60)
-        && validGoalTarget(request.resource.data.targets, 'muscle', 5, 60)
-        && validGoalTarget(request.resource.data.targets, 'visceral', 1, 30)
+        && validGoalTarget(request.resource.data.targets, 'weight', 5, 500)
+        && validGoalTarget(request.resource.data.targets, 'fat', 0.1, 100)
+        && request.resource.data.get('units', {}) is map
+        && request.resource.data.get('units', {}).keys().hasOnly(['muscle','visceral'])
+        && request.resource.data.get('units', {}).get('muscle', 'percent') in ['percent','kg']
+        && request.resource.data.get('units', {}).get('visceral', 'index') in ['index','cm2']
+        && request.resource.data.get('muscleKind', 'skeletal') in ['skeletal','total']
+        && validGoalTarget(request.resource.data.targets, 'muscle', 0.1, request.resource.data.get('units', {}).get('muscle', 'percent') == 'kg' ? 500 : 100)
+        && validGoalTarget(request.resource.data.targets, 'visceral', 0.1, 1000)
         && request.resource.data.get('history', []).size() <= 20;
     }
     // Legacy records remain stored. No client may read the shared collection.

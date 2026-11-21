@@ -24,7 +24,7 @@ public final class UpdateProvider extends ContentProvider {
   }
   public Cursor query(Uri uri, String[] projection, String selection, String[] args, String sortOrder) {
     MatrixCursor cursor=new MatrixCursor(new String[]{OpenableColumns.DISPLAY_NAME,OpenableColumns.SIZE});
-    try { File f=file(uri);cursor.addRow(new Object[]{"BioVault_Pro_atualizacao.apk",f.length()}); } catch(Exception ignored) {}
+    try { File f=file(uri);cursor.addRow(new Object[]{"BIOSHAPE_atualizacao.apk",f.length()}); } catch(Exception ignored) {}
     return cursor;
   }
   public Uri insert(Uri uri,ContentValues values) { throw new UnsupportedOperationException(); }

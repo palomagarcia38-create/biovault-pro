@@ -1,0 +1,25 @@
+{
+  "base": "ba47615c9bee8a3cda24b7d9bb699493f9cbe665",
+  "stage": "codigo_para_revisao_nao_publicado",
+  "date": "2026-11-21",
+  "buildWeb": "passed",
+  "tests": {
+    "regression": 46,
+    "accounts": 8,
+    "goals": 9,
+    "multibrand": 18,
+    "rulesEmulator": 39,
+    "total": 120
+  },
+  "mobileBrowser": {
+    "status": "blocked_before_page_load",
+    "reason": "Chromium socket() failed: Operation not permitted"
+  },
+  "androidDevice": "not_run",
+  "productionWrites": 0,
+  "deployments": 0,
+  "existingElementIdsPreserved": 164,
+  "existingFunctionsPreserved": 123,
+  "androidNativeUnchanged": true,
+  "updateFeedUnchanged": true
+}

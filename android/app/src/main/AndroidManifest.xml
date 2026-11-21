@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.biovault.pro" android:versionCode="50100" android:versionName="5.1.0">
+    package="com.biovault.pro" android:versionCode="50200" android:versionName="5.2.0">
   <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35" />
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-  <application android:label="BioVault Pro" android:icon="@drawable/ic_launcher"
+  <application android:label="BIOSHAPE" android:icon="@drawable/ic_launcher"
       android:theme="@android:style/Theme.Material.NoActionBar"
       android:allowBackup="false" android:usesCleartextTraffic="false"
       android:supportsRtl="true">
