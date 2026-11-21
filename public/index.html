@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BIOSHAPE • Holographic HUD v5.2.0</title>
+  <title>BIOSHAPE • Holographic HUD v5.2.1</title>
   <link rel="stylesheet" href="vendor/tailwind.css" />
   <script src="vendor/chart.umd.js"></script>
   <link rel="stylesheet" href="vendor/fontawesome.css">
@@ -286,6 +286,16 @@ body {padding-bottom:0;background-color:#020b15;}
 .holo-mode button {font:9px 'JetBrains Mono',monospace;border:0;background:transparent;padding:5px 6px;min-height:28px;}
 .holo-mode button[aria-pressed=true] {background:#0a3544;color:#b9faff;}
 #holoPortrait {position:absolute;inset:34px -35% 22px;overflow:visible;z-index:0;}
+
+/* Visual scanning only: the portrait stays still and does not rotate. */
+.holo-scan-track{position:absolute;inset:3% 6%;overflow:hidden;z-index:2;pointer-events:none;border-radius:40%;}
+.holo-scan-sweep{position:absolute;inset:0;border-bottom:2px solid #a4fff2;background:linear-gradient(180deg,transparent 86%,#55f1e308 92%,#63ffe626 98%,#a4fff280 100%);box-shadow:0 5px 16px #52ffdc55;transform:translateY(-96%);animation:portrait-scan-sweep 4.8s ease-in-out infinite alternate;will-change:transform;pointer-events:none;}
+@keyframes portrait-scan-sweep{from{transform:translateY(-96%);}to{transform:translateY(-4%);}}
+#holoPortrait[data-motion=paused] .holo-scan-sweep{animation-play-state:paused;}
+#holoPortrait[data-unavailable=true] .holo-scan-track{display:none;}
+@media(prefers-reduced-motion:reduce){.holo-scan-track{display:none;}}
+@media print{.holo-scan-track{display:none!important;}}
+
 .holo-art-image {position:absolute;height:100%;width:auto;max-width:none;left:50%;top:0;transform:translateX(-50%) scaleX(var(--body-width,1));transform-origin:center;object-fit:contain;transition:opacity .35s ease;filter:saturate(.85) brightness(.8);pointer-events:none;}
 #holoArtWarm {opacity:0;}
 #holoPortrait[data-warm=true] #holoArtWarm {opacity:1;}
@@ -315,7 +325,7 @@ body {padding-bottom:0;background-color:#020b15;}
 .compare-toolbar #compareStatusLabel {font-size:9px;}
 .compare-toolbar select {font-size:9px;max-width:145px;}
 .compare-toolbar .compare-ref-label {font-size:9px;}
-#bottomNav {position:static;clear:both;width:min(100%,1100px);margin:20px auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid #00c8df44;background:#03101df5;backdrop-filter:blur(16px);padding:9px 10px max(9px,env(safe-area-inset-bottom));box-shadow:0 -5px 30px #020611cc;}
+#bottomNav {position:fixed;z-index:35;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,1100px);margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid #00c8df44;background:#03101df5;backdrop-filter:blur(16px);padding:9px 10px max(9px,env(safe-area-inset-bottom));box-shadow:0 -5px 30px #020611cc;}
 #bottomNav button {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:44px;color:#698495;font:8px 'JetBrains Mono',monospace;}
 #bottomNav i {font-size:20px;}
 #bottomNav button[aria-current=page] {color:#51dfff;text-shadow:0 0 13px #00d9ffbb;}
@@ -374,7 +384,17 @@ body {padding-bottom:0;background-color:#020b15;}
  .metric-card .metric-title {font-size:8px;}
  .metric-card .metric-status {font-size:6px;}
 }
-@media(prefers-reduced-motion:reduce) {.holo-art-image {transition:none;}}
+@media(prefers-reduced-motion:reduce) {
+/* Visual scanning only: the portrait stays still and does not rotate. */
+.holo-scan-track{position:absolute;inset:3% 6%;overflow:hidden;z-index:2;pointer-events:none;border-radius:40%;}
+.holo-scan-sweep{position:absolute;inset:0;border-bottom:2px solid #a4fff2;background:linear-gradient(180deg,transparent 86%,#55f1e308 92%,#63ffe626 98%,#a4fff280 100%);box-shadow:0 5px 16px #52ffdc55;transform:translateY(-96%);animation:portrait-scan-sweep 4.8s ease-in-out infinite alternate;will-change:transform;pointer-events:none;}
+@keyframes portrait-scan-sweep{from{transform:translateY(-96%);}to{transform:translateY(-4%);}}
+#holoPortrait[data-motion=paused] .holo-scan-sweep{animation-play-state:paused;}
+#holoPortrait[data-unavailable=true] .holo-scan-track{display:none;}
+@media(prefers-reduced-motion:reduce){.holo-scan-track{display:none;}}
+@media print{.holo-scan-track{display:none!important;}}
+
+.holo-art-image {transition:none;}}
 @media print {#bottomNav,#holoPortrait,#biometricLinks {display:none!important;}}
 
 html {scrollbar-gutter:stable;}
@@ -475,7 +495,7 @@ html {scrollbar-gutter:stable;}
 #accountEmail{flex:1;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 #updateStatus{font-size:11px;color:#91cdd6;}
 @media print{#authScreen,#accountBar{display:none!important;}}
-body.pb-20{padding-bottom:env(safe-area-inset-bottom,0px);}
+body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area-inset-bottom,0px))) + 16px);}
 #goalRibbon{display:block;margin:8px auto 0;padding:8px 14px;border:1px solid #205264;border-radius:24px;color:#9cecf1;font-size:11px;max-width:100%;text-align:center;}
 .goal-modal.hidden{display:none;}
 .goal-modal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:12px;background:#000b;backdrop-filter:blur(8px);}
@@ -505,7 +525,7 @@ body.pb-20{padding-bottom:env(safe-area-inset-bottom,0px);}
 @media(max-width:390px){.goal-modal-card{padding:16px;}.goal-values b{font-size:14px;}.goal-plan-heading h3{font-size:15px;}}
 
 
-/* Home and footer stay in document flow, leaving all indicators touchable. */
+/* Home stays in document flow; the fixed navigation reserves its measured height below the content. */
 #homeSummary{margin:18px 0 10px;padding:18px;border:1px solid #245368;border-radius:18px;background:linear-gradient(135deg,#0a2938,#06121f);}
 #homeSummary #personContext{margin:0 0 18px;display:flex;align-items:flex-start;flex-direction:column;gap:5px;}
 #homeSummary #homePersonName{font:800 24px/1.25 'Inter',sans-serif;letter-spacing:.08em;color:#c8fff7;text-transform:uppercase;overflow-wrap:anywhere;}
@@ -563,7 +583,7 @@ body.pb-20{padding-bottom:env(safe-area-inset-bottom,0px);}
           </div>
         </div>
         <button onclick="checkForAppUpdate()" id="updateAppButton" title="Buscar atualização" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v5.2.0
+          ↻ v5.2.1
         </button>
       </div>
 
@@ -645,9 +665,10 @@ body.pb-20{padding-bottom:env(safe-area-inset-bottom,0px);}
             <button type="button" id="holoMode3d" data-holo-mode="3d" aria-pressed="false">3D</button>
             <button type="button" id="holoMode2d" data-holo-mode="2d" aria-pressed="false">2D</button>
           </div>
-          <div id="holoPortrait" data-warm="false" role="img" aria-label="Ilustração holográfica. As cores representam apenas as faixas dos indicadores, sem localização medida de gordura.">
+          <div id="holoPortrait" data-warm="false" role="img" aria-label="Ilustração holográfica com varredura visual animada. As cores representam apenas as faixas dos indicadores, sem localização medida de gordura.">
             <img id="holoArtCool" class="holo-art-image" src="assets/hologram-neutral-cyan-v44.webp" alt="" width="1024" height="1536" fetchpriority="high" decoding="async" />
             <img id="holoArtWarm" class="holo-art-image" src="assets/hologram-neutral-amber-v44.webp" alt="" width="1024" height="1536" decoding="async" />
+            <span class="holo-scan-track" aria-hidden="true"><span class="holo-scan-sweep"></span></span>
             <span id="portraitVisceralCore" class="live-visceral" aria-hidden="true"></span>
           </div>
           <div id="canvas3dContainer" class="hidden" tabindex="0" role="img" aria-label="Ilustração corporal 3D. Arraste na horizontal ou use as setas para girar."></div>
@@ -920,7 +941,7 @@ body.pb-20{padding-bottom:env(safe-area-inset-bottom,0px);}
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.2.0</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.2.1</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Inicial</span></button>
@@ -929,7 +950,7 @@ body.pb-20{padding-bottom:env(safe-area-inset-bottom,0px);}
     <button type="button" data-app-nav="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i><span>Configuração</span></button>
   </nav>
 
-<div id="trainingModal" class="hidden goal-modal no-print" role="dialog" aria-modal="true" aria-labelledby="trainingTitle"><div class="goal-modal-card"><div class="goal-modal-top"><span>COMPOSIÇÃO E TREINO</span><button type="button" onclick="closeTraining()" aria-label="Fechar treino">✕</button></div><h2 id="trainingTitle">Seu acompanhamento para o treino</h2><p class="goal-intro">Músculo, gordura e metas que você definiu, para revisar junto com seu acompanhamento profissional.</p><div id="trainingSummary" class="training-summary"></div><div class="home-actions"><button type="button" onclick="closeTraining(); document.getElementById('chartMetricSelect').value='muscle'; openQuickPanel('chart')">Comparar músculo</button><button type="button" onclick="closeTraining(); openGoalPlan()">Definir minha meta</button></div><p class="goal-help">Bioimpedância estima composição; não mede força nem desempenho. Esta tela não prescreve exercícios ou alimentação e não prevê resultados.</p></div></div>
+<div id="trainingModal" class="hidden goal-modal no-print" role="dialog" aria-modal="true" aria-labelledby="trainingTitle"><div class="goal-modal-card" style="min-height:210px"><div class="goal-modal-top"><span>BIOSHAPE</span><button type="button" onclick="closeTraining()" aria-label="Fechar treino">✕</button></div><h2 id="trainingTitle">Treino</h2><div id="trainingSummary"></div></div></div>
 <div id="importBackupModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 no-print" role="dialog" aria-modal="true" aria-labelledby="importBackupTitle"><div class="panel-dark cyber-panel rounded-2xl p-5 w-full max-w-lg space-y-4"><div class="flex justify-between gap-4"><h2 id="importBackupTitle">Revisar restauração do backup</h2><button id="closeImportButton" type="button" onclick="closeImportBackup()" aria-label="Fechar restauração">✕</button></div><p id="importBackupSummary" role="status"></p><button id="confirmImportButton" type="button" class="neon-btn rounded-xl p-3 w-full" onclick="confirmImportBackup()" disabled>Adicionar registros revisados</button></div></div>
 <div id="goalPlanModal" class="hidden goal-modal no-print" role="dialog" aria-modal="true" aria-labelledby="goalPlanHeading">
   <div class="goal-modal-card">
@@ -1139,14 +1160,8 @@ function closeTraining(){ $('trainingModal').classList.add('hidden');trainingOpe
 let trainingOpener=null;
 function openTraining(){
   closeMetricDetail();closeQuickPanel();trainingOpener=document.activeElement;
-  const r=allVisible().at(-1),plan=readJSON(GOALS_KEY,{})||{};
+  // Reserved for the future workout feature. Opening this view never creates a plan.
   $('trainingSummary').replaceChildren();
-  for(const text of r?[
-    'Última pesagem: '+dateLabel(r.date)+' · '+equipmentInfo(r).label,
-    muscleLabel(r)+': '+fmt(r.muscle)+' '+metricUnit(r,'muscle'),
-    'Gordura corporal: '+fmt(r.fat)+'%',
-    goalConfigured(plan)?'Seu objetivo: '+GOAL_OBJECTIVES[plan.objective]+'. Consulte os valores e o prazo em Metas.':'Você ainda não definiu uma meta pessoal.'
-  ]:['Adicione uma pesagem para acompanhar músculo e gordura junto das suas metas.']){const p=document.createElement('p');p.textContent=text;$('trainingSummary').append(p);}
   $('trainingModal').classList.remove('hidden');$('trainingModal').querySelector('button').focus();
 }
 
@@ -1262,7 +1277,7 @@ function navigateApp(destination) {
 function setHoloMode(mode) {
   holo.mode='portrait';$('holoStage').dataset.view='portrait';$('holoPortrait').classList.remove('hidden');
   for(const id of ['canvas3dContainer','holoFallback','holoRotationControls','holoAutoRotate','holoScanBeam'])$(id).classList.add('hidden');
-  $('holoStatus').textContent='Holograma ilustrativo • Cores dos indicadores';
+  $('holoStatus').textContent='Holograma ilustrativo • Varredura visual';
 }
 function resizeHolo() {
   const el=$('canvas3dContainer');if(!holo.renderer||el.classList.contains('hidden'))return;
@@ -1396,9 +1411,22 @@ function disposeHolo() {
   for(const g of geometries)g.dispose();for(const m of materials)m.dispose();
   holo.renderer.dispose();holo.renderer=null;
 }
+function initializeBottomNavigation(){
+  const nav=$('bottomNav');
+  const reserveSpace=()=>{const height=nav.getBoundingClientRect().height;if(height>0)document.documentElement.style.setProperty('--bottom-nav-height',Math.ceil(height)+'px');};
+  if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(reserveSpace);observer.observe(nav);}
+  window.addEventListener('resize',reserveSpace);document.fonts?.ready.then(reserveSpace);reserveSpace();
+}
 function initializeHoloControls() {
+  const portrait=$('holoPortrait');let portraitVisible=true;
+  const updateMotion=()=>{portrait.dataset.motion=!document.hidden&&portraitVisible?'running':'paused';};
+  if(typeof IntersectionObserver!=='undefined'){
+    holo.portraitObserver=new IntersectionObserver(entries=>{portraitVisible=entries.some(entry=>entry.isIntersecting);updateMotion();},{threshold:0});
+    holo.portraitObserver.observe(portrait);
+  }
+  document.addEventListener('visibilitychange',updateMotion);updateMotion();
   setHoloMode('portrait');window.addEventListener('resize',scheduleBiometricLinks);
-  for(const id of ['holoArtCool','holoArtWarm'])$(id).addEventListener('error',()=>{$('holoStatus').textContent='Holograma indisponível no momento. Seus indicadores continuam disponíveis.';});
+  for(const id of ['holoArtCool','holoArtWarm'])$(id).addEventListener('error',()=>{$('holoPortrait').dataset.unavailable='true';$('holoStatus').textContent='Holograma indisponível no momento. Seus indicadores continuam disponíveis.';});
   document.fonts?.ready.then(scheduleBiometricLinks);
 }
 
@@ -1591,7 +1619,7 @@ let PREFS_KEY = 'biovault_prefs';
 let GOALS_KEY = 'biovault_goals';
 let authSDK=null,authSession=null,currentUser=null,authReady=false,sdkPromise=null,accountEpoch=0,profileUnsubscribe=null;
 let authMode='login',authBusy=false,pendingSignupName='',guestMode=false;
-const APP_VERSION='5.2.0';
+const APP_VERSION='5.2.1';
 const UPDATE_MANIFEST='https://palomagarcia38-create.github.io/biovault-pro/public/updates/latest.json';
 let readings = [], selectedReadingId = null, compareMode = false;
 let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
@@ -2360,6 +2388,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){void conn
 $('goalPlanModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.stopPropagation();deferGoalPlan();}if(event.key==='Tab'){const items=[...$('goalPlanModal').querySelectorAll('input,select,button')].filter(el=>!el.disabled&&!el.closest('[hidden]'));const first=items[0],last=items.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
 $('trainingModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.stopPropagation();closeTraining();}if(event.key==='Tab'){const nodes=[...$('trainingModal').querySelectorAll('button')],first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
 $('backupFileInput').addEventListener('change',event=>void previewBackupFile(event.target.files[0]));
+initializeBottomNavigation();
 initializeHoloControls();
 loadProfilePrefs();
 const cached=readJSON(CACHE_KEY,[]);
