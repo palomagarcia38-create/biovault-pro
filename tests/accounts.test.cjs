@@ -2,7 +2,7 @@ const {JSDOM,VirtualConsole}=require('jsdom');
 const fs=require('fs');const assert=require('node:assert/strict');const crypto=require('crypto');
 const html=fs.readFileSync('public/index.html','utf8');
 let source=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
-for(const name of ['app','firestore','auth'])source=source.replace(`import('./vendor/firebase-${name}.js')`,`window.__sdk.${name}()`);
+for(const name of ['app','firestore','auth'])source=source.replace(`import('./vendor/firebase-${name}.js?v=50000.1')`,`window.__sdk.${name}()`);
 source+='\nwindow.__state={get readings(){return readings},get user(){return currentUser},get key(){return CACHE_KEY},get prefsKey(){return PREFS_KEY},switchAccount,flushPending,cloudMeasurementPayload};';
 const tick=()=>new Promise(r=>setTimeout(r,20));
 const sample=(id,weight=65)=>({id,date:'2026-11-20',weight,height:165,age:28,sex:'F',personName:'Local',_sync:'synced'});

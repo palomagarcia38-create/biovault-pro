@@ -1794,7 +1794,7 @@ async function flushPending() {
   }
 }
 async function getFirebaseSDKs(){
-  if(!sdkPromise)sdkPromise=Promise.all([import('./vendor/firebase-app.js'),import('./vendor/firebase-firestore.js'),import('./vendor/firebase-auth.js')]).then(([appSDK,fireSDK,identitySDK])=>{
+  if(!sdkPromise)sdkPromise=Promise.all([import('./vendor/firebase-app.js?v=50000.1'),import('./vendor/firebase-firestore.js?v=50000.1'),import('./vendor/firebase-auth.js?v=50000.1')]).then(([appSDK,fireSDK,identitySDK])=>{
     fire=fireSDK;authSDK=identitySDK;const app=appSDK.getApps().length?appSDK.getApp():appSDK.initializeApp(firebaseConfig);
     db=fire.getFirestore(app);void loadCloudKnowledge(fire,db);authSession=authSDK.getAuth(app);authSession.languageCode='pt-BR';
     authSDK.onAuthStateChanged(authSession,user=>{authReady=true;switchAccount(user);});
@@ -1805,7 +1805,7 @@ async function getFirebaseSDKs(){
 async function connectCloud() {
   if(connecting)return;connecting=true;
   try {await getFirebaseSDKs();if(currentUser&&!unsubscribe)subscribeAccount();}
-  catch {if(!guestMode)$('authStatus').textContent='Sem conexão com o serviço de acesso. Você pode consultar os dados salvos neste aparelho.';}
+  catch(error) {console.error('BioVault startup:',error?.code||error?.message||'unknown');if(!guestMode)$('authStatus').textContent='Sem conexão com o serviço de acesso. Você pode consultar os dados salvos neste aparelho.';}
   finally {connecting=false;setSyncStatus();}
 }
 function subscribeAccount(){
