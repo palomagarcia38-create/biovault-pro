@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://palomagarcia38-create.github.io; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'" />
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Holographic HUD v4.5.1</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>BioVault Pro • Holographic HUD v5.0.0</title>
+  <link rel="stylesheet" href="vendor/tailwind.css" />
+  <script src="vendor/chart.umd.js"></script>
+  <link rel="stylesheet" href="vendor/fontawesome.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Orbitron:wght@600;700;800;900&display=swap');
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: #050a14;
@@ -454,10 +455,52 @@ html {scrollbar-gutter:stable;}
 @media(max-width:440px){#personContext {margin-top:5px;}#personContext strong {font-size:12px;}#newWeighingModal>div {padding:14px;}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;}}
 
+
+[hidden]{display:none!important;}
+#authScreen{position:fixed;inset:0;z-index:1000;background:radial-gradient(ellipse at 50% 15%,#123247,#020611 62%);overflow:auto;display:grid;place-items:center;padding:24px 18px;}
+.auth-card{width:min(100%,410px);border:1px solid #1b5263;border-radius:24px;background:#071320;padding:28px 24px;box-shadow:0 28px 100px #0008;}
+.auth-logo{display:grid;place-items:center;width:54px;height:54px;border-radius:16px;color:#021018;background:linear-gradient(135deg,#77fff1,#32b1fa);font-size:20px;font-weight:900;margin-bottom:24px;}
+.auth-card h1{font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-1px;}.auth-card h1 span{color:#59e8f0;}
+.auth-card p{font-size:13px;color:#8baebd;line-height:1.7;margin:12px 0 22px;}
+.auth-tabs{display:flex;border:1px solid #1d3b50;border-radius:12px;padding:4px;margin-bottom:22px;gap:4px;}
+.auth-tabs button{flex:1;padding:10px;border-radius:8px;color:#8dafbe;font-weight:700;font-size:13px;}.auth-tabs button[aria-selected=true]{background:#16445b;color:#c9faff;}
+.auth-card label{display:block;font-size:12px;color:#adc5d2;margin-bottom:16px;}
+.auth-card input{display:block;box-sizing:border-box;width:100%;padding:13px 14px;margin-top:7px;border:1px solid #264456;border-radius:10px;background:#030c16;color:white;font-size:16px;}
+.auth-card input:focus{outline:2px solid #46d9e5;outline-offset:2px;}
+.auth-primary{width:100%;border:0;background:linear-gradient(100deg,#68eee0,#36bdfa);color:#011c2a;border-radius:12px;padding:14px;font-size:14px;font-weight:800;}.auth-primary:disabled{opacity:.55;}
+.auth-secondary{display:block;text-align:center;width:100%;font-size:12px;color:#9cc6d5;padding:12px;margin-top:6px;}
+#authStatus{font-size:12px;line-height:1.6;color:#ffda93;min-height:20px;margin:14px 0;}
+#accountBar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 2px;font-size:11px;color:#8baebd;}
+#accountBar button{padding:7px 10px;border:1px solid #234152;border-radius:8px;color:#b6dbe7;}
+#accountEmail{flex:1;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+#updateStatus{font-size:11px;color:#91cdd6;}
+@media print{#authScreen,#accountBar{display:none!important;}}
   </style>
 </head>
 <body class="pb-20">
+<section id="authScreen" aria-label="Acessar BioVault">
+  <div class="auth-card">
+    <div class="auth-logo" aria-hidden="true">BV</div>
+    <h1>Seu corpo.<br><span>Sua evolução.</span></h1>
+    <p>Entre na sua conta para acompanhar suas pesagens, com seu perfil sempre pronto.</p>
+    <div class="auth-tabs" role="tablist" aria-label="Tipo de acesso">
+      <button id="authLoginTab" type="button" role="tab" aria-selected="true" onclick="setAuthMode('login')">Entrar</button>
+      <button id="authSignupTab" type="button" role="tab" aria-selected="false" onclick="setAuthMode('signup')">Criar conta</button>
+    </div>
+    <form id="accountForm" onsubmit="submitAccountForm(event)">
+      <label id="signupNameLabel" hidden>Como você se chama?<input id="accountName" autocomplete="name" maxlength="80" /></label>
+      <label>E-mail<input id="accountEmailInput" type="email" autocomplete="username" required maxlength="254" placeholder="seu@email.com" /></label>
+      <label>Senha<input id="accountPassword" type="password" autocomplete="current-password" required minlength="6" maxlength="128" /></label>
+      <button id="accountSubmit" class="auth-primary" type="submit">Entrar na minha conta</button>
+    </form>
+    <div id="authStatus" role="status" aria-live="polite"></div>
+    <button class="auth-secondary" type="button" onclick="resetAccountPassword()">Esqueci minha senha</button>
+    <button class="auth-secondary" type="button" onclick="continueOnDevice()">Continuar somente neste aparelho</button>
+    <p style="font-size:11px;margin-bottom:0">No modo local, as pesagens ficam neste aparelho. Ao entrar, você usa o histórico da sua conta.</p>
+  </div>
+</section>
 
+<div id="appRoot" inert>
   <!-- TOP HEADER -->
   <header id="appHeader" class="max-w-7xl mx-auto px-3 pt-3 pb-2 no-print">
     <div class="panel-dark cyber-panel hud-corners rounded-2xl p-3.5 space-y-3">
@@ -475,11 +518,12 @@ html {scrollbar-gutter:stable;}
             <p class="brand-description text-[11px] text-slate-400 mt-0.5">Holograma • Composição e evolução</p>
           </div>
         </div>
-        <button onclick="window.location.reload()" title="Atualizar App" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v4.5.1
+        <button onclick="checkForAppUpdate()" id="updateAppButton" title="Buscar atualização" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
+          ↻ v5.0.0
         </button>
       </div>
 
+      <div id="accountBar"><span id="accountEmail">Uso neste aparelho</span><button id="accountLoginButton" type="button" onclick="showAccountLogin()">Entrar</button><button id="accountLogoutButton" type="button" onclick="logoutAccount()" hidden>Sair</button><button id="importDeviceButton" type="button" onclick="importDeviceHistory()" hidden>Trazer histórico deste aparelho</button><span id="updateStatus" role="status"></span></div>
       <!-- CONTROLES SUPERIORES -->
       <div id="personContext"><strong id="personContextName">Seu acompanhamento</strong><span id="personContextMeta">Comece pelo seu nome e sua altura</span></div>
       <details id="profileDrawer"><summary><i class="fa-solid fa-sliders" aria-hidden="true"></i> Perfil e ferramentas <i class="fa-solid fa-angle-down" aria-hidden="true"></i></summary>
@@ -779,7 +823,7 @@ html {scrollbar-gutter:stable;}
 
       <p class="text-[10px] text-slate-400">Relatório de acompanhamento com estimativas da Omron; não substitui avaliação individual. Referências: <a href="https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf" target="_blank" rel="noopener noreferrer">Manual Omron HBF-514C</a>; <a href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight" target="_blank" rel="noopener noreferrer">OMS — IMC</a>; <a href="https://www.who.int/publications/i/item/9789241501491" target="_blank" rel="noopener noreferrer">OMS — Cintura e RCQ</a>.</p>
       <div class="flex gap-2 no-print">
-        <button onclick="window.print()" class="flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs">
+        <button onclick="printReport()" class="flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs">
           🖨️ Imprimir / Salvar PDF (A4)
         </button>
         <button onclick="shareWhatsApp()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs">
@@ -821,7 +865,7 @@ html {scrollbar-gutter:stable;}
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v4.5.1</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v5.0.0</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>INÍCIO</span></button>
@@ -831,6 +875,7 @@ html {scrollbar-gutter:stable;}
   </nav>
 
 <div id="importBackupModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 no-print" role="dialog" aria-modal="true" aria-labelledby="importBackupTitle"><div class="panel-dark cyber-panel rounded-2xl p-5 w-full max-w-lg space-y-4"><div class="flex justify-between gap-4"><h2 id="importBackupTitle">Revisar restauração do backup</h2><button id="closeImportButton" type="button" onclick="closeImportBackup()" aria-label="Fechar restauração">✕</button></div><p id="importBackupSummary" role="status"></p><button id="confirmImportButton" type="button" class="neon-btn rounded-xl p-3 w-full" onclick="confirmImportBackup()" disabled>Adicionar registros revisados</button></div></div>
+</div>
   <script type="module">
     const firebaseConfig = {
       apiKey: "AIzaSyBUJkLOV2b-P_Pq8dsp7rCGLV5bb-Jxgkg",
@@ -1366,9 +1411,13 @@ function renderClinicalReference(key,record,info) {
 
 // BioVault Pro: real records, stable selection and recoverable synchronization.
 const $ = id => document.getElementById(id);
-const CACHE_KEY = 'biovault_local_readings';
-const PREFS_KEY = 'biovault_prefs';
-const GOALS_KEY = 'biovault_goals';
+let CACHE_KEY = 'biovault_local_readings';
+let PREFS_KEY = 'biovault_prefs';
+let GOALS_KEY = 'biovault_goals';
+let authSDK=null,authSession=null,currentUser=null,authReady=false,sdkPromise=null,accountEpoch=0,profileUnsubscribe=null;
+let authMode='login',authBusy=false,pendingSignupName='',guestMode=false;
+const APP_VERSION='5.0.0';
+const UPDATE_MANIFEST='https://palomagarcia38-create.github.io/biovault-pro/public/updates/latest.json';
 let readings = [], selectedReadingId = null, compareMode = false;
 let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
 let currentAnalyses = {}, currentReading = null, chartInst = null;
@@ -1421,18 +1470,18 @@ function profile(r = {}) {
 }
 function pendingCount() { return readings.filter(r => ['pending','deleting'].includes(r._sync)).length; }
 function setSyncStatus() {
-  const n = pendingCount(), synced = db && serverSeen && navigator.onLine && !n;
+  const n = pendingCount(), synced = currentUser && db && serverSeen && navigator.onLine && !n;
   $('syncPill').className = `text-[10px] px-2 py-1 rounded-full font-semibold ${synced ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}`;
-  $('syncPill').textContent = n ? `● ${n} pendente(s) de sincronização` : synced ? '● Firebase sincronizado' : '● Modo local';
+  $('syncPill').textContent = n ? `● ${n} pendente(s) de sincronização` : synced ? '● Firebase sincronizado' : currentUser?'● Conta • salvo no aparelho':'● Salvo neste aparelho';
 }
 function loadProfilePrefs() {
   const p = readJSON(PREFS_KEY, {}) || {};
   profilePersonId=typeof p.personId==='string'?p.personId:null;
   $('profileNameInput').value=cleanPersonName(p.name);
   try {
-    if(p.sex==null)p.sex=localStorage.getItem('bv_sex');
-    if(p.age==null)p.age=localStorage.getItem('bv_age');
-    if(p.height==null)p.height=localStorage.getItem('bv_height');
+    if(!currentUser&&p.sex==null)p.sex=localStorage.getItem('bv_sex');
+    if(!currentUser&&p.age==null)p.age=localStorage.getItem('bv_age');
+    if(!currentUser&&p.height==null)p.height=localStorage.getItem('bv_height');
   }catch{}
   if (['F','M'].includes(p.sex)) $('sexSelect').value = p.sex;
   if (validNumber(p.age) && p.age >= 18 && p.age <= 120) $('realAgeInput').value = p.age;
@@ -1448,8 +1497,8 @@ function saveProfilePrefs() {
     notify('Confira a idade (18–120 anos) e a altura (100–220 cm).'); return false;
   }
   profilePersonId=profilePersonId||'person_'+crypto.randomUUID();
-  const ok=writeJSON(PREFS_KEY, {name:cleanPersonName($('profileNameInput').value),personId:profilePersonId,sex:$('sexSelect').value, age:number($('realAgeInput').value), height:number($('heightCmInput').value)});
-  renderPersonContext();return ok;
+  const ok=writeJSON(PREFS_KEY, {_pending:true,name:cleanPersonName($('profileNameInput').value),personId:profilePersonId,sex:$('sexSelect').value, age:number($('realAgeInput').value), height:number($('heightCmInput').value)});
+  renderPersonContext();if(ok)void syncAccountProfile();return ok;
 }
 function calcBmiValue(weight, height) {
   const w = number(weight), h = number(height) / 100;
@@ -1663,7 +1712,9 @@ function openNewWeighingModal() {
   closeMetricDetail();if(saving)return;editingReadingId=null;
   $('weighingForm').reset();const prefs=readJSON(PREFS_KEY,{})||{};
   $('weighingModalTitle').textContent='Seu perfil e nova medição';$('btnSaveWeighing').textContent='Salvar medição';
-  $('mDate').value=localDate();$('mPersonName').value=cleanPersonName(prefs.name||$('profileNameInput').value);
+  $('mDate').value=localDate();$('mPersonName').value=cleanPersonName(prefs.name||currentUser?.displayName||$('profileNameInput').value);
+  $('mPersonName').readOnly=!!currentUser;
+  $('mPersonName').closest('label').hidden=!!currentUser;
   $('mAge').value=prefs.age??currentReading?.age??'';$('mSex').value=prefs.sex||currentReading?.sex||'';
   $('mHeight').value=prefs.height??currentReading?.height??'';
   $('saveStatus').textContent='';autoCalcModalBmi();$('newWeighingModal').classList.remove('hidden');
@@ -1713,54 +1764,78 @@ function shareWhatsApp() {
   window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
 }
 async function flushPending() {
-  if (!db || !navigator.onLine) {setSyncStatus();return;}
+  const user=currentUser,epoch=accountEpoch;
+  if (!user || !db || !navigator.onLine) {setSyncStatus();return;}
+  void syncAccountProfile();
   for (const item of [...readings]) {
-    if (!['pending','deleting'].includes(item._sync) || inFlight.has(item.id)) continue;
-    inFlight.add(item.id);
-    const deleting=item._sync==='deleting';
+    if(epoch!==accountEpoch)return;
+    const flightKey=user.uid+':'+item.id;
+    if (!['pending','deleting'].includes(item._sync) || inFlight.has(flightKey)) continue;
+    inFlight.add(flightKey);inFlight.add(item.id);
+    const deleting=item._sync==='deleting';let uploaded=false;
     try {
-      const ref=fire.doc(db,'measurements',item.id);
+      const ref=fire.doc(db,'users',user.uid,'measurements',item.id);
       if (deleting) await fire.deleteDoc(ref);
-      else {
-        const payload=cloudMeasurementPayload(item);
-        await fire.setDoc(ref,{...payload,ts:fire.serverTimestamp()},{merge:true});
-      }
+      else await fire.setDoc(ref,{...cloudMeasurementPayload(item),ts:fire.serverTimestamp()});
+      if(epoch!==accountEpoch)return;uploaded=true;
       const latest=readings.find(r=>r.id===item.id);
       if (deleting) readings=readings.filter(r=>r.id!==item.id);
       else if (latest && latest._sync==='pending' && latest._revision===item._revision) latest._sync='synced';
-      persist(); serverSeen=true; recomputeAll();
+      persist();serverSeen=true;recomputeAll();
     } catch(error) {
+      if(epoch!==accountEpoch)return;
       if (deleting && ['permission-denied','unauthenticated'].includes(error.code)) {
         const latest=readings.find(r=>r.id===item.id);if(latest){latest._deleted=false;latest._sync=latest._priorSync||'synced';delete latest._priorSync;}persist();recomputeAll();
-        notify('O Firebase recusou a exclusão. A pesagem foi mantida no histórico.');
-      } else notify('Alteração guardada neste navegador, aguardando sincronização com o Firebase.');
+        notify('O servidor recusou a exclusão. A pesagem foi mantida no histórico.');
+      } else notify(error.code==='permission-denied'?'Sua medição está salva no aparelho. A sincronização da conta ainda precisa ser liberada no servidor.':'Alteração salva no aparelho, aguardando conexão para sincronizar.');
     } finally {
-      inFlight.delete(item.id);setSyncStatus();
-      // If the user deleted while its creation was still uploading, delete after the create settles.
-      if (!deleting && (readings.find(r=>r.id===item.id)?._sync==='deleting'||(readings.find(r=>r.id===item.id)?._sync==='pending'&&readings.find(r=>r.id===item.id)?._revision!==item._revision))) void flushPending();
+      inFlight.delete(flightKey);if(epoch===accountEpoch){inFlight.delete(item.id);setSyncStatus();const latest=readings.find(r=>r.id===item.id);if(uploaded&&!deleting&&(latest?._sync==='deleting'||(latest?._sync==='pending'&&latest._revision!==item._revision)))void flushPending();}
     }
   }
 }
+async function getFirebaseSDKs(){
+  if(!sdkPromise)sdkPromise=Promise.all([import('./vendor/firebase-app.js'),import('./vendor/firebase-firestore.js'),import('./vendor/firebase-auth.js')]).then(([appSDK,fireSDK,identitySDK])=>{
+    fire=fireSDK;authSDK=identitySDK;const app=appSDK.getApps().length?appSDK.getApp():appSDK.initializeApp(firebaseConfig);
+    db=fire.getFirestore(app);void loadCloudKnowledge(fire,db);authSession=authSDK.getAuth(app);authSession.languageCode='pt-BR';
+    authSDK.onAuthStateChanged(authSession,user=>{authReady=true;switchAccount(user);});
+    return app;
+  }).catch(error=>{sdkPromise=null;throw error;});
+  return sdkPromise;
+}
 async function connectCloud() {
-  if (connecting || unsubscribe || !navigator.onLine) return;
-  connecting=true;
-  try {
-    const [appSDK,fireSDK]=await Promise.all([import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js'),import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js')]);
-    fire=fireSDK;db=fire.getFirestore(appSDK.initializeApp(firebaseConfig));
-    void loadCloudKnowledge(fire,db);
-    unsubscribe=fire.onSnapshot(fire.collection(db,'measurements'),{includeMetadataChanges:true},snapshot=>{
-      const merged=new Map(snapshot.metadata.fromCache ? readings.map(r=>[r.id,r]) : []);
-      for (const d of snapshot.docs) {const r=normalize(d.data(),d.id);if(r) merged.set(d.id,restoreLocalIdentity({...r,_sync:'synced'},readings.find(local=>local.id===d.id)));}
-      // Local pending entries survive an empty/partial cloud response and keep their stable IDs.
-      for (const r of readings) if (['pending','deleting'].includes(r._sync)) merged.set(r.id,r);
-      readings=[...merged.values()];
-      if (!snapshot.metadata.fromCache) serverSeen=true;
-      persist();recomputeAll();
-      if (!snapshot.metadata.fromCache) void flushPending();
-    },()=>{serverSeen=false;unsubscribe=null;setSyncStatus();notify('Não foi possível consultar o Firebase. Os registros locais continuam disponíveis.');});
-    void flushPending();
-  } catch {serverSeen=false;notify('Sem conexão com o Firebase. Novas pesagens ficam salvas neste navegador e aguardam sincronização.');}
+  if(connecting)return;connecting=true;
+  try {await getFirebaseSDKs();if(currentUser&&!unsubscribe)subscribeAccount();}
+  catch {if(!guestMode)$('authStatus').textContent='Sem conexão com o serviço de acesso. Você pode consultar os dados salvos neste aparelho.';}
   finally {connecting=false;setSyncStatus();}
+}
+function subscribeAccount(){
+  if(!currentUser||!db||unsubscribe)return;
+  const user=currentUser,epoch=accountEpoch;
+  unsubscribe=fire.onSnapshot(fire.collection(db,'users',user.uid,'measurements'),{includeMetadataChanges:true},snapshot=>{
+    if(epoch!==accountEpoch)return;
+    const merged=new Map(snapshot.metadata.fromCache?readings.map(r=>[r.id,r]):[]);
+    for(const d of snapshot.docs){const r=normalize(d.data(),d.id);if(r)merged.set(d.id,restoreLocalIdentity({...r,_sync:'synced'},readings.find(local=>local.id===d.id)));}
+    for(const r of readings)if(['pending','deleting'].includes(r._sync))merged.set(r.id,r);
+    readings=[...merged.values()];if(!snapshot.metadata.fromCache)serverSeen=true;
+    persist();recomputeAll();if(!snapshot.metadata.fromCache)void flushPending();
+  },()=>{if(epoch!==accountEpoch)return;serverSeen=false;unsubscribe=null;setSyncStatus();notify('As pesagens estão salvas no aparelho. Não foi possível sincronizar sua conta.');});
+  profileUnsubscribe=fire.onSnapshot(fire.doc(db,'users',user.uid,'profile','main'),snapshot=>{
+    if(epoch!==accountEpoch||!snapshot.exists())return;
+    const local=readJSON(PREFS_KEY,{});if(local._pending)return;
+    const remote=snapshot.data();if(writeJSON(PREFS_KEY,{...remote,_pending:false})){loadProfilePrefs();recomputeAll();}
+  },()=>{});
+  void flushPending();
+}
+let syncingProfile=false;
+async function syncAccountProfile(){
+  if(!currentUser||!db||syncingProfile||!navigator.onLine)return;
+  const prefs=readJSON(PREFS_KEY,{});if(!prefs._pending)return;
+  const uid=currentUser.uid,epoch=accountEpoch;syncingProfile=true;
+  try{
+    const payload={name:cleanPersonName(prefs.name),personId:uid,sex:prefs.sex,age:prefs.age,height:prefs.height};
+    await fire.setDoc(fire.doc(db,'users',uid,'profile','main'),payload);
+    if(epoch===accountEpoch&&JSON.stringify(readJSON(PREFS_KEY,{}))===JSON.stringify(prefs))writeJSON(PREFS_KEY,{...prefs,_pending:false});
+  }catch{}finally{syncingProfile=false;}
 }
 
 // One remembered person profile; each measurement retains its own profile snapshot.
@@ -1768,8 +1843,8 @@ function cleanPersonName(value){return String(value||'').replace(/[\u0000-\u001f
 function recordPersonName(record){return cleanPersonName(record?.personName||record?.nome)||'Sem nome (registro anterior)';}
 function renderPersonContext(){
   const name=cleanPersonName($('profileNameInput').value);
-  $('personContextName').textContent=name||'Seu acompanhamento';
-  $('personContextMeta').textContent=name?'Seu perfil • '+fmt($('heightCmInput').value)+' cm':'Comece pelo seu nome e sua altura';
+  $('personContextName').textContent=name?'Oi, '+name.split(' ')[0]+'!':'Seu acompanhamento';
+  $('personContextMeta').textContent=name?'Vamos fazer seu acompanhamento • '+fmt($('heightCmInput').value)+' cm':'Comece pelo seu nome e sua altura';
 }
 function editReading(id){
   const record=readings.find(r=>r.id===id&&!r._deleted);if(!record||inFlight.has(id)){notify('Aguarde a sincronização desta medição antes de editar.');return;}
@@ -1787,7 +1862,8 @@ function editReading(id){
 }
 // Names stay on this device until authenticated, per-account storage is in place.
 function cloudMeasurementPayload(record){
-  const payload=Object.fromEntries(Object.entries(record).filter(([key])=>!key.startsWith('_')&&!['id','personName','personId','nome'].includes(key)));
+  const payload=Object.fromEntries(Object.entries(record).filter(([key])=>!key.startsWith('_')&&!['id','personName','personId','nome','ownerUid','userId'].includes(key)));
+  if(currentUser){payload.personName=cleanPersonName(record.personName);payload.personId=currentUser.uid;}
   if(Array.isArray(record.revisions))payload.revisions=record.revisions.map(version=>({...version,previous:cloudMeasurementPayload(version.previous||{})}));
   return payload;
 }
@@ -1805,6 +1881,7 @@ function buildCsv(list=visibleReadings()){
 }
 function buildBackup(){return {format:'biovault-backup',schema:1,exportedAt:new Date().toISOString(),profile:readJSON(PREFS_KEY,{}),measurements:readings};}
 function downloadFile(contents,type,name){
+  if(window.BioVaultNative?.saveFile){const bytes=new TextEncoder().encode(contents);let binary='';for(const byte of bytes)binary+=String.fromCharCode(byte);window.BioVaultNative.saveFile(btoa(binary),name,type);return;}
   const url=URL.createObjectURL(new Blob([contents],{type}));const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function exportCsv(){downloadFile(buildCsv(),'text/csv;charset=utf-8','BioVault_medicoes_'+localDate()+'.csv');}
@@ -1842,7 +1919,106 @@ function confirmImportBackup(){
   selectedReadingId=added.at(-1).id;closeImportBackup();recomputeAll();notify(added.length+' medição(ões) adicionada(s). Acompanhe a sincronização no topo.');void flushPending();
 }
 
-Object.assign(window,{renderPersonContext,editReading,exportCsv,exportBackup,previewBackupFile,closeImportBackup,confirmImportBackup,renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
+function setAuthMode(mode){
+  if(authBusy)return;authMode=mode==='signup'?'signup':'login';
+  $('signupNameLabel').hidden=authMode!=='signup';$('accountName').required=authMode==='signup';
+  $('authLoginTab').setAttribute('aria-selected',String(authMode==='login'));
+  $('authSignupTab').setAttribute('aria-selected',String(authMode==='signup'));
+  $('accountSubmit').textContent=authMode==='signup'?'Criar minha conta':'Entrar na minha conta';
+  $('accountPassword').autocomplete=authMode==='signup'?'new-password':'current-password';$('authStatus').textContent='';
+}
+function authErrorMessage(error){
+  const messages={'auth/invalid-credential':'Confira seu e-mail e senha e tente novamente.','auth/wrong-password':'Confira seu e-mail e senha e tente novamente.','auth/user-not-found':'Confira seu e-mail e senha e tente novamente.','auth/email-already-in-use':'Este e-mail já tem uma conta. Entre ou use “Esqueci minha senha”.','auth/invalid-email':'Informe um e-mail válido.','auth/weak-password':'Use uma senha com pelo menos 6 caracteres.','auth/network-request-failed':'Sem conexão. Confira a internet e tente novamente.','auth/too-many-requests':'Muitas tentativas. Aguarde um pouco para tentar novamente.','auth/operation-not-allowed':'O acesso por e-mail ainda precisa ser ativado no servidor.','auth/configuration-not-found':'O serviço de login ainda precisa ser ativado no servidor.','auth/user-disabled':'Esta conta está desativada.','auth/password-does-not-meet-requirements':'A senha não atende aos requisitos de segurança. Use uma senha mais longa, com letras, números e símbolo.'};
+  return messages[error?.code]||'Não foi possível concluir o acesso. Tente novamente em instantes.';
+}
+async function submitAccountForm(event){
+  event.preventDefault();if(authBusy||!$('accountForm').reportValidity())return;
+  const name=cleanPersonName($('accountName').value);if(authMode==='signup'&&!name){$('authStatus').textContent='Informe seu nome para preparar seu perfil.';return;}
+  authBusy=true;$('accountSubmit').disabled=true;$('authStatus').textContent='Conectando com sua conta…';
+  const email=$('accountEmailInput').value.trim(),password=$('accountPassword').value;
+  try{
+    await getFirebaseSDKs();await authSDK.setPersistence(authSession,authSDK.indexedDBLocalPersistence);
+    if(authMode==='signup'){
+      pendingSignupName=name;
+      const credential=await authSDK.createUserWithEmailAndPassword(authSession,email,password);
+      await authSDK.updateProfile(credential.user,{displayName:name});
+      if(currentUser?.uid===credential.user.uid){$('profileNameInput').value=name;const prefs=readJSON(PREFS_KEY,{});writeJSON(PREFS_KEY,{...prefs,name,personId:credential.user.uid});renderPersonContext();}
+    }else await authSDK.signInWithEmailAndPassword(authSession,email,password);
+    $('accountPassword').value='';$('authStatus').textContent='';
+  }catch(error){pendingSignupName='';$('authStatus').textContent=authErrorMessage(error);}
+  finally{authBusy=false;$('accountSubmit').disabled=false;}
+}
+async function resetAccountPassword(){
+  const email=$('accountEmailInput').value.trim();
+  if(!email||!$('accountEmailInput').checkValidity()){$('authStatus').textContent='Preencha seu e-mail acima para receber a recuperação.';return;}
+  if(authBusy)return;authBusy=true;$('accountSubmit').disabled=true;
+  try{await getFirebaseSDKs();await authSDK.sendPasswordResetEmail(authSession,email);$('authStatus').textContent='Se houver uma conta para este e-mail, você receberá as instruções de recuperação.';}
+  catch(error){$('authStatus').textContent=error.code==='auth/user-not-found'?'Se houver uma conta para este e-mail, você receberá as instruções de recuperação.':authErrorMessage(error);}
+  finally{authBusy=false;$('accountSubmit').disabled=false;}
+}
+function resetAccountView(){
+  closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();
+  readings=[];selectedReadingId=null;currentReading=null;serverSeen=false;profilePersonId=null;storageBlocked=false;
+  $('profileNameInput').value='';$('sexSelect').value='F';$('realAgeInput').value='28';$('heightCmInput').value='165';
+  $('gFatSlider').value='25';$('gMuscSlider').value='32';$('gViscSlider').value='9';
+}
+function switchAccount(user){
+  // A late auth-null event must not overwrite an explicitly selected local mode.
+  if(!user&&guestMode)return;
+  accountEpoch++;unsubscribe?.();profileUnsubscribe?.();unsubscribe=null;profileUnsubscribe=null;inFlight.clear();
+  currentUser=user;guestMode=false;resetAccountView();
+  if(user){
+    CACHE_KEY='biovault_user_'+user.uid+'_readings';PREFS_KEY='biovault_user_'+user.uid+'_prefs';GOALS_KEY='biovault_user_'+user.uid+'_goals';
+    const cached=readJSON(CACHE_KEY,[]);if(Array.isArray(cached))readings=cached.map(r=>normalize(r)).filter(Boolean);else storageBlocked=true;
+    loadProfilePrefs();const name=cleanPersonName(pendingSignupName||readJSON(PREFS_KEY,{}).name||user.displayName);
+    pendingSignupName='';if(name){$('profileNameInput').value=name;const prefs=readJSON(PREFS_KEY,{});writeJSON(PREFS_KEY,{...prefs,name,personId:user.uid});renderPersonContext();}
+    $('accountEmail').textContent=user.email||'Minha conta';$('accountLoginButton').hidden=true;$('accountLogoutButton').hidden=false;
+    const legacy=readJSON('biovault_local_readings',[]);$('importDeviceButton').hidden=!Array.isArray(legacy)||!legacy.length;
+    $('authScreen').hidden=true;$('appRoot').inert=false;recomputeAll();subscribeAccount();
+  }else{
+    CACHE_KEY='biovault_signed_out_readings';PREFS_KEY='biovault_signed_out_prefs';GOALS_KEY='biovault_signed_out_goals';
+    $('accountEmail').textContent='Entre na sua conta';$('accountLoginButton').hidden=false;$('accountLogoutButton').hidden=true;$('importDeviceButton').hidden=true;
+    $('authScreen').hidden=false;$('appRoot').inert=true;recomputeAll();
+  }
+}
+function continueOnDevice(){
+  if(authBusy||currentUser)return;accountEpoch++;guestMode=true;unsubscribe?.();profileUnsubscribe?.();unsubscribe=null;profileUnsubscribe=null;resetAccountView();
+  CACHE_KEY='biovault_local_readings';PREFS_KEY='biovault_prefs';GOALS_KEY='biovault_goals';
+  const cached=readJSON(CACHE_KEY,[]);if(Array.isArray(cached))readings=cached.map(r=>normalize(r)).filter(Boolean);else storageBlocked=true;
+  loadProfilePrefs();migrateLegacyCache();recomputeAll();$('authScreen').hidden=true;$('appRoot').inert=false;$('accountEmail').textContent='Salvo somente neste aparelho';$('accountLoginButton').hidden=false;$('accountLogoutButton').hidden=true;
+}
+function showAccountLogin(){if(currentUser)return;guestMode=false;$('authScreen').hidden=false;$('appRoot').inert=true;setAuthMode('login');$('accountEmailInput').focus();}
+async function logoutAccount(){
+  if(authBusy||saving)return;
+  if(pendingCount()&&!confirm('Existem medições aguardando envio. Elas continuarão guardadas neste aparelho para esta conta. Deseja sair?'))return;
+  try{await authSDK.signOut(authSession);switchAccount(null);$('accountPassword').value='';}
+  catch{notify('Não foi possível sair agora. Tente novamente.');}
+}
+function importDeviceHistory(){
+  if(!currentUser)return;
+  try{
+    const legacy=readJSON('biovault_local_readings',[]);
+    importPreview=validateBackup({format:'biovault-backup',schema:1,measurements:legacy});
+    $('importBackupSummary').textContent='Adicionar '+importPreview.records.length+' medição(ões) deste aparelho à conta '+(currentUser.email||'atual')+'? Confirme apenas se os registros são seus. Os originais serão preservados.';
+    $('confirmImportButton').disabled=!importPreview.records.length;$('importBackupModal').classList.remove('hidden');
+  }catch(error){notify(error.message);}
+}
+async function checkForAppUpdate(){
+  if(saving||!$('newWeighingModal').classList.contains('hidden')){notify('Salve ou feche a medição antes de atualizar.');return;}
+  if(window.BioVaultNative?.checkForUpdate){$('updateStatus').textContent='Buscando atualização…';window.BioVaultNative.checkForUpdate();return;}
+  $('updateStatus').textContent='Buscando atualização…';
+  try{
+    const response=await fetch('version.json',{cache:'no-store'});if(!response.ok)throw Error();
+    const release=await response.json();
+    if(release.version===APP_VERSION){$('updateStatus').textContent='Você está na versão mais recente.';return;}
+    if(confirm('Versão '+release.version+' disponível. Atualizar agora? Seus dados serão mantidos.'))window.location.reload();
+    else $('updateStatus').textContent='Atualização disponível.';
+  }catch{$('updateStatus').textContent='Não foi possível consultar agora. Tente com internet.';}
+}
+function printReport(){if(window.BioVaultNative?.printReport)window.BioVaultNative.printReport();else window.print();}
+
+
+Object.assign(window,{setAuthMode,submitAccountForm,resetAccountPassword,continueOnDevice,showAccountLogin,logoutAccount,checkForAppUpdate,printReport,importDeviceHistory,renderPersonContext,editReading,exportCsv,exportBackup,previewBackupFile,closeImportBackup,confirmImportBackup,renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
 document.addEventListener('click',event=>{
   if(event.target.closest('[data-metric-close]'))closeMetricDetail();
   if(event.target.closest('[data-metric-evolution]'))openMetricEvolution();

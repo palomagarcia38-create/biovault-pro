@@ -15,4 +15,6 @@ npm test --prefix tests
 
 As fixtures contêm somente IDs de elementos das versões anteriores. Dados usados nos testes são sintéticos. A suíte não substitui a revisão visual no navegador e no celular.
 
-O nome e o identificador pessoal permanecem no aparelho, inclusive após sincronização e edição; não são enviados no payload das medições nem nas versões anteriores. A suíte cobre essa fronteira.
+No modo local, nome e pesagens permanecem no aparelho. Após autenticação, o nome e as versões das medições sincronizam somente em `users/{uid}/measurements`; o perfil fica em `users/{uid}/profile/main`. A suíte cobre os caminhos de proprietário e a preservação de dados antigos.
+
+A versão 5.0 acrescenta 8 verificações de conta em `accounts.test.cjs` e 19 verificações de regras em `rules.test.cjs`, no emulador `demo-biovault`. Na ativação do servidor, 12 verificações adicionais de cadastro, login e autorização passaram com contas e documentos temporários, removidos após o teste. Nenhum registro real foi alterado.
