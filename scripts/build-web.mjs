@@ -11,7 +11,7 @@ for (const [file,module] of [['firebase-app','firebase/app'],['firebase-firestor
   entryPoints[file]=input;
 }
 // Shared chunks keep a single Firebase component registry across all SDKs.
-await build({entryPoints,bundle:true,splitting:true,format:'esm',minify:true,outdir:'public/vendor',chunkNames:'_chunks/[name]-[hash]',target:['es2020'],legalComments:'eof'});
+await build({entryPoints,bundle:true,splitting:true,format:'esm',minify:true,outdir:'public/vendor',chunkNames:'chunks/[name]-[hash]',target:['es2020'],legalComments:'eof'});
 await fs.copyFile('node_modules/chart.js/dist/chart.umd.js','public/vendor/chart.umd.js');
 await fs.cp('node_modules/@fortawesome/fontawesome-free/css/all.min.css','public/vendor/fontawesome.css');
 await fs.cp('node_modules/@fortawesome/fontawesome-free/webfonts','public/webfonts',{recursive:true});
