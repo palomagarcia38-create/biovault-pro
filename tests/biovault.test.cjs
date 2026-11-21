@@ -7,15 +7,16 @@ const projectRoot=path.resolve(__dirname,'..');
 const legacyMarkup=name=>JSON.parse(fs.readFileSync(path.join(__dirname,'fixtures',name+'.json'),'utf8')).map(id=>'<div id="'+id+'"></div>').join('');
 const html=fs.readFileSync(path.join(projectRoot,'public/index.html'),'utf8');
 let source=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
-source=source.replace("import('https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js')","window.__appModule()").replace("import('https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js')","window.__fireModule()");
-source+=`\nwindow.__inspect={analyze,profile,calcBmiValue,classifyBmi,reference,validDate,holoAppearance,clinicalRanges,estimateRestingEnergy,chartPeriodReadings,buildCsv,buildBackup,validateBackup,getKnowledge:()=>clinicalKnowledge,getMetricCharts:()=>metricCharts,getHolo:()=>holo,getSelected:()=>currentReading,getReadings:()=>readings,getChart:()=>chartInst};`;
+source=source.replace("import('./vendor/firebase-app.js')","window.__appModule()").replace("import('./vendor/firebase-firestore.js')","window.__fireModule()");
+source=source.replace("import('./vendor/firebase-auth.js')","window.__authModule()");
+source+=`\nwindow.__inspect={analyze,profile,calcBmiValue,classifyBmi,reference,validDate,holoAppearance,clinicalRanges,estimateRestingEnergy,chartPeriodReadings,buildCsv,buildBackup,validateBackup,getKnowledge:()=>clinicalKnowledge,getMetricCharts:()=>metricCharts,getHolo:()=>holo,getSelected:()=>currentReading,getCacheKey:()=>CACHE_KEY,getCurrentUser:()=>currentUser,getReadings:()=>readings,getChart:()=>chartInst};`;
 const tick=()=>new Promise(r=>setTimeout(r,30));
 const sample=(id,date,protocol='Em jejum',more={})=>({id,date,weight:64,height:165,fat:28,muscle:29,visceral:6,bodyAge:28,rm:1450,waist:74,hip:98,sex:'F',age:28,protocol,_sync:'synced',...more});
 const rows=[sample('a','2026-10-01','Em jejum',{weight:60}),sample('b','2026-10-02','Hidratado',{weight:70}),sample('c','2026-10-03','Em jejum',{weight:80,fat:39,muscle:24,visceral:15,bodyAge:45,waist:90,hip:100})];
 const results=[];
 function text(w,id){return w.document.getElementById(id).textContent;}
 function visible(w,id){return !w.document.getElementById(id).classList.contains('hidden');}
-function records(w){return JSON.parse(w.localStorage.getItem('biovault_local_readings'));}
+function records(w){return JSON.parse(w.localStorage.getItem(w.__inspect.getCacheKey()));}
 async function setup(data=[],cloud=null,opts={}){
   const errors=[];const vc=new VirtualConsole();vc.on('jsdomError',e=>errors.push(e.message));
   const dom=new JSDOM(html,{url:'https://biovault.test',runScripts:'outside-only',virtualConsole:vc});
@@ -38,17 +39,20 @@ async function setup(data=[],cloud=null,opts={}){
   }
   if(opts.storage!=null)w.localStorage.setItem('biovault_local_readings',opts.storage);else w.localStorage.setItem('biovault_local_readings',JSON.stringify(data));
   for(const [key,value]of Object.entries(opts.storageKeys||{}))w.localStorage.setItem(key,value);
+  w.__authModule=()=>Promise.resolve({getAuth:()=>({}),onAuthStateChanged:(auth,cb)=>setTimeout(()=>cb(cloud?{uid:'test-owner',email:'test@example.invalid',displayName:'Paloma'}:null),0)});
   if(cloud){
+    w.localStorage.setItem('biovault_user_test-owner_readings',JSON.stringify(data));
+    for(const [key,value]of Object.entries(opts.storageKeys||{}))if(key==='biovault_prefs'||key==='biovault_goals')w.localStorage.setItem('biovault_user_test-owner_'+(key==='biovault_prefs'?'prefs':'goals'),value);
     const remote=structuredClone(cloud.records||[]);w.__cloud={writes:[],deletions:[],knowledgeReads:[],records:remote};let callback;
     const emit=()=>callback?.({metadata:{fromCache:false},docs:w.__cloud.records.map(r=>({id:r.id,data:()=>({...r})}))});
-    const fire={getFirestore:()=>({}),collection:()=>({}),doc:(db,col,id)=>({id,collection:col}),serverTimestamp:()=>null,
+    const fire={getFirestore:()=>({}),collection:()=>({}),doc:(db,...parts)=>({id:parts.at(-1),collection:parts.slice(0,-1).join('/'),path:parts.join('/')}),serverTimestamp:()=>null,
       getDoc:async(ref)=>{w.__cloud.knowledgeReads.push(ref);return{exists:()=>!!cloud.knowledge,data:()=>cloud.knowledge};},
-      onSnapshot:(ref,options,cb)=>{callback=cb;setTimeout(emit,0);return()=>{};},
-      setDoc:async(ref,item)=>{w.__cloud.writes.push({id:ref.id,...item});if(cloud.failWrite)throw Object.assign(Error('denied'),{code:'permission-denied'});w.__cloud.records=w.__cloud.records.filter(r=>r.id!==ref.id);w.__cloud.records.push({id:ref.id,...item});setTimeout(emit,0);},
+      onSnapshot:(ref,options,cb)=>{if(typeof options==='function')return()=>{};callback=cb;setTimeout(emit,0);return()=>{};},
+      setDoc:async(ref,item)=>{if(ref.collection.endsWith('/profile'))return;w.__cloud.writes.push({id:ref.id,path:ref.path,...item});if(cloud.failWrite)throw Object.assign(Error('denied'),{code:'permission-denied'});w.__cloud.records=w.__cloud.records.filter(r=>r.id!==ref.id);w.__cloud.records.push({id:ref.id,...item});setTimeout(emit,0);},
       deleteDoc:async(ref)=>{w.__cloud.deletions.push(ref.id);if(cloud.failDelete)throw Object.assign(Error('denied'),{code:'permission-denied'});w.__cloud.records=w.__cloud.records.filter(r=>r.id!==ref.id);setTimeout(emit,0);}};
-    w.__appModule=()=>Promise.resolve({initializeApp:()=>({})});w.__fireModule=()=>Promise.resolve(fire);
+    w.__appModule=()=>Promise.resolve({getApps:()=>[],getApp:()=>({}),initializeApp:()=>({})});w.__fireModule=()=>Promise.resolve(fire);
   }else {w.__appModule=()=>Promise.reject(Error('offline'));w.__fireModule=()=>Promise.reject(Error('offline'));}
-  w.eval(source);await tick();return{w,dom,errors};
+  w.eval(source);await tick();if(!cloud)w.continueOnDevice();await tick();return{w,dom,errors};
 }
 async function fill(w,values={}){
   w.openNewWeighingModal();
@@ -249,8 +253,8 @@ async function run(name,test){await test();results.push(name);console.log('PASS'
  await run('profile names are rendered as text and cannot inject markup into history or reports',async()=>{
  const {w,dom,errors}=await setup();await fill(w,{mPersonName:'<img src=x onerror=alert(1)>'});assert.equal(w.document.querySelector('#personContext img'),null);assert.equal(w.document.querySelector('#subView-history img'),null);w.openReportModal();assert.equal(w.document.querySelector('#repPersonName img'),null);assert.match(text(w,'repPersonName'),/img src/);assert.deepEqual(errors,[]);dom.window.close();
  });
- await run('personal names stay on the device through sync edits reload and revision history',async()=>{
- const {w,dom,errors}=await setup([],{records:[]});await fill(w,{mPersonName:'Paloma Privada'});await tick();const first=records(w)[0];assert.equal(first.personName,'Paloma Privada');assert(!JSON.stringify(w.__cloud.writes).includes('Paloma Privada'));assert.equal(w.__cloud.writes[0].personId,undefined);w.editReading(first.id);w.document.getElementById('mPersonName').value='Nome atualizado';w.document.getElementById('mWeight').value='66';await w.saveWeighing({preventDefault(){}});await tick();const current=records(w)[0];assert.equal(current.personName,'Nome atualizado');assert.equal(current.revisions[0].previous.personName,'Paloma Privada');const sent=JSON.stringify(w.__cloud.writes);assert(!sent.includes('Paloma Privada'));assert(!sent.includes('Nome atualizado'));const again=await setup(records(w),{records:w.__cloud.records});assert.equal(records(again.w)[0].personName,'Nome atualizado');assert.equal(records(again.w)[0].revisions[0].previous.personName,'Paloma Privada');assert.deepEqual(again.errors,[]);again.dom.window.close();assert.deepEqual(errors,[]);dom.window.close();
+ await run('authenticated names sync inside the owner path through edits reload and revision history',async()=>{
+ const {w,dom,errors}=await setup([],{records:[]});await fill(w,{mPersonName:'Paloma Privada'});await tick();const first=records(w)[0];assert.equal(first.personName,'Paloma Privada');assert.equal(w.__cloud.writes[0].personName,'Paloma Privada');assert.equal(w.__cloud.writes[0].personId,'test-owner');assert.equal(w.__cloud.writes[0].path,'users/test-owner/measurements/'+first.id);w.editReading(first.id);w.document.getElementById('mPersonName').value='Nome atualizado';w.document.getElementById('mWeight').value='66';await w.saveWeighing({preventDefault(){}});await tick();const current=records(w)[0];assert.equal(current.personName,'Nome atualizado');assert.equal(current.revisions[0].previous.personName,'Paloma Privada');const sent=JSON.stringify(w.__cloud.writes);assert(sent.includes('Paloma Privada'));assert(sent.includes('Nome atualizado'));assert(w.__cloud.writes.every(r=>r.path.startsWith('users/test-owner/measurements/')));const again=await setup(records(w),{records:w.__cloud.records});assert.equal(records(again.w)[0].personName,'Nome atualizado');assert.equal(records(again.w)[0].revisions[0].previous.personName,'Paloma Privada');assert.deepEqual(again.errors,[]);again.dom.window.close();assert.deepEqual(errors,[]);dom.window.close();
  });
  console.log(JSON.stringify({passed:results.length,tests:results},null,2));
  fs.writeFileSync(__dirname+'/results.json',JSON.stringify({passed:results.length,tests:results},null,2));
