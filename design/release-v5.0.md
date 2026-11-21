@@ -13,28 +13,30 @@ O APK inclui a interface, hologramas, gráficos, estilos, ícones e SDKs Firebas
 - Atualizador verifica versão, SHA-256, nome do pacote e certificado de assinatura antes de abrir o instalador do Android. A confirmação do sistema é obrigatória; não há instalação silenciosa.
 - Sem permissão de acesso geral aos arquivos. Importação e exportação usam os seletores do Android.
 
-## Ativação pendente no servidor
+## Servidor ativado
 
-Em 20/11/2026, a consulta ao provedor retornou `CONFIGURATION_NOT_FOUND`; o serviço Authentication ainda não está configurado no projeto `bioimpedancia-59fce`. O navegador de administração está desconectado da conta Google.
+Em 20/11/2026, após a reconexão da conta Google:
 
-Antes de liberar o acesso por conta em produção:
+- Firebase Authentication ativado com o provedor E-mail/senha no projeto `bioimpedancia-59fce`.
+- Regras anteriores de modo de teste substituídas por isolamento por UID. A versão anterior permanece no histórico do console.
+- Cadastro, entrada, gravação/leitura do dono e bloqueio entre contas validados no serviço real com contas e documentos temporários.
+- Coleção compartilhada antiga bloqueada para clientes; seus documentos permanecem armazenados.
+- APK assinado e manifesto de atualização publicados e conferidos por SHA-256.
 
-1. Entrar no console do projeto `bioimpedancia-59fce` e ativar Authentication > E-mail/senha.
-2. Ler as regras atuais e preservar regras necessárias a outras coleções do projeto. Publicar as regras de isolamento propostas em `firestore.rules`, substituindo permissões amplas que também coincidam com os caminhos privados. Regras permissivas sobrepostas prevalecem: apenas adicionar um `allow false` não corrige um wildcard permissivo.
-3. Validar criação/entrada e leitura/gravação apenas da própria conta. Nenhuma pesagem de produção foi criada durante o desenvolvimento.
-4. Publicar o APK assinado e `public/updates/latest.json` no canal de atualização.
+Nenhum registro real foi alterado. As coleções antigas não são apagadas nem automaticamente atribuídas ao primeiro usuário. O projeto financeiro não foi usado.
 
-As coleções antigas não são apagadas nem automaticamente atribuídas ao primeiro usuário. Não usar o projeto do aplicativo financeiro para esta ativação.
+No primeiro acesso, tocar em **Criar conta** e cadastrar nome, e-mail e senha do BioVault. Nas próximas aberturas, a sessão e o nome são lembrados. O APK 5.0.0 já entregue passa a usar o servidor ativado sem reinstalação.
 
 ## Validação executada
 
 - 46 verificações de regressão clínica, histórico, edição, gráficos e exportação.
 - 8 verificações de conta, cache separado, callbacks tardios, envio em andamento, importação revisada e mensagens de acesso.
 - 19 verificações no emulador Firestore: dono, outro usuário, visitante, perfil, identidade inválida e bloqueio da coleção compartilhada. Sem gravações em produção.
+- 12 verificações no serviço real de Authentication/Firestore com dados sintéticos; contas e documentos temporários removidos após o teste.
 - SDKs empacotados inicializam Auth e Firestore com o mesmo registro de componentes Firebase.
 - Compilação e assinatura APK v2/v3 verificadas pelas ferramentas oficiais Android.
 
-A suíte visual `tests/mobile.test.cjs` está preparada, mas o navegador headless não pôde iniciar neste ambiente por restrição a sockets. Não houve instalação em celular físico nem validação do login no servidor de produção.
+A suíte visual `tests/mobile.test.cjs` está preparada, mas o navegador headless não pôde iniciar neste ambiente por restrição a sockets. Não houve instalação em celular físico. O login e as regras foram validados separadamente no serviço real, conforme descrito acima.
 
 ## Reproduzir
 
