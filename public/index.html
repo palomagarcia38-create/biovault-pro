@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BIOSHAPE • Holographic HUD v5.2.1</title>
+  <title>BIOSHAPE • Holographic HUD v5.2.2</title>
   <link rel="stylesheet" href="vendor/tailwind.css" />
   <script src="vendor/chart.umd.js"></script>
   <link rel="stylesheet" href="vendor/fontawesome.css">
@@ -266,6 +266,8 @@ body {padding-bottom:0;background-color:#020b15;}
 .metric-card .metric-value {font:500 25px 'Orbitron',sans-serif;letter-spacing:-.04em;white-space:nowrap;line-height:1.25;margin:8px 0 6px;color:#b6edfa;text-shadow:0 0 12px #00eaff3a;}
 .metric-card .metric-unit {font:500 10px 'Inter',sans-serif;letter-spacing:0;color:#93afc0;margin-left:3px;}
 .metric-card .metric-status {display:block;font:600 9px 'JetBrains Mono',monospace;line-height:1.3;min-height:12px;margin-top:3px;color:#8cb9c4;}
+.metric-card .metric-estimate{display:block;font:600 10px/1.35 'Inter',sans-serif;color:#bcefe5;margin:5px 0;overflow-wrap:anywhere;}.metric-estimate small{display:block;font-size:8px;color:#88a7b4;font-weight:400;}
+@media(max-width:440px){.metric-card .metric-estimate{font-size:8px;}.metric-estimate small{font-size:7px;}}
 .metric-card .metric-sub {font:8px 'JetBrains Mono',monospace;line-height:1.35;color:#7d9cae;margin-top:5px;display:none;}
 .metric-card[data-compare=true] .metric-sub {display:block;}
 .metric-card[data-metric=whr] .metric-value {font-size:23px;}
@@ -536,6 +538,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
 .home-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}.home-actions button{min-height:48px;padding:12px 10px;border:1px solid #45b6c0;border-radius:12px;color:#b4f6ef;background:#0b3040;font-size:12px;font-weight:700;line-height:1.5;}.home-actions .neon-btn{color:#03202d;background:linear-gradient(100deg,#6cebd7,#3bc3f2);}
 .source-fields{margin:12px 0;}.source-fields select,.person-field textarea{width:100%;margin-top:5px;background:#07101f;border:1px solid #30485d;border-radius:10px;padding:10px;color:#e3f2f7;}.person-field textarea{resize:vertical;}
 #bottomNav button{font-family:'Inter',sans-serif;font-size:10px;padding:6px 3px;line-height:1.4;min-height:58px;}#bottomNav button:focus-visible,.home-actions button:focus-visible{outline:2px solid #70ffe5;outline-offset:3px;}
+.reference-policy-note{font-size:10px;line-height:1.5;color:#8dabb9;margin:8px 0;}
 .source-notice{font-size:11px;line-height:1.6;color:#e6c99a;border:1px solid #705629;border-radius:12px;padding:10px;margin:10px 0;background:#241e14;}.training-summary{font-size:13px;line-height:1.8;color:#b7d5df;}#repNotes{white-space:pre-wrap;overflow-wrap:anywhere;}.training-summary strong{color:#75efdb;}.training-summary p{margin:12px 0;}
 @media(max-width:440px){#homeSummary{padding:14px;}#homeSummary #homePersonName{font-size:21px;}.home-actions button{font-size:11px;}.home-measures .home-current strong{font-size:25px;}}
 
@@ -583,7 +586,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
           </div>
         </div>
         <button onclick="checkForAppUpdate()" id="updateAppButton" title="Buscar atualização" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v5.2.1
+          ↻ v5.2.2
         </button>
       </div>
 
@@ -651,6 +654,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
         <span id="activeReadingBadge" class="text-[11px] text-slate-400 mono">--/--/----</span>
       </div>
 
+      <p class="reference-policy-note">Mesmas faixas de acompanhamento por sexo e idade, com ou sem origem informada. Veja a fonte e os limites ao tocar no indicador.</p>
       <p id="comparisonSourceNotice" class="source-notice" role="status" hidden></p>
       <!-- GRID CENTRAL -->
       <div id="biometricGrid" class="grid grid-cols-12 gap-1.5 sm:gap-3 items-center pt-1">
@@ -838,7 +842,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
 <p class="form-hint">Seu perfil fica vinculado à conta ou a este aparelho no modo local. Idade e sexo são usados somente nas referências aplicáveis ao registro.</p>
 </fieldset><fieldset class="measurement-section"><legend>2. Sua nova medição</legend>
 <p class="form-hint">Transcreva os resultados da sua balança ou laudo. Além de peso e altura, preencha apenas o que estiver disponível; confirme as unidades.
-</p><div class="source-fields"><label class="person-field">Equipamento / referência<select id="mEquipmentProfile" onchange="updateMeasurementSourceForm()"><option value="unspecified">Não informado (opcional)</option><option value="omron">Omron HBF-514C</option><option value="other">Outra balança ou exame</option></select></label><label class="person-field" id="mEquipmentNameField" hidden>Marca e modelo / laboratório (opcional)<input id="mEquipment" type="text" maxlength="120" placeholder="Ex.: InBody 270, Tanita, exame na clínica" /></label></div><p id="measurementReferenceNote" class="form-hint">Sem equipamento informado: valores registrados sem aplicar faixas de outro fabricante.</p>
+</p><div class="source-fields"><select id="mEquipmentProfile" hidden inert aria-hidden="true" tabindex="-1"><option value="unspecified">Não informado</option><option value="omron">Legado</option><option value="other">Origem informada</option></select><label class="person-field" id="mEquipmentNameField">Origem do resultado (opcional)<input id="mEquipment" type="text" maxlength="120" placeholder="Balança, exame ou laboratório — preenchimento opcional" /></label></div><p id="measurementReferenceNote" class="form-hint">Usamos as mesmas faixas de acompanhamento do app, conforme sexo, idade e unidade, mesmo sem informar a origem. Não são diagnóstico.</p>
         <div class="grid grid-cols-3 gap-2">
           <label class="block text-[11px] text-slate-400">Data<input type="date" id="mDate" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-slate-700 text-white" /></label>
           <label class="block text-[11px] text-slate-400">Peso (kg) *<input type="number" step=".1" min="1" max="500" id="mWeight" oninput="autoCalcModalBmi()" required class="w-full mt-1 px-2 py-2 rounded-xl bg-[#07101f] border border-sky-500/50 font-bold mono text-white" /></label>
@@ -897,7 +901,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
       <p id="repSynthesis" class="text-slate-300 leading-relaxed"></p>
       </div>
 
-      <p class="text-[10px] text-slate-400">Relatório de acompanhamento de bioimpedância. Os algoritmos e as referências variam por equipamento; estimativas não são diagnóstico. O holograma é ilustrativo e não reconstrói anatomia nem gordura regional. Faixas Omron se aplicam somente aos registros compatíveis com esse modelo. Referências: <a href="https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf" target="_blank" rel="noopener noreferrer">Manual Omron HBF-514C</a>; <a href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight" target="_blank" rel="noopener noreferrer">OMS — IMC</a>; <a href="https://www.who.int/publications/i/item/9789241501491" target="_blank" rel="noopener noreferrer">OMS — Cintura e RCQ</a>; <a href="https://pubmed.ncbi.nlm.nih.gov/15380917/" target="_blank" rel="noopener noreferrer">Princípios e limites da bioimpedância</a>.</p>
+      <p class="text-[10px] text-slate-400">Relatório de acompanhamento de bioimpedância. Os algoritmos e as referências variam por equipamento; estimativas não são diagnóstico. O holograma é ilustrativo e não reconstrói anatomia nem gordura regional. O app mantém as faixas anteriores de acompanhamento (fonte: manual Omron HBF-514C), independentemente da origem informada, respeitando idade, sexo, definição e unidade. Elas não são faixas universais validadas para qualquer equipamento. Referências: <a href="https://omronhealthcare.com/storage/pdfs/1665708-0f_hbf-514c-z_e_m_web_alt_text_acc.pdf" target="_blank" rel="noopener noreferrer">Manual Omron HBF-514C</a>; <a href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight" target="_blank" rel="noopener noreferrer">OMS — IMC</a>; <a href="https://www.who.int/publications/i/item/9789241501491" target="_blank" rel="noopener noreferrer">OMS — Cintura e RCQ</a>; <a href="https://pubmed.ncbi.nlm.nih.gov/15380917/" target="_blank" rel="noopener noreferrer">Princípios e limites da bioimpedância</a>.</p>
       <div class="flex gap-2 no-print">
         <button onclick="printReport()" class="flex-1 py-2.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs">
           🖨️ Imprimir / Salvar PDF (A4)
@@ -941,7 +945,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.2.1</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.2.2</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Inicial</span></button>
@@ -1102,44 +1106,44 @@ function migrateLegacyCache() {
   if(changed&&persist())writeJSON('biovault_v42_imported_keys',[...seen]);
 }
 
-// Absent metadata means an earlier Omron-only record, never a new unspecified source.
+// Source metadata is optional and remains untouched; the app reference depends on the metric and unit.
 function equipmentInfo(record={}) {
   const legacy=record.measurementSchema==null&&!Object.prototype.hasOwnProperty.call(record,'equipment');
   const name=String(record.equipment||'').replace(/[\u0000-\u001f\u007f]/g,'').trim().replace(/\s+/g,' ').slice(0,120);
-  const label=name||(legacy?'Omron HBF-514C':'Equipamento não informado');
-  return {label,known:!!name||legacy,legacy,omron:/^omron\s+hbf[ -]?514c$/i.test(label),key:(name|| (legacy?'Omron HBF-514C':'')).toLocaleLowerCase('pt-BR').replace(/\s+/g,' ').trim()};
+  const label=name||'Origem não informada';
+  return {label,known:!!name,legacy,omron:/^omron\s+hbf[ -]?514c$/i.test(label),key:name.toLocaleLowerCase('pt-BR').replace(/\s+/g,' ').trim()};
 }
 function muscleUnit(record={}){return record.muscleUnit==='kg'?'kg':'percent';}
 function muscleKind(record={}){return record.muscleKind==='total'?'total':'skeletal';}
 function visceralUnit(record={}){return record.visceralUnit==='cm2'?'cm2':'index';}
 function metricUnit(record,key){return key==='muscle'?(muscleUnit(record)==='kg'?'kg':'%'):key==='visceral'?(visceralUnit(record)==='cm2'?'cm²':'nível'):({weight:'kg',fat:'%',bodyAge:'anos',rm:'kcal/dia',waist:'cm',hip:'cm',bmi:'kg/m²',whr:'RCQ'}[key]||'');}
 function muscleLabel(record){return muscleKind(record)==='total'?'Massa muscular total':'Músculo esquelético';}
-function omronReference(record,key){return equipmentInfo(record).omron&&(key!=='muscle'||(muscleUnit(record)==='percent'&&muscleKind(record)==='skeletal'))&&(key!=='visceral'||visceralUnit(record)==='index');}
+function usesAppReference(record,key){return (key!=='muscle'||(muscleUnit(record)==='percent'&&muscleKind(record)==='skeletal'))&&(key!=='visceral'||visceralUnit(record)==='index');}
+function omronReference(record,key){return usesAppReference(record,key);}
 function comparableMetric(a,b,key){
   if(!a||!b)return false;
   if(key==='muscle')return muscleUnit(a)===muscleUnit(b)&&muscleKind(a)===muscleKind(b);
-  if(key==='visceral'||key==='bodyAge'){const x=equipmentInfo(a),y=equipmentInfo(b);return x.known&&y.known&&x.key===y.key&&(key!=='visceral'||visceralUnit(a)===visceralUnit(b));}
+  if(key==='visceral'||key==='bodyAge'){const x=equipmentInfo(a),y=equipmentInfo(b);return !(x.known&&y.known&&x.key!==y.key)&&(key!=='visceral'||visceralUnit(a)===visceralUnit(b));}
   return true;
 }
 function sourceNotice(list){
   if(!list.length)return '';
   const sources=list.map(equipmentInfo),known=new Set(sources.filter(x=>x.known).map(x=>x.key));
   if(known.size>1)return 'Equipamento alterado: '+[...new Set(sources.map(x=>x.label))].join(' → ')+'. Algoritmos e condições podem diferir; diferenças não comprovam mudança corporal. Índices e unidades incompatíveis não são comparados.';
-  if(sources.some(x=>!x.known))return 'Há pesagem sem equipamento informado. Não é possível confirmar a comparabilidade; confira o laudo, as unidades e as condições de medição.';
+  // Missing source never blocks the app's adopted reference or a compatible-unit comparison.
   return '';
 }
 function sourceChartLines(list){return !sourceNotice(list);}
 function updateMeasurementSourceForm(){
-  const omron=$('mEquipmentProfile').value==='omron';
-  $('mEquipmentNameField').hidden=$('mEquipmentProfile').value!=='other';
-  for(const id of ['mMuscleKind','mMuscleUnit','mVisceralUnit'])$(id).disabled=omron;
-  if(omron){$('mMuscleKind').value='skeletal';$('mMuscleUnit').value='percent';$('mVisceralUnit').value='index';}
+  $('mEquipmentNameField').hidden=false;
+  for(const id of ['mMuscleKind','mMuscleUnit','mVisceralUnit'])$(id).disabled=false;
   const kg=$('mMuscleUnit').value==='kg',area=$('mVisceralUnit').value==='cm2';
   $('mMuscleLabel').textContent=($('mMuscleKind').value==='total'?'Massa muscular total':'Músculo esquelético')+(kg?' (kg)':' (% do peso)');
-  $('mVisceralLabel').textContent=area?'Área visceral estimada (cm²)':omron?'Gordura visceral (1–30)':'Gordura visceral (índice)';
-  $('mFat').max=omron?'60':'100';$('mMuscle').max=omron?'60':kg?'500':'100';$('mVisc').max=omron?'30':'1000';$('mVisc').min=omron?'1':'0.1';$('mVisc').step=omron?'1':'0.1';
-  $('measurementReferenceNote').textContent=omron?'Faixas do manual Omron HBF-514C, conforme sexo e idade. Não são diagnóstico.':'Faixas de gordura, músculo, visceral e idade corporal dependem do equipamento. O app preserva os valores e não aplica a tabela Omron.';
+  $('mVisceralLabel').textContent=area?'Área visceral estimada (cm²)':'Gordura visceral (escala adotada: 1–30)';
+  $('mFat').max='100';$('mMuscle').max=kg?'500':'100';$('mVisc').max=area?'1000':'30';$('mVisc').min=area?'0.1':'1';$('mVisc').step=area?'0.1':'1';
+  $('measurementReferenceNote').textContent='Usamos as mesmas faixas de acompanhamento por sexo e idade, com origem informada ou não. São as referências adotadas pelo app; a fonte e os limites aparecem nos detalhes. Não são diagnóstico.';
 }
+
 function validSourceFields(record){
   if(record.measurementSchema!=null&&record.measurementSchema!==2)return false;
   if(record.equipment!=null&&(typeof record.equipment!=='string'||record.equipment.length>120))return false;
@@ -1151,9 +1155,6 @@ function validSourceFields(record){
   if(muscleUnit(record)==='percent'&&validNumber(record.muscle)&&number(record.muscle)>100)return false;
   if(validNumber(record.fat)&&number(record.fat)>100)return false;
   if(muscleUnit(record)==='percent'&&validNumber(record.fat)&&validNumber(record.muscle)&&number(record.fat)+number(record.muscle)>100)return false;
-  if(omronReference(record,'fat')&&validNumber(record.fat)&&record.fat>60)return false;
-  if(omronReference(record,'muscle')&&validNumber(record.muscle)&&record.muscle>60)return false;
-  if(omronReference(record,'visceral')&&validNumber(record.visceral)&&(record.visceral>30||!Number.isInteger(number(record.visceral))))return false;
   return true;
 }
 function closeTraining(){ $('trainingModal').classList.add('hidden');trainingOpener?.focus?.(); }
@@ -1451,7 +1452,7 @@ function applyConversationalKnowledge(result,record) {
   const high=status=>['ALTO','MUITO ALTO'].includes(status);
   for(const [key,info]of Object.entries(result)) {
     const entry=clinicalKnowledge.metrics[key];if(!entry)continue;
-    if(['fat','muscle','visceral','bodyAge'].includes(key)&&!omronReference(record,key))continue;
+    if(['fat','muscle','visceral','bodyAge'].includes(key)&&!usesAppReference(record,key))continue;
     let state=info.neutral&&['SEM REFERÊNCIA','SEM DADOS'].includes(info.status)?'unknown':
       info.status==='BAIXO'||info.status==='BAIXO PESO'?'low':info.status==='MUITO ALTO'?'veryHigh':
       info.status==='ALTO'||info.status==='ACIMA DA REFERÊNCIA'||info.status==='ACIMA DA INFORMADA'||info.status==='SOBREPESO'||info.status.startsWith('OBESIDADE')?'high':'normal';
@@ -1463,7 +1464,7 @@ function applyConversationalKnowledge(result,record) {
       if(high(info.status))intro+=`Seu resultado está ${fmt(value-upper)} ponto(s) percentual(is) acima desse limite. `;
       if(info.status==='BAIXO')intro+=`São ${fmt(limits[0]-value)} ponto(s) percentual(is) abaixo do início da faixa. `;
     }else if(key==='bmi')intro=`Com ${fmt(record.weight)} kg e ${fmt(p.height)} cm, seu IMC é ${fmt(calcBmiValue(record.weight,p.height))} kg/m² (${info.status.toLowerCase()}). `;
-    else if(key==='visceral')intro=`Você registrou nível ${fmt(record.visceral,0)}; a faixa normal da Omron vai de 1 a 9. `;
+    else if(key==='visceral')intro=`Você registrou nível ${fmt(record.visceral,0)}; a faixa de acompanhamento adotada no app vai de 1 a 9 na escala 1–30. `;
     else if(key==='bodyAge')intro=`O registro informa ${fmt(record.bodyAge,0)} anos e sua idade registrada é ${fmt(p.age,0)}. `+(validNumber(record.bodyAge)&&(record.bodyAge<18||record.bodyAge>80)?'Esse valor de idade corporal está fora da faixa exibida pelo HBF-514C (18–80 anos); confira a transcrição. O valor salvo foi mantido. ':'');
     else if(key==='whr'&&number(record.hip)>0)intro=`Sua cintura é ${fmt(record.waist)} cm e seu quadril ${fmt(record.hip)} cm: a relação é ${fmt(record.waist/record.hip,2)}. `;
     else if(key==='weight')intro=`Sua pesagem foi de ${fmt(record.weight)} kg. `;
@@ -1484,7 +1485,7 @@ function applyConversationalKnowledge(result,record) {
     }else if(key==='visceral'&&info.status==='NORMAL'&&result.whr.altered) {
       info.contextEvidence='Neste registro, a RCQ está acima do corte mesmo com o visceral normal. Os indicadores observam aspectos diferentes; a cintura continua merecendo atenção.';
     }else if(key==='whr'&&info.altered&&result.visceral.status==='NORMAL') {
-      info.contextEvidence='Seu nível visceral está normal na escala Omron. Isso é um resultado favorável desse índice, mas não apaga a atenção indicada pela relação cintura–quadril.';
+      info.contextEvidence='Seu índice visceral está na faixa normal adotada pelo app. Isso é um resultado favorável desse índice, mas não apaga a atenção indicada pela relação cintura–quadril.';
     }
   }
   return result;
@@ -1572,30 +1573,31 @@ const clinicalSources=Object.fromEntries(Object.entries(clinicalKnowledge.source
 clinicalSources.inbody=['InBody — parâmetros e unidades dos laudos','https://research.inbody.com/result-sheet-interpretation-parameter-keynote/'];
 function clinicalEvidence(key,record,info) {
   const entry=clinicalKnowledge.metrics[key];
-  if(['fat','muscle','visceral','bodyAge'].includes(key)&&!omronReference(record,key))return {text:'Bioimpedância estima composição por algoritmos do equipamento. Músculo esquelético, massa muscular total e massa magra são indicadores diferentes. Hidratação, protocolo e equipamento podem alterar os resultados. Use as faixas do laudo; o holograma é apenas ilustrativo.',sources:key==='muscle'?['bia','inbody','strength']:['bia','inbody']};
-  return {text:entry.evidence+(info.contextEvidence?' '+info.contextEvidence:''),sources:entry.sources};
+  if(['fat','muscle','visceral','bodyAge'].includes(key)&&!usesAppReference(record,key))return {text:'Bioimpedância estima composição por algoritmos do equipamento. Músculo esquelético, massa muscular total e massa magra são indicadores diferentes. Hidratação, protocolo e equipamento podem alterar os resultados. Use as faixas do laudo; o holograma é apenas ilustrativo.',sources:key==='muscle'?['bia','inbody','strength']:['bia','inbody']};
+  if(key==='bodyAge')return {text:'Idade corporal é uma estimativa informada pelo exame, obtida por algoritmo próprio. Comparar esse número com a idade cadastrada não mede envelhecimento nem prevê longevidade.',sources:['bia','omron']};
+  return {text:entry.evidence+(info.contextEvidence?' '+info.contextEvidence:'')+(['fat','muscle','visceral'].includes(key)?' As faixas anteriores foram mantidas como referências de acompanhamento do app, independentemente da origem informada; não constituem validação para qualquer equipamento.':''),sources:entry.sources};
 }
 function clinicalRanges(key,record,info) {
   record=resolveReading(record);
   const p=profile(record),current=info.status;
-  if(['fat','muscle','visceral','bodyAge'].includes(key)&&!omronReference(record,key))return {ranges:[],note:'Sem faixa aplicável cadastrada para '+equipmentInfo(record).label+'. Valor em '+metricUnit(record,key)+'. Consulte a referência específica do exame. Ausência de classificação não significa resultado normal.'};
+  if(['fat','muscle','visceral','bodyAge'].includes(key)&&!usesAppReference(record,key))return {ranges:[],note:'A referência adotada usa músculo esquelético em % do peso e nível visceral na escala 1–30. Este registro usa '+metricUnit(record,key)+' ou outra definição; não há conversão automática para essa faixa. Ausência de classificação não significa resultado normal.'};
   let ranges=[],note='';
   const row=(label,value,status=label)=>({label,value,current:current===status});
   if(key==='fat'||key==='muscle') {
     const r=reference(key,p.sex,p.age);
     if(r)ranges=[row('Baixo',`< ${fmt(r[0])}%`,'BAIXO'),row('Normal',`${fmt(r[0])} a ${fmt(r[1]-.1)}%`,'NORMAL'),row('Alto',`${fmt(r[1])} a ${fmt(r[2]-.1)}%`,'ALTO'),row('Muito alto',`≥ ${fmt(r[2])}%`,'MUITO ALTO')];
-    note=r?`Omron HBF-514C • ${p.sex==='F'?'Feminino':'Masculino'} • ${fmt(p.age,0)} anos. Faixas para leituras com uma casa decimal.`:`Sem classificação Omron disponível para a idade informada. Gordura: 20–79 anos; músculo: 18–80 anos.`;
+    note=r?`Referência de acompanhamento adotada no BIOSHAPE • Fonte: manual Omron HBF-514C • ${p.sex==='F'?'Feminino':'Masculino'} • ${fmt(p.age,0)} anos. Faixas para leituras com uma casa decimal; usadas independentemente da origem informada. Não substituem o laudo específico nem avaliação individual.`:`Sem faixa de acompanhamento disponível para a idade informada. Gordura: 20–79 anos; músculo: 18–80 anos.`;
   }else if(key==='bmi') {
     ranges=[row('Baixo peso','< 18,5','BAIXO PESO'),row('Normal','18,5 a < 25','NORMAL'),row('Sobrepeso','25 a < 30','SOBREPESO'),row('Obesidade','≥ 30',current.startsWith('OBESIDADE')?current:'OBESIDADE')];note='IMC em kg/m². Pontos de corte para adultos; o cálculo completo define a faixa antes do arredondamento.';
   }else if(key==='visceral') {
-    ranges=[row('Normal','1 a 9','NORMAL'),row('Alto','10 a 14','ALTO'),row('Muito alto','15 a 30','MUITO ALTO')];note='Níveis relativos do aparelho. Não equivalem a uma área individual medida por tomografia.';
+    ranges=[row('Normal','1 a 9','NORMAL'),row('Alto','10 a 14','ALTO'),row('Muito alto','15 a 30','MUITO ALTO')];note='Escala 1–30 adotada para acompanhamento no app; fonte: manual Omron HBF-514C. Não é uma faixa universal de todos os aparelhos, nem equivale à área em cm² ou à tomografia.';
   }else if(key==='whr') {
     if(!['F','M'].includes(p.sex)||!Number.isFinite(p.age)||p.age<18)return {ranges:[],note:'Informe idade e sexo de referência para avaliar a RCQ em adultos.'};
     const cut=p.sex==='F'?'.85':'.90';ranges=[row('Abaixo do corte',`< 0,${cut.slice(1)}`,'ABAIXO DO CORTE'),row('No corte ou acima',`≥ 0,${cut.slice(1)}`,'ACIMA DA REFERÊNCIA')];note=`Referência para ${p.sex==='F'?'mulheres':'homens'}. Calcule a razão antes de arredondar. Considere o protocolo e a população.`;
   }else if(key==='bodyAge') {
-    ranges=[row('Idade informada',`${fmt(p.age,0)} anos`),row('Idade do visor',`${fmt(record.bodyAge,0)} anos`)];note='Comparação produzida pela Omron. Não há faixas clínicas de normalidade nem garantia de reversão em anos.';
+    ranges=[row('Idade informada',`${fmt(p.age,0)} anos`),row('Idade do visor',`${fmt(record.bodyAge,0)} anos`)];note='Comparação numérica da idade informada no exame com a idade cadastrada. Não há faixa clínica universal nem garantia de reversão em anos.';
   }else if(key==='weight') {
-    const fat=number(record.weight)*number(record.fat)/100;ranges=[row('Peso registrado',`${fmt(record.weight)} kg`),row('Gordura estimada',`${fmt(fat)} kg`),row('Livre de gordura',`${fmt(number(record.weight)-fat)} kg`)];note='Massa livre de gordura inclui músculos, água, ossos e órgãos. Os compartimentos são estimados.';
+    const fat=estimatedFatMass(record);ranges=[row('Peso registrado',`${fmt(record.weight)} kg`),row('Gordura estimada',`${fmt(fat)} kg`),row('Livre de gordura',`${fmt(number(record.weight)-fat)} kg`)];note='Massa livre de gordura inclui músculos, água, ossos e órgãos. Os compartimentos são estimados.';
   }else {
     ranges=[row('Repouso estimado',`${fmt(record.rm,0)} kcal/dia`)];note=record.rmMethod==='harris-benedict-1984'?'Calculado por Harris–Benedict revisada (1984), sem leitura do visor. Não representa todo o gasto diário nem uma meta calórica.':'Sem faixa universal de normalidade. Não representa todo o gasto diário nem uma meta calórica.';
   }
@@ -1619,7 +1621,7 @@ let PREFS_KEY = 'biovault_prefs';
 let GOALS_KEY = 'biovault_goals';
 let authSDK=null,authSession=null,currentUser=null,authReady=false,sdkPromise=null,accountEpoch=0,profileUnsubscribe=null;
 let authMode='login',authBusy=false,pendingSignupName='',guestMode=false;
-const APP_VERSION='5.2.1';
+const APP_VERSION='5.2.2';
 const UPDATE_MANIFEST='https://palomagarcia38-create.github.io/biovault-pro/public/updates/latest.json';
 let readings = [], selectedReadingId = null, compareMode = false;
 let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
@@ -1722,22 +1724,31 @@ function reference(kind, sex, age) {
   return (kind === 'fat' ? FAT_RANGES : MUSCLE_RANGES)[sex][age < 40 ? 0 : age < 60 ? 1 : 2];
 }
 function percentageInfo(value, limits, kind) {
-  if (!limits || !validNumber(value)) return {status:'SEM REFERÊNCIA',altered:false,neutral:true};
+  if (!validNumber(value)) return {status:'SEM DADOS',altered:false,neutral:true};
+  if (!limits) return {status:'SEM REFERÊNCIA',altered:false,neutral:true};
   const v = number(value), status = v < limits[0] ? 'BAIXO' : v < limits[1] ? 'NORMAL' : v < limits[2] ? 'ALTO' : 'MUITO ALTO';
   return {status, altered:kind === 'fat' ? status !== 'NORMAL' : status === 'BAIXO', neutral:kind === 'muscle' && ['ALTO','MUITO ALTO'].includes(status)};
+}
+function estimatedFatMass(record={}){
+  const weight=number(record.weight),fat=number(record.fat);
+  return Number.isFinite(weight)&&weight>0&&Number.isFinite(fat)&&fat>=0&&fat<=100?weight*fat/100:NaN;
+}
+function fatMassLabel(record){
+  const kg=estimatedFatMass(record);
+  return Number.isFinite(kg)?'≈ '+kg.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' kg de gordura':'Sem estimativa em kg';
 }
 function analyze(cur) {
   cur=resolveReading(cur);
   const p = profile(cur), bmi = calcBmiValue(cur.weight,p.height), bi = classifyBmi(bmi,p.age);
-  const fr = omronReference(cur,'fat')?reference('fat',p.sex,p.age):null, mr = omronReference(cur,'muscle')?reference('muscle',p.sex,p.age):null;
+  const fr = usesAppReference(cur,'fat')?reference('fat',p.sex,p.age):null, mr = usesAppReference(cur,'muscle')?reference('muscle',p.sex,p.age):null;
   const fi = percentageInfo(cur.fat,fr,'fat'), mi = percentageInfo(cur.muscle,mr,'muscle');
-  const validVisceral = omronReference(cur,'visceral') && validNumber(cur.visceral) && cur.visceral >= 1 && cur.visceral <= 30 && p.age >= 18 && p.age <= 80;
+  const validVisceral = usesAppReference(cur,'visceral') && validNumber(cur.visceral) && cur.visceral >= 1 && cur.visceral <= 30 && p.age >= 18 && p.age <= 80;
   const vi = {status:!validVisceral ? 'SEM REFERÊNCIA' : cur.visceral <= 9 ? 'NORMAL' : cur.visceral <= 14 ? 'ALTO' : 'MUITO ALTO',altered:validVisceral && cur.visceral > 9,neutral:!validVisceral};
   const ratio = validNumber(cur.waist) && validNumber(cur.hip) && cur.waist > 0 && cur.hip > 0 ? cur.waist / cur.hip : NaN;
   const rcqLimit = p.sex === 'F' ? .85 : .9, ratioReference=['F','M'].includes(p.sex)&&Number.isFinite(p.age)&&p.age>=18, ratioAltered = ratioReference && Number.isFinite(ratio) && ratio >= rcqLimit;
-  const ageValid = omronReference(cur,'bodyAge') && validNumber(cur.bodyAge) && cur.bodyAge >= 18 && cur.bodyAge <= 80 && Number.isFinite(p.age) && p.age >= 18 && p.age <= 80;
+  const ageValid = usesAppReference(cur,'bodyAge') && validNumber(cur.bodyAge) && cur.bodyAge >= 18 && cur.bodyAge <= 80 && Number.isFinite(p.age) && p.age >= 18 && p.age <= 80;
   const ageDiff = ageValid ? cur.bodyAge - p.age : NaN;
-  const fatKg = validNumber(cur.fat) ? cur.weight * cur.fat / 100 : NaN;
+  const fatKg = estimatedFatMass(cur);
   const muscleKg = validNumber(cur.muscle) ? muscleUnit(cur)==='kg'?number(cur.muscle):cur.weight * cur.muscle / 100 : NaN;
   const neutral = {altered:false,neutral:true};
   const make = (title,status,info,whatIs,why,action) => ({title,status,...info,whatIs,why,action});
@@ -1747,15 +1758,15 @@ function analyze(cur) {
       bi.neutral ? 'Confira a altura e a idade para interpretar o índice.' : bi.isAltered ? `O cálculo está na faixa ${bi.label.toLowerCase()}. O IMC não separa gordura, músculo e líquidos; músculo alto não permite atribuir sozinho a causa do IMC elevado.` : 'O cálculo está na faixa de referência para adultos. Isso não avalia todos os aspectos da saúde.',
       'Compare com cintura, composição corporal e histórico. Avalie mudanças alimentares com orientação individual.'),
     fat:make(`Gordura corporal — ${fmt(cur.fat)}% (${fmt(fatKg)} kg estimados)`,fi.status,fi,
-      `Proporção estimada do peso correspondente à gordura.${fr ? ` Referência Omron para ${p.sex === 'F' ? 'mulheres' : 'homens'} de ${p.age} anos: ${fmt(fr[0])}% a ${fmt(fr[1]-.1)}%.` : ' O manual não fornece classificação para a idade informada (faixas disponíveis: 20–79 anos).'}`,
+      `Proporção estimada do peso correspondente à gordura.${fr ? ` Faixa adotada pelo app para ${p.sex === 'F' ? 'mulheres' : 'homens'} de ${p.age} anos: ${fmt(fr[0])}% a ${fmt(fr[1]-.1)}%.` : ' A referência adotada não abrange a idade informada (faixas disponíveis: 20–79 anos).'}`,
       fi.neutral ? 'Registre a idade correta. Sem uma faixa aplicável, o aplicativo não classifica esse percentual.' : fi.altered ? `O percentual está ${fi.status.toLowerCase()} em relação à referência. Hidratação e condições da medição influenciam a estimativa. A leitura não identifica a causa da diferença.` : 'O percentual estimado está na faixa de referência da idade e do sexo registrados.',
       fi.status === 'BAIXO' ? 'Evite restrição calórica sem avaliação. Se houver perda involuntária de peso, alimentação insuficiente ou sintomas, procure avaliação.' : fi.altered ? 'Acompanhe a tendência em condições semelhantes e avalie alimentação, atividade física e preservação de músculo com um profissional.' : 'Mantenha condições semelhantes de medição para acompanhar a tendência.'),
     muscle:make(`Músculo esquelético — ${fmt(cur.muscle)}% (${fmt(muscleKg)} kg estimados)`,mi.status,mi,
-      `Percentual estimado dos músculos ligados aos ossos.${mr ? ` Referência Omron: ${fmt(mr[0])}% a ${fmt(mr[1]-.1)}% na faixa normal; alto a partir de ${fmt(mr[1])}%.` : ' A classificação Omron está disponível de 18 a 80 anos.'}`,
+      `Percentual estimado dos músculos ligados aos ossos.${mr ? ` Faixa adotada pelo app: ${fmt(mr[0])}% a ${fmt(mr[1]-.1)}% na faixa normal; alto a partir de ${fmt(mr[1])}%.` : ' A faixa de acompanhamento adotada abrange 18–80 anos.'}`,
       mi.status === 'SEM REFERÊNCIA' ? 'Não há faixa aplicável para a idade ou não há valor registrado.' : mi.altered ? 'O percentual está abaixo da referência. Ele depende do peso total e da hidratação; não confirma perda muscular nem sarcopenia.' : 'A classificação descreve o percentual estimado. Valores altos não confirmam força, função ou proteção contra doenças.',
       mi.altered ? 'Acompanhe força e função, além do percentual. Discuta treino de força e alimentação adequada ao seu contexto.' : 'Compare a tendência com força, medidas e atividade física.'),
     visceral:make(`Gordura visceral — nível ${fmt(cur.visceral,0)}`,vi.status,vi,
-      'Índice relativo estimado pela Omron: 1–9 normal, 10–14 alto e 15–30 muito alto. Não equivale a uma medição por imagem.',
+      'Escala de acompanhamento adotada no app: 1–9 normal, 10–14 alto e 15–30 muito alto. Fonte das faixas: manual Omron HBF-514C. Índices de outros métodos podem não ser equivalentes; não há conversão de área em cm² para nível e não se trata de medição por imagem.',
       !validVisceral ? 'Confira o nível informado e a idade (referência de 18–80 anos).' : vi.altered ? 'O nível está acima da referência da balança. Adiposidade abdominal elevada pode se associar a risco metabólico; a leitura não mede cortisol, inflamação ou resistência à insulina.' : 'O nível está na faixa normal da balança. Ele não exclui fatores de risco cardiovascular ou metabólico.',
       vi.altered ? 'Observe a evolução junto com a cintura e leve os registros para avaliação dos demais fatores de risco.' : 'Acompanhe a tendência do nível e da cintura em condições semelhantes.'),
     bodyAge:make(`Idade corporal — ${fmt(cur.bodyAge,0)} anos (informada: ${fmt(p.age,0)})`,!ageValid ? 'SEM REFERÊNCIA' : ageDiff > 0 ? 'ACIMA DA INFORMADA' : ageDiff < 0 ? 'ABAIXO DA INFORMADA' : 'IGUAL À INFORMADA',{altered:ageValid && ageDiff > 0,neutral:true},
@@ -1776,8 +1787,13 @@ function analyze(cur) {
       'A leitura não define uma meta de consumo calórico nem um limite seguro para dieta. Use avaliação individual para planejar a alimentação.')
   };
   if(muscleUnit(cur)==='kg')result.muscle.title=muscleLabel(cur)+' — '+fmt(cur.muscle)+' kg';
-  for(const key of ['fat','muscle','visceral','bodyAge'])if(!omronReference(cur,key)){const info=result[key];Object.assign(info,{title:(key==='muscle'?muscleLabel(cur):key==='fat'?'Gordura corporal':key==='visceral'?'Gordura visceral':'Idade corporal')+' — '+fmt(cur[key],key==='bodyAge'?0:1)+' '+metricUnit(cur,key),status:validNumber(cur[key])?'SEM REFERÊNCIA':'SEM DADOS',altered:false,neutral:true,whatIs:'Resultado informado em '+metricUnit(cur,key)+'. A definição, o método e as faixas dependem do equipamento ou laudo. Não há conversão automática entre índices, área e percentuais.',why:'Equipamento: '+equipmentInfo(cur).label+'. A referência Omron não se aplica a este indicador.',action:'Confira o indicador, a unidade e as referências do laudo. Compare em condições semelhantes e leve seu histórico à avaliação profissional.',conversationHeadline:'Seu registro, com a referência do equipamento'});}
-  return applyConversationalKnowledge(result,cur);
+  for(const key of ['fat','muscle','visceral','bodyAge'])if(!usesAppReference(cur,key)){const info=result[key];Object.assign(info,{title:(key==='muscle'?muscleLabel(cur):key==='fat'?'Gordura corporal':key==='visceral'?'Gordura visceral':'Idade corporal')+' — '+fmt(cur[key],key==='bodyAge'?0:1)+' '+metricUnit(cur,key),status:validNumber(cur[key])?'SEM REFERÊNCIA':'SEM DADOS',altered:false,neutral:true,whatIs:'Resultado informado em '+metricUnit(cur,key)+'. A definição, o método e as faixas dependem do equipamento ou laudo. Não há conversão automática entre índices, área e percentuais.',why:'A referência adotada usa percentual de músculo esquelético e nível visceral 1–30; ela não se aplica a outras unidades ou à massa muscular total.',action:'Confira o indicador, a unidade e as referências do laudo. Compare em condições semelhantes e leve seu histórico à avaliação profissional.',conversationHeadline:'Seu registro, com a referência do equipamento'});}
+  const output=applyConversationalKnowledge(result,cur);
+  if(Number.isFinite(fatKg))output.fat.whatIs+=' Massa de gordura estimada: '+fmt(cur.weight)+' kg × '+fmt(cur.fat)+'% ÷ 100 = '+fmt(fatKg)+' kg. É uma conversão do percentual informado, não uma medição direta.';
+  output.bodyAge.whatIs='Idade corporal informada no exame. A comparação com a idade cadastrada é numérica; o algoritmo do equipamento não mede envelhecimento biológico.';
+  output.bodyAge.why=ageValid?'Diferença de '+(ageDiff>0?'+':'')+ageDiff+' ano(s) em relação à idade cadastrada. Não representa diagnóstico, longevidade ou previsão de resultado.':'Valor fora da faixa de comparação adotada (18–80 anos), ou idade não informada. O dado original permanece preservado.';
+  output.bodyAge.conversationHeadline='Idade corporal informada no exame';
+  return output;
 }
 function populateCompareDropdown(list = visibleReadings()) {
   const previous = $('compareSelect').value;
@@ -1809,7 +1825,7 @@ function recomputeAll() {
   const cur = currentReading, previous = list.find(r => r.id === $('compareSelect').value) || list[0];
   currentAnalyses = analyze(cur);
   const a = currentAnalyses, altered = Object.keys(a).filter(k => a[k].altered);
-  $('activeReadingBadge').textContent = `${dateLabel(cur.date)} • ${recordPersonName(cur)} • ${equipmentInfo(cur).label}`;
+  $('activeReadingBadge').textContent = `${dateLabel(cur.date)} • ${recordPersonName(cur)}${equipmentInfo(cur).known?' • '+equipmentInfo(cur).label:''}`;
   $('comparisonSourceNotice').textContent=sourceNotice(compareMode?[previous,cur]:[cur]);$('comparisonSourceNotice').hidden=!$('comparisonSourceNotice').textContent;
   $('phenotypeTitle').textContent = altered.length ? `${altered.length} indicador(es) em atenção` : 'Indicadores nas faixas avaliadas';
   $('phenotypeDesc').textContent = altered.length ? 'Toque nos cards destacados ou nos alertas para entender cada resultado.' : 'Veja as referências e as limitações ao tocar nos indicadores.';
@@ -1837,11 +1853,11 @@ function recomputeAll() {
     const short={weight:'PESO',fat:'GORDURA',visceral:'VISCERAL',rm:'BASAL',bmi:'IMC AUTO',muscle:'MÚSCULO',bodyAge:'IDADE CORPORAL',whr:'CINT./QUADRIL'}[key];
     const primary={weight:fmt(cur.weight),fat:fmt(cur.fat),visceral:fmt(cur.visceral,0),rm:fmt(cur.rm,0),bmi:fmt(bmi),muscle:fmt(cur.muscle),bodyAge:fmt(cur.bodyAge,0),whr:number(cur.hip)>0?fmt(rcq,2):'—'}[key];
     const unit={weight:'kg',fat:'%',visceral:metricUnit(cur,'visceral'),rm:'kcal',bmi:'',muscle:metricUnit(cur,'muscle'),bodyAge:'anos',whr:''}[key];
-    return `<button type="button" data-metric="${key}" data-compare="${compareMode}" data-favorable="${!!info.favorable}" aria-label="${title}: ${value}. ${info.status}. Abrir detalhes" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node hud-panel ${danger?'alert-danger-border':''} ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title"><span class="metric-full-label">${title}</span><span class="metric-short-label" aria-hidden="true">${short}</span><i class="fa-solid fa-${glyph} metric-glyph" aria-hidden="true"></i></span><span class="metric-value">${primary}<span class="metric-unit">${unit}</span></span>${metricReferenceBar(key,cur,info)}<span class="metric-status ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="metric-sub">${sub}</span></button>`;
+    return `<button type="button" data-metric="${key}" data-compare="${compareMode}" data-favorable="${!!info.favorable}" aria-label="${title}: ${value}. ${info.status}. Abrir detalhes" aria-pressed="${key===selectedMetricKey}" class="metric-card bio-node hud-panel ${danger?'alert-danger-border':''} ${info.altered?'alert-card altered-node':''} ${key===selectedMetricKey?'active-card active-node':''} rounded-xl p-2.5 sm:p-3 cursor-pointer"><span class="metric-title"><span class="metric-full-label">${title}</span><span class="metric-short-label" aria-hidden="true">${short}</span><i class="fa-solid fa-${glyph} metric-glyph" aria-hidden="true"></i></span><span class="metric-value">${primary}<span class="metric-unit">${unit}</span></span>${key==='fat'?`<span class="metric-estimate">${fatMassLabel(cur)}<small>Estimativa pelo percentual informado</small></span>`:''}${metricReferenceBar(key,cur,info)}<span class="metric-status ${info.altered?'text-amber-400':info.neutral?'text-sky-300':'text-emerald-400'}">${info.status}</span><span class="metric-sub">${sub}</span></button>`;
   };
   $('leftCardsColumn').innerHTML = ['weight','fat','visceral','rm'].map(card).join('');
   $('rightCardsColumn').innerHTML = ['bmi','muscle','bodyAge','whr'].map(card).join('');
-  $('svgVisceralCore').setAttribute('r',String(omronReference(cur,'visceral')&&validNumber(cur.visceral)?Math.min(18,5+cur.visceral*.8):5));
+  $('svgVisceralCore').setAttribute('r',String(usesAppReference(cur,'visceral')&&validNumber(cur.visceral)?Math.min(18,5+cur.visceral*.8):5));
   $('svgVisceralCore').setAttribute('fill',a.visceral.altered ? '#ff2a5f' : a.visceral.neutral?'#94a3b8':'#10b981');
   updateHolo3DState(cur);
   selectMetricDetail(selectedMetricKey,false); renderClinicalAlerts(altered); updateGoalsBox(); renderEvolutionChart(list); setSyncStatus();
@@ -2053,7 +2069,7 @@ async function saveWeighing(event) {
   const old=editingReadingId?readings.find(r=>r.id===editingReadingId&&!r._deleted):null;
   if(editingReadingId&&(!old||inFlight.has(old.id))){$('saveStatus').textContent='Aguarde a sincronização ou reabra a medição antes de editar.';return;}
   const fields={weight:'mWeight',height:'mHeight',fat:'mFat',muscle:'mMuscle',visceral:'mVisc',bodyAge:'mBodyAge',rm:'mRm',waist:'mWaist',hip:'mHip'};
-  const item={...old,id:old?.id||'bv_'+crypto.randomUUID(),date:$('mDate').value,personName,personId:old?.personId||profilePersonId||'person_'+crypto.randomUUID(),sex:$('mSex').value,age:number($('mAge').value),measurementSchema:2,equipment:$('mEquipmentProfile').value==='omron'?'Omron HBF-514C':$('mEquipmentProfile').value==='other'?$('mEquipment').value.trim().slice(0,120)||null:null,muscleUnit:$('mMuscleUnit').value,muscleKind:$('mMuscleKind').value,visceralUnit:$('mVisceralUnit').value,notes:$('mNotes').value.trim(),entryMethod:'manual',createdAt:old?.createdAt||new Date().toISOString(),_sync:'pending',_revision:crypto.randomUUID()};
+  const item={...old,id:old?.id||'bv_'+crypto.randomUUID(),date:$('mDate').value,personName,personId:old?.personId||profilePersonId||'person_'+crypto.randomUUID(),sex:$('mSex').value,age:number($('mAge').value),measurementSchema:2,equipment:$('mEquipment').value.trim().slice(0,120)||null,muscleUnit:$('mMuscleUnit').value,muscleKind:$('mMuscleKind').value,visceralUnit:$('mVisceralUnit').value,notes:$('mNotes').value.trim(),entryMethod:'manual',createdAt:old?.createdAt||new Date().toISOString(),_sync:'pending',_revision:crypto.randomUUID()};
   for(const [key,id]of Object.entries(fields))item[key]=$(id).value===''?null:number($(id).value);
   if(item.rm==null){item.rm=estimateRestingEnergy(item.weight,item.height,item.age,item.sex);item.rmMethod='harris-benedict-1984';}else item.rmMethod='reported';
   const optional=['fat','muscle','visceral','bodyAge','waist','hip'];
@@ -2083,18 +2099,18 @@ function openReportModal() {
   $('repTableRows').innerHTML=definitions.map(([key,label])=>{
     const x=value(first,key),y=value(cur,key),d=comparableMetric(first,cur,key)?y-x:NaN,info=a[key],digits=key==='whr'?2:['rm','bodyAge'].includes(key)||key==='visceral'&&visceralUnit(cur)==='index'?0:1;
     const deltaUnit=['fat','muscle'].includes(key)&&metricUnit(cur,key)==='%'?'p.p.':metricUnit(cur,key);
-    return `<tr><td class="py-2 font-bold text-white">${label}${key==='muscle'&&muscleKind(first)!==muscleKind(cur)?' (tipo alterado)':''}</td><td class="py-2 mono text-slate-400">${fmt(x,digits)} ${metricUnit(first,key)}</td><td class="py-2 mono font-bold text-white">${fmt(y,digits)} ${metricUnit(cur,key)}</td><td class="py-2 mono text-sky-400">${Number.isFinite(d)?(d>0?'+':'')+fmt(d,digits)+' '+deltaUnit:'Sem comparação'}</td><td class="py-2 font-bold ${info?.altered?'text-amber-300':info?.neutral?'text-sky-300':'text-emerald-400'}">${info?.status||'REGISTRADO'}</td></tr>`;
+    return `<tr><td class="py-2 font-bold text-white">${label}${key==='muscle'&&muscleKind(first)!==muscleKind(cur)?' (tipo alterado)':''}</td><td class="py-2 mono text-slate-400">${fmt(x,digits)} ${metricUnit(first,key)}${key==='fat'?`<small class="block">${fatMassLabel(first)}</small>`:''}</td><td class="py-2 mono font-bold text-white">${fmt(y,digits)} ${metricUnit(cur,key)}${key==='fat'?`<small class="block">${fatMassLabel(cur)}</small>`:''}</td><td class="py-2 mono text-sky-400">${Number.isFinite(d)?(d>0?'+':'')+fmt(d,digits)+' '+deltaUnit:'Sem comparação'}</td><td class="py-2 font-bold ${info?.altered?'text-amber-300':info?.neutral?'text-sky-300':'text-emerald-400'}">${info?.status||'REGISTRADO'}</td></tr>`;
   }).join('');
   $('repEquipment').textContent='Equipamento inicial: '+equipmentInfo(first).label+' · Selecionado: '+equipmentInfo(cur).label+'. '+sourceNotice([first,cur]);
   $('repNotes').textContent=cur.notes?'Observações transcritas, sem interpretação automática: '+cur.notes:'';
-  $('repSynthesis').textContent=`Comparação entre ${dateLabel(first.date)} e a pesagem selecionada de ${dateLabel(cur.date)} • ${recordPersonName(cur)}. Peso ${fmt(cur.weight)} kg; IMC ${fmt(calcBmiValue(cur.weight,p.height))} kg/m²; gordura ${fmt(cur.fat)}%; ${muscleLabel(cur).toLowerCase()} ${fmt(cur.muscle)} ${metricUnit(cur,'muscle')}; visceral ${fmt(cur.visceral)} ${metricUnit(cur,'visceral')}.${cur._sync==='pending'?' Registro pendente de sincronização.':''}${cur.height?'':' A altura desta pesagem antiga não estava registrada; o IMC usa a altura informada no topo.'}${cur.rmMethod==='harris-benedict-1984'?' Metabolismo em repouso calculado por Harris–Benedict revisada (1984); não é leitura do equipamento.':''}`;
+  $('repSynthesis').textContent=`Comparação entre ${dateLabel(first.date)} e a pesagem selecionada de ${dateLabel(cur.date)} • ${recordPersonName(cur)}. Peso ${fmt(cur.weight)} kg; IMC ${fmt(calcBmiValue(cur.weight,p.height))} kg/m²; gordura ${fmt(cur.fat)}% (${fatMassLabel(cur)}, estimados pelo percentual); ${muscleLabel(cur).toLowerCase()} ${fmt(cur.muscle)} ${metricUnit(cur,'muscle')}; visceral ${fmt(cur.visceral)} ${metricUnit(cur,'visceral')}.${cur._sync==='pending'?' Registro pendente de sincronização.':''}${cur.height?'':' A altura desta pesagem antiga não estava registrada; o IMC usa a altura informada no topo.'}${cur.rmMethod==='harris-benedict-1984'?' Metabolismo em repouso calculado por Harris–Benedict revisada (1984); não é leitura do equipamento.':''}`;
   $('reportModal').classList.remove('hidden');
 }
 
 function closeReportModal() { $('reportModal').classList.add('hidden'); }
 function shareWhatsApp() {
   if(!currentReading)return;const r=currentReading,p=profile(r);
-  const message=`${recordPersonName(r)} • BIOSHAPE • ${equipmentInfo(r).label} (${dateLabel(r.date)})\n• Peso: ${fmt(r.weight)} kg | Altura: ${fmt(p.height)} cm | IMC: ${fmt(calcBmiValue(r.weight,p.height))}\n• Gordura: ${fmt(r.fat)}% | ${muscleLabel(r)}: ${fmt(r.muscle)} ${metricUnit(r,'muscle')}\n• Visceral: ${fmt(r.visceral)} ${metricUnit(r,'visceral')} | Idade corporal: ${fmt(r.bodyAge,0)} anos\nEstimativas do equipamento; sem diagnóstico.`;
+  const message=`${recordPersonName(r)} • BIOSHAPE • ${equipmentInfo(r).label} (${dateLabel(r.date)})\n• Peso: ${fmt(r.weight)} kg | Altura: ${fmt(p.height)} cm | IMC: ${fmt(calcBmiValue(r.weight,p.height))}\n• Gordura: ${fmt(r.fat)}% (${fatMassLabel(r)}, estimativa) | ${muscleLabel(r)}: ${fmt(r.muscle)} ${metricUnit(r,'muscle')}\n• Visceral: ${fmt(r.visceral)} ${metricUnit(r,'visceral')} | Idade corporal: ${fmt(r.bodyAge,0)} anos\nEstimativas do equipamento; sem diagnóstico.`;
   window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
 }
 
@@ -2220,9 +2236,9 @@ function restoreLocalIdentity(remote,local){
   return merged;
 }
 function buildCsv(list=visibleReadings()){
-  const headers=['Nome','Data','Sexo de referência','Idade (anos)','Altura (cm)','Peso (kg)','Gordura (%)','Músculo (valor)','Visceral (valor)','Idade corporal (anos)','Repouso (kcal/dia)','Origem do repouso','Cintura (cm)','Quadril (cm)','IMC (kg/m²)','RCQ','Equipamento','Identificador','Unidade do músculo','Tipo de músculo','Unidade visceral','Observações'];
+  const headers=['Nome','Data','Sexo de referência','Idade (anos)','Altura (cm)','Peso (kg)','Gordura (%)','Músculo (valor)','Visceral (valor)','Idade corporal (anos)','Repouso (kcal/dia)','Origem do repouso','Cintura (cm)','Quadril (cm)','IMC (kg/m²)','RCQ','Equipamento','Identificador','Unidade do músculo','Tipo de músculo','Unidade visceral','Observações','Gordura estimada (kg)'];
   const cell=value=>{let s=value==null?'':String(value);if(typeof value==='string'&&/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';};
-  const rows=list.map(r=>{const p=profile(r);return [recordPersonName(r),r.date,p.sex,p.age,p.height,r.weight,r.fat,r.muscle,r.visceral,r.bodyAge,readingBasal(r),r.rmMethod||'reported',r.waist,r.hip,Number.isFinite(calcBmiValue(r.weight,p.height))?Number(calcBmiValue(r.weight,p.height).toFixed(2)):null,r.waist>0&&r.hip>0?Number((r.waist/r.hip).toFixed(4)):null,equipmentInfo(r).label,r.id,metricUnit(r,'muscle'),muscleKind(r),metricUnit(r,'visceral'),r.notes||''];});
+  const rows=list.map(r=>{const p=profile(r);return [recordPersonName(r),r.date,p.sex,p.age,p.height,r.weight,r.fat,r.muscle,r.visceral,r.bodyAge,readingBasal(r),r.rmMethod||'reported',r.waist,r.hip,Number.isFinite(calcBmiValue(r.weight,p.height))?Number(calcBmiValue(r.weight,p.height).toFixed(2)):null,r.waist>0&&r.hip>0?Number((r.waist/r.hip).toFixed(4)):null,equipmentInfo(r).label,r.id,metricUnit(r,'muscle'),muscleKind(r),metricUnit(r,'visceral'),r.notes||'',Number.isFinite(estimatedFatMass(r))?Number(estimatedFatMass(r).toFixed(1)):null];});
   return '\ufeff'+[headers,...rows].map(row=>row.map(v=>typeof v==='number'&&!Number.isFinite(v)?'':cell(v)).join(';')).join('\r\n');
 }
 function buildBackup(){return {format:'biovault-backup',schema:1,exportedAt:new Date().toISOString(),profile:readJSON(PREFS_KEY,{}),goals:goalPayload(readJSON(GOALS_KEY,{})),measurements:readings};}
