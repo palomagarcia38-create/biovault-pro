@@ -55,10 +55,12 @@ public final class MainActivity extends Activity {
     super.onCreate(saved);
     getWindow().setStatusBarColor(Color.rgb(2,6,17));
     getWindow().setNavigationBarColor(Color.rgb(2,6,17));
-    // Target 35 enforces edge-to-edge. Apply system insets to keep controls reachable.
+    // Keep status/cutout/keyboard insets, while navigation is revealed transiently by swipe.
+    if(android.os.Build.VERSION.SDK_INT>=30)getWindow().setDecorFitsSystemWindows(false);
+    if(android.os.Build.VERSION.SDK_INT>=29)getWindow().setNavigationBarContrastEnforced(false);
     web=new WebView(this);web.setBackgroundColor(Color.rgb(2,6,17));
     web.setOnApplyWindowInsetsListener((view,insets)->{
-      if(android.os.Build.VERSION.SDK_INT>=30){android.graphics.Insets bars=insets.getInsets(android.view.WindowInsets.Type.systemBars()|android.view.WindowInsets.Type.displayCutout());view.setPadding(bars.left,bars.top,bars.right,bars.bottom);}
+      if(android.os.Build.VERSION.SDK_INT>=30){android.graphics.Insets bars=insets.getInsets(android.view.WindowInsets.Type.systemBars()|android.view.WindowInsets.Type.displayCutout());int bottom=Math.max(bars.bottom,insets.getInsets(android.view.WindowInsets.Type.ime()).bottom);view.setPadding(bars.left,bars.top,bars.right,bottom);}
       else view.setPadding(insets.getSystemWindowInsetLeft(),insets.getSystemWindowInsetTop(),insets.getSystemWindowInsetRight(),insets.getSystemWindowInsetBottom());
       return insets;
     });
@@ -98,8 +100,16 @@ public final class MainActivity extends Activity {
         return true;
       }
     });
-    setContentView(web);web.loadUrl(START);
+    setContentView(web);web.loadUrl(START);getWindow().getDecorView().post(this::hideSystemNavigation);
   }
+  private void hideSystemNavigation(){
+    if(android.os.Build.VERSION.SDK_INT>=30){
+      android.view.WindowInsetsController controller=getWindow().getInsetsController();
+      if(controller!=null){controller.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);controller.hide(android.view.WindowInsets.Type.navigationBars());}
+    }else getWindow().getDecorView().setSystemUiVisibility(android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE|android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION|android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+  }
+  @Override public void onWindowFocusChanged(boolean focused){super.onWindowFocusChanged(focused);if(focused)hideSystemNavigation();}
+  @Override protected void onResume(){super.onResume();getWindow().getDecorView().post(this::hideSystemNavigation);}
   private long versionCode(PackageInfo info){return android.os.Build.VERSION.SDK_INT>=28?info.getLongVersionCode():info.versionCode;}
   private WebResourceResponse missing(){return new WebResourceResponse("text/plain","UTF-8",404,"Not Found",new HashMap<>(),new ByteArrayInputStream(new byte[0]));}
   private void toast(String message){runOnUiThread(()->Toast.makeText(this,message,Toast.LENGTH_LONG).show());}
@@ -190,8 +200,8 @@ public final class MainActivity extends Activity {
     }
     if(request==UNKNOWN_SOURCES){if(getPackageManager().canRequestPackageInstalls())installUpdate();else updateStatus("Permissão não concedida. O aplicativo foi mantido.");}
   }
-  @Override public void onBackPressed(){web.evaluateJavascript("(() => {const ids=['newWeighingModal','reportModal','importBackupModal','metricDetailModal','quickPanelModal'];return ids.some(id=>!document.getElementById(id)?.classList.contains('hidden'));})()",visible->{
-    if("true".equals(visible))web.evaluateJavascript("closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();",null);
+  @Override public void onBackPressed(){web.evaluateJavascript("(() => {const ids=['goalPlanModal','newWeighingModal','reportModal','importBackupModal','metricDetailModal','quickPanelModal'];return ids.some(id=>!document.getElementById(id)?.classList.contains('hidden'));})()",visible->{
+    if("true".equals(visible))web.evaluateJavascript("if(!document.getElementById('goalPlanModal').classList.contains('hidden'))deferGoalPlan();else{closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();}",null);
     else new AlertDialog.Builder(this).setTitle("Sair do BioVault?").setMessage("Suas pesagens continuarão salvas.").setNegativeButton("Continuar",null).setPositiveButton("Sair",(dialog,which)->finish()).show();
   });}
   @Override protected void onDestroy(){if(fileCallback!=null)fileCallback.onReceiveValue(null);web.removeJavascriptInterface("BioVaultNative");web.destroy();worker.shutdownNow();super.onDestroy();}

@@ -26,6 +26,15 @@ const assert=require('node:assert/strict');
     await assertFails(getDocs(collection(anon,'measurements')));passed++;
     await assertFails(setDoc(doc(alice,'measurements/legacy'),reading));passed++;
     await assertSucceeds(getDoc(doc(anon,'clinical_knowledge/biovault-v4-4')));passed++;
+    const goal={schema:2,objective:'lose_weight',targets:{weight:60,fat:25,muscle:32,visceral:null},baseline:null,deadline:'2027-02-20',startedAt:'2026-11-20',updatedAt:'2026-11-20',history:[],dismissed:false};
+    await assertSucceeds(setDoc(doc(alice,'users/alice/goals/active'),goal));passed++;
+    await assertSucceeds(getDoc(doc(alice,'users/alice/goals/active')));passed++;
+    await assertFails(getDoc(doc(bob,'users/alice/goals/active')));passed++;
+    await assertFails(setDoc(doc(bob,'users/alice/goals/active'),goal));passed++;
+    await assertFails(getDoc(doc(anon,'users/alice/goals/active')));passed++;
+    await assertFails(setDoc(doc(alice,'users/alice/goals/active'),{...goal,targets:{weight:-1}}));passed++;
+    await assertFails(setDoc(doc(alice,'users/alice/goals/active'),{...goal,admin:true}));passed++;
+    await assertSucceeds(setDoc(doc(alice,'users/alice/goals/active'),{schema:2,dismissed:true,objective:null,targets:{},baseline:null,deadline:null,startedAt:'2026-11-20',updatedAt:'2026-11-20'}));passed++;
     assert.equal((await getDoc(doc(alice,'users/alice/measurements/a'))).data().weight,65);passed++;
     console.log(JSON.stringify({passed,project:'demo-biovault',productionWrites:0}));
   }finally{await env.cleanup();}

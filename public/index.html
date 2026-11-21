@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BioVault Pro • Holographic HUD v5.0.0</title>
+  <title>BioVault Pro • Holographic HUD v5.1.0</title>
   <link rel="stylesheet" href="vendor/tailwind.css" />
   <script src="vendor/chart.umd.js"></script>
   <link rel="stylesheet" href="vendor/fontawesome.css">
@@ -475,6 +475,35 @@ html {scrollbar-gutter:stable;}
 #accountEmail{flex:1;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 #updateStatus{font-size:11px;color:#91cdd6;}
 @media print{#authScreen,#accountBar{display:none!important;}}
+body.pb-20{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));}
+#goalRibbon{display:block;margin:8px auto 0;padding:8px 14px;border:1px solid #205264;border-radius:24px;color:#9cecf1;font-size:11px;max-width:100%;text-align:center;}
+.goal-modal.hidden{display:none;}
+.goal-modal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:12px;background:#000b;backdrop-filter:blur(8px);}
+.goal-modal-card{width:min(100%,540px);max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;background:#071320;border:1px solid #205264;border-radius:22px;padding:22px;color:#e2eef3;scroll-padding:24px;}
+.goal-modal-top{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#5ad9e5;font:10px 'Inter',sans-serif;letter-spacing:2px;}
+.goal-modal-top button{min-width:44px;min-height:44px;font-size:18px;letter-spacing:0;}
+.goal-modal-card h2{font-size:25px;font-weight:800;letter-spacing:-.8px;line-height:1.15;}
+.goal-intro{font-size:13px;color:#a4bfcd;margin:12px 0 20px;line-height:1.6;}
+.goal-modal-card h3,.goal-objectives legend{font-size:13px;font-weight:700;margin:18px 0 10px;}
+.goal-objectives{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 20px;border:0;}
+.goal-objectives label{display:flex;align-items:center;gap:8px;border:1px solid #264557;border-radius:12px;padding:12px 10px;font-size:12px;min-height:54px;cursor:pointer;}
+.goal-objectives label:has(input:checked){border-color:#5de8e6;background:#0f3444;color:#c7fffa;}
+.goal-objectives input{accent-color:#64eee3;width:17px;height:17px;flex-shrink:0;}
+.goal-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.goal-input-grid label,.goal-date-label{font-size:11px;color:#a9c7d3;display:block;}
+.goal-input-grid input,.goal-date-label input{display:block;width:100%;background:#020b16;border:1px solid #284a5b;color:#fff;padding:12px;border-radius:10px;font-size:16px;min-height:48px;margin-top:7px;box-sizing:border-box;}
+.goal-modal-card input:focus{outline:2px solid #5ce3e9;outline-offset:2px;}
+.goal-help{font-size:11px;color:#87a9b9;line-height:1.65;margin:10px 0 15px;}
+.goal-date-shortcuts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}.goal-date-shortcuts button{border:1px solid #25485c;border-radius:20px;padding:9px 12px;color:#a8d8e6;font-size:11px;}
+.goal-save{display:block;width:100%;margin-top:15px;padding:14px;border-radius:12px;color:#032435;background:linear-gradient(100deg,#66eee1,#37bdf7);font-size:14px;font-weight:800;}
+.goal-defer{display:block;width:100%;padding:13px;margin-top:5px;color:#95b9c9;font-size:12px;}
+#goalFormStatus{color:#ffda93;font-size:12px;line-height:1.6;}
+.goal-plan-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin:8px 0 12px;}.goal-plan-heading span{font-size:9px;letter-spacing:2px;color:#5ae2e8;}.goal-plan-heading h3{font-size:18px;font-weight:800;margin:6px 0;}.goal-plan-heading p,.goal-comparison-note{font-size:11px;color:#93b6c8;line-height:1.6;}
+.goal-plan-heading button,.goal-empty button{border:1px solid #2a5869;border-radius:10px;padding:10px 13px;color:#a0eced;font-size:11px;white-space:nowrap;}
+.goal-progress-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:15px 0;}
+.goal-progress-card{padding:15px;background:#071522;border:1px solid #1c3c4d;border-radius:15px;}.goal-card-title{display:flex;justify-content:space-between;gap:8px;font-size:12px;}.goal-card-title span{color:#58dfde;font-size:10px;}.goal-values{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:17px 0;color:#87a9bb;font-size:9px;}.goal-values b{display:block;color:#d5edf2;font-size:16px;margin-top:4px;}.goal-track{height:6px;border-radius:9px;background:#142f40;overflow:hidden;}.goal-track i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#35bacb,#63eadb);}.goal-progress-card p{font-size:10px;color:#9eb6c6;margin-top:11px;line-height:1.6;}.goal-progress-card p.goal-achieved{color:#62e8b3;}.goal-legacy{color:#8eadbd;padding:8px 0;}.goal-legacy>summary{cursor:pointer;margin:10px 0;}.goal-empty{padding:20px;border:1px dashed #295268;border-radius:15px;line-height:1.7;}.goal-empty strong{font-size:16px;}.goal-empty p{font-size:12px;color:#8dafbe;margin:8px 0 15px;}
+@media(max-width:390px){.goal-modal-card{padding:16px;}.goal-values b{font-size:14px;}.goal-plan-heading h3{font-size:15px;}}
+
   </style>
 </head>
 <body class="pb-20">
@@ -519,13 +548,14 @@ html {scrollbar-gutter:stable;}
           </div>
         </div>
         <button onclick="checkForAppUpdate()" id="updateAppButton" title="Buscar atualização" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v5.0.0
+          ↻ v5.1.0
         </button>
       </div>
 
       <div id="accountBar"><span id="accountEmail">Uso neste aparelho</span><button id="accountLoginButton" type="button" onclick="showAccountLogin()">Entrar</button><button id="accountLogoutButton" type="button" onclick="logoutAccount()" hidden>Sair</button><button id="importDeviceButton" type="button" onclick="importDeviceHistory()" hidden>Trazer histórico deste aparelho</button><span id="updateStatus" role="status"></span></div>
       <!-- CONTROLES SUPERIORES -->
       <div id="personContext"><strong id="personContextName">Seu acompanhamento</strong><span id="personContextMeta">Comece pelo seu nome e sua altura</span></div>
+      <button type="button" id="goalRibbon" onclick="openGoalPlan()">◎ Vamos definir suas metas?</button>
       <details id="profileDrawer"><summary><i class="fa-solid fa-sliders" aria-hidden="true"></i> Perfil e ferramentas <i class="fa-solid fa-angle-down" aria-hidden="true"></i></summary>
       <div id="profileControls" class="flex flex-wrap items-center gap-2">
         <label class="person-name-control">Seu nome<input id="profileNameInput" type="text" maxlength="80" autocomplete="name" placeholder="Como você se chama?" onchange="saveProfilePrefs(); renderPersonContext()" /></label>
@@ -720,7 +750,7 @@ html {scrollbar-gutter:stable;}
         <div id="metricChartGrid"></div>
       </div>
 
-      <div id="subView-goals" class="hidden space-y-3 text-xs">
+      <div id="subView-goals" class="hidden space-y-3 text-xs"><div id="goalPlanOverview"></div><details class="goal-legacy"><summary>Ajustes rápidos de composição</summary>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div class="bg-[#07101f] border border-slate-800 rounded-xl p-2.5">
             <div class="flex justify-between font-bold"><span>Meta Gordura %</span><span id="gFatLbl" class="text-sky-400 mono">22.0%</span></div>
@@ -735,7 +765,7 @@ html {scrollbar-gutter:stable;}
             <input type="range" min="1" max="30" step="1" value="5" id="gViscSlider" oninput="updateGoalsBox()" class="w-full accent-amber-500 mt-1" />
           </div>
         </div>
-        <div id="goalsSummaryText" class="bg-[#07101f] border border-slate-800 rounded-xl p-3 text-slate-300"></div>
+        </details><div id="goalsSummaryText" class="bg-[#07101f] border border-slate-800 rounded-xl p-3 text-slate-300"></div>
       </div>
 
       <div id="subView-alerts" class="space-y-2 text-xs"></div>
@@ -865,7 +895,7 @@ html {scrollbar-gutter:stable;}
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v5.0.0</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BioVault Pro • Omron HBF-514C • HUD v5.1.0</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>INÍCIO</span></button>
@@ -875,6 +905,36 @@ html {scrollbar-gutter:stable;}
   </nav>
 
 <div id="importBackupModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 no-print" role="dialog" aria-modal="true" aria-labelledby="importBackupTitle"><div class="panel-dark cyber-panel rounded-2xl p-5 w-full max-w-lg space-y-4"><div class="flex justify-between gap-4"><h2 id="importBackupTitle">Revisar restauração do backup</h2><button id="closeImportButton" type="button" onclick="closeImportBackup()" aria-label="Fechar restauração">✕</button></div><p id="importBackupSummary" role="status"></p><button id="confirmImportButton" type="button" class="neon-btn rounded-xl p-3 w-full" onclick="confirmImportBackup()" disabled>Adicionar registros revisados</button></div></div>
+<div id="goalPlanModal" class="hidden goal-modal no-print" role="dialog" aria-modal="true" aria-labelledby="goalPlanHeading">
+  <div class="goal-modal-card">
+    <div class="goal-modal-top"><span>SEU ACOMPANHAMENTO</span><button type="button" onclick="deferGoalPlan()" aria-label="Fechar metas">✕</button></div>
+    <h2 id="goalPlanHeading">Quais são suas metas?</h2>
+    <p class="goal-intro">Um plano seu, para comparar cada nova pesagem com o que você quer alcançar.</p>
+    <form id="goalPlanForm" onsubmit="saveGoalPlan(event)">
+      <fieldset class="goal-objectives"><legend>Qual é seu objetivo principal?</legend>
+        <label><input id="goalObjectiveLose" type="radio" name="goalObjective" value="lose_weight" required />Perder peso</label>
+        <label><input type="radio" name="goalObjective" value="gain_muscle" required />Ganhar massa muscular</label>
+        <label><input type="radio" name="goalObjective" value="recomposition" required />Reduzir gordura e ganhar músculo</label>
+        <label><input type="radio" name="goalObjective" value="maintain" required />Manter meus resultados</label>
+      </fieldset>
+      <h3>Onde você quer chegar?</h3><p class="goal-help">Preencha os indicadores que quer acompanhar. Basta definir um deles.</p>
+      <div class="goal-input-grid">
+        <label>Peso desejado · kg<input id="goalTargetWeight" type="number" inputmode="decimal" min="5" max="150" step="0.1" /></label>
+        <label>Gordura corporal · %<input id="goalTargetFat" type="number" inputmode="decimal" min="5" max="60" step="0.1" /></label>
+        <label>Músculo esquelético · %<input id="goalTargetMuscle" type="number" inputmode="decimal" min="5" max="60" step="0.1" /></label>
+        <label>Gordura visceral · nível<input id="goalTargetVisceral" type="number" inputmode="numeric" min="1" max="30" step="1" /></label>
+      </div>
+      <h3>Em quanto tempo?</h3><div class="goal-date-shortcuts"><button type="button" onclick="setGoalWeeks(4)">4 semanas</button><button type="button" onclick="setGoalWeeks(8)">8 semanas</button><button type="button" onclick="setGoalWeeks(12)">12 semanas</button></div>
+      <label class="goal-date-label">Data desejada · opcional<input id="goalDeadline" type="date" /></label>
+      <p id="goalBaselineNote" class="goal-help"></p>
+      <p class="goal-help">Você pode ajustar o plano depois. O prazo ajuda a acompanhar sua evolução, sem prever automaticamente o resultado.</p>
+      <div id="goalFormStatus" role="status" aria-live="polite"></div>
+      <button type="submit" class="goal-save">Salvar minhas metas</button>
+      <button type="button" class="goal-defer" onclick="deferGoalPlan()">Definir mais tarde</button>
+    </form>
+  </div>
+</div>
+
 </div>
   <script type="module">
     const firebaseConfig = {
@@ -1416,7 +1476,7 @@ let PREFS_KEY = 'biovault_prefs';
 let GOALS_KEY = 'biovault_goals';
 let authSDK=null,authSession=null,currentUser=null,authReady=false,sdkPromise=null,accountEpoch=0,profileUnsubscribe=null;
 let authMode='login',authBusy=false,pendingSignupName='',guestMode=false;
-const APP_VERSION='5.0.0';
+const APP_VERSION='5.1.0';
 const UPDATE_MANIFEST='https://palomagarcia38-create.github.io/biovault-pro/public/updates/latest.json';
 let readings = [], selectedReadingId = null, compareMode = false;
 let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
@@ -1470,7 +1530,7 @@ function profile(r = {}) {
 }
 function pendingCount() { return readings.filter(r => ['pending','deleting'].includes(r._sync)).length; }
 function setSyncStatus() {
-  const n = pendingCount(), synced = currentUser && db && serverSeen && navigator.onLine && !n;
+  const n = pendingCount()+(readJSON(GOALS_KEY,{})?._pending?1:0), synced = currentUser && db && serverSeen && navigator.onLine && !n;
   $('syncPill').className = `text-[10px] px-2 py-1 rounded-full font-semibold ${synced ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}`;
   $('syncPill').textContent = n ? `● ${n} pendente(s) de sincronização` : synced ? '● Firebase sincronizado' : currentUser?'● Conta • salvo no aparelho':'● Salvo neste aparelho';
 }
@@ -1489,7 +1549,7 @@ function loadProfilePrefs() {
   renderPersonContext();
   const goals = readJSON(GOALS_KEY, {}) || {};
   for (const [k,id] of Object.entries({fat:'gFatSlider',muscle:'gMuscSlider',visceral:'gViscSlider'})) {
-    if (validNumber(goals[k])) $(id).value = goals[k];
+    if (validNumber(goalTargets(goals)[k])) $(id).value = goalTargets(goals)[k];
   }
 }
 function saveProfilePrefs() {
@@ -1693,14 +1753,114 @@ function renderEvolutionChart(list = visibleReadings()) {
   ]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#17253d'}},kg:{position:'left',title:{display:true,text:'kg',color:'#00f0ff'},ticks:{color:'#94a3b8'},grid:{color:'#17253d'}},percent:{position:'right',title:{display:true,text:'%',color:'#94a3b8'},ticks:{color:'#94a3b8'},grid:{drawOnChartArea:false}}}}});
   renderMetricGallery(list,allReadings);
 }
-function updateGoalsBox() {
-  const fat=number($('gFatSlider').value),muscle=number($('gMuscSlider').value),visceral=number($('gViscSlider').value);
-  $('gFatLbl').textContent=`${fmt(fat)}%`; $('gMuscLbl').textContent=`${fmt(muscle)}%`; $('gViscLbl').textContent=`Nível ${fmt(visceral,0)}`;
-  if (!currentReading) return;
-  const r=currentReading;
-  $('goalsSummaryText').textContent = `Metas pessoais de acompanhamento, ajustáveis: gordura ${fmt(fat)}% (atual ${fmt(r.fat)}%; diferença ${fmt(number(r.fat)-fat)} p.p.); músculo ${fmt(muscle)}% (atual ${fmt(r.muscle)}%; diferença ${fmt(muscle-number(r.muscle))} p.p.); visceral nível ${visceral} (atual ${fmt(r.visceral,0)}). Os alvos não são prescrições automáticas.`;
+const GOAL_OBJECTIVES={lose_weight:'Perder peso',gain_muscle:'Ganhar massa muscular',recomposition:'Reduzir gordura e ganhar músculo',maintain:'Manter meus resultados'};
+let goalDraftBaseline=null,goalOpener=null,goalUnsubscribe=null,goalSyncEpoch=null;
+function goalTargets(plan={}){return plan.targets||{weight:null,fat:plan.fat??null,muscle:plan.muscle??null,visceral:plan.visceral??null};}
+function goalConfigured(plan=readJSON(GOALS_KEY,{})){plan=plan||{};return plan.schema===2&&!!GOAL_OBJECTIVES[plan.objective]&&Object.values(goalTargets(plan)).some(validNumber);}
+function goalBaseline(record){return record?{id:String(record.id),date:record.date,weight:validNumber(record.weight)?number(record.weight):null,fat:validNumber(record.fat)?number(record.fat):null,muscle:validNumber(record.muscle)?number(record.muscle):null,visceral:validNumber(record.visceral)?number(record.visceral):null}:null;}
+function goalMetricProgress(start,current,target,key='weight'){
+  if(!validNumber(target)||!validNumber(current)||!validNumber(start))return {available:false,reached:false,progress:null};
+  start=number(start);current=number(current);target=number(target);
+  const tolerance=key==='weight'?.5:key==='visceral'?0:.5;
+  const same=Math.abs(target-start)<1e-9;
+  const reached=same?Math.abs(current-target)<=tolerance:target>start?current>=target:current<=target;
+  const progress=same?(reached?100:0):Math.max(0,Math.min(100,(current-start)/(target-start)*100));
+  return {available:true,reached,progress,remaining:Math.abs(target-current),direction:same?'maintain':target>start?'up':'down'};
 }
-function saveGoals() { writeJSON(GOALS_KEY,{fat:number($('gFatSlider').value),muscle:number($('gMuscSlider').value),visceral:number($('gViscSlider').value)}); updateGoalsBox(); }
+function goalDays(from,to){return Math.round((Date.parse(to+'T12:00:00Z')-Date.parse(from+'T12:00:00Z'))/86400000);}
+function updateGoalsBox(){
+  const fat=number($('gFatSlider').value),muscle=number($('gMuscSlider').value),visceral=number($('gViscSlider').value);
+  $('gFatLbl').textContent=`${fmt(fat)}%`;$('gMuscLbl').textContent=`${fmt(muscle)}%`;$('gViscLbl').textContent=`Nível ${fmt(visceral,0)}`;
+  const plan=readJSON(GOALS_KEY,{})||{},configured=goalConfigured(plan),r=currentReading;
+  $('goalRibbon').textContent=configured?'◎ Minhas metas · '+GOAL_OBJECTIVES[plan.objective]:'◎ Vamos definir suas metas?';
+  if(!configured){
+    $('goalPlanOverview').innerHTML='<div class="goal-empty"><strong>Seu próximo passo começa com uma meta.</strong><p>Escolha seu objetivo, os indicadores que quer acompanhar e um prazo.</p><button type="button" onclick="openGoalPlan()">Definir minhas metas</button></div>';
+    if(r)$('goalsSummaryText').textContent=`Metas rápidas ajustáveis: gordura ${fmt(fat)}% (atual ${fmt(r.fat)}%); músculo ${fmt(muscle)}% (atual ${fmt(r.muscle)}%); visceral nível ${visceral} (atual ${fmt(r.visceral,0)}).`;
+    return;
+  }
+  const targets=goalTargets(plan),base=plan.baseline;
+  const definitions=[['weight','Peso','kg',1],['fat','Gordura corporal','%',1],['muscle','Músculo esquelético','%',1],['visceral','Gordura visceral','nível',0]];
+  let active=0,reached=0;
+  const cards=definitions.filter(([key])=>validNumber(targets[key])).map(([key,label,unit,digits])=>{
+    active++;const result=goalMetricProgress(base?.[key],r?.[key],targets[key],key);if(result.reached)reached++;
+    const achieved=allVisible().filter(x=>!base||x.date>=base.date).filter(x=>!r||x.date<=r.date).find(x=>goalMetricProgress(base?.[key],x[key],targets[key],key).reached);
+    const state=!r?'Aguardando sua primeira pesagem':!validNumber(r[key])?'Indicador não informado nesta pesagem':!validNumber(base?.[key])?'Sem este indicador na pesagem de partida':result.reached?'Meta atingida':result.direction==='maintain'?'Fora da faixa de manutenção':`Faltam ${fmt(result.remaining,digits)} ${['fat','muscle'].includes(key)?'p.p.':unit}`;
+    return `<article class="goal-progress-card"><div class="goal-card-title"><strong>${label}</strong><span>${result.available?Math.round(result.progress)+'% do caminho':'Sem comparação'}</span></div><div class="goal-values"><span>Partida<b>${fmt(base?.[key],digits)} ${unit}</b></span><span>Selecionada<b>${fmt(r?.[key],digits)} ${unit}</b></span><span>Meta<b>${fmt(targets[key],digits)} ${unit}</b></span></div><div class="goal-track" role="progressbar" aria-label="Progresso da meta de ${label}" ${result.available?`aria-valuenow="${Math.round(result.progress)}" aria-valuemin="0" aria-valuemax="100"`:'aria-valuetext="Sem dados suficientes"'}><i style="width:${result.progress??0}%"></i></div><p class="${result.reached?'goal-achieved':''}">${state}${achieved?' · Primeiro registro no alvo: '+dateLabel(achieved.date):''}</p></article>`;
+  }).join('');
+  let timing='Sem prazo definido';
+  if(validDate(plan.deadline)){const days=goalDays(localDate(),plan.deadline);timing=dateLabel(plan.deadline)+' · '+(days>0?'faltam '+days+' dias':days===0?'prazo hoje':'prazo encerrado há '+Math.abs(days)+' dias');}
+  $('goalPlanOverview').innerHTML=`<div class="goal-plan-heading"><div><span>MEU PLANO</span><h3>${GOAL_OBJECTIVES[plan.objective]}</h3><p>${timing}</p></div><button type="button" onclick="openGoalPlan()">Editar metas</button></div><p class="goal-comparison-note">${r?'Comparação com a pesagem selecionada de '+dateLabel(r.date)+'.':'A comparação começa na primeira pesagem.'} ${reached} de ${active} alvo(s) atingido(s).</p><div class="goal-progress-grid">${cards}</div>`;
+  $('goalsSummaryText').textContent='O prazo organiza seu acompanhamento; não é uma previsão automática de resultado. Percentuais de gordura e músculo são estimativas da balança. Ao manter um valor, o acompanhamento usa uma faixa de ±0,5 kg ou ponto percentual.';
+}
+function goalPayload(plan){plan=plan||{};return Object.fromEntries(Object.entries(plan).filter(([key])=>!key.startsWith('_')));}
+function saveGoals(){
+  const old=readJSON(GOALS_KEY,{})||{};
+  const plan={...old,schema:2,objective:old.objective||'recomposition',targets:{...goalTargets(old),fat:number($('gFatSlider').value),muscle:number($('gMuscSlider').value),visceral:number($('gViscSlider').value)},baseline:old.baseline||goalBaseline(currentReading),deadline:old.deadline||null,startedAt:old.startedAt||localDate(),updatedAt:new Date().toISOString(),_pending:true,_revision:crypto.randomUUID()};
+  if(writeJSON(GOALS_KEY,plan)){updateGoalsBox();void syncAccountGoals();}
+}
+function openGoalPlan(){
+  closeMetricDetail();const plan=readJSON(GOALS_KEY,{})||{},targets=goalTargets(plan);
+  goalOpener=document.activeElement;goalDraftBaseline=plan.baseline||goalBaseline(currentReading||allVisible().at(-1));
+  $('goalPlanForm').reset();
+  for(const input of document.querySelectorAll('input[name="goalObjective"]'))input.checked=input.value===plan.objective;
+  for(const [key,id]of Object.entries({weight:'goalTargetWeight',fat:'goalTargetFat',muscle:'goalTargetMuscle',visceral:'goalTargetVisceral'})){
+    $(id).value=validNumber(targets[key])?targets[key]:'';$(id).placeholder=validNumber(currentReading?.[key])?'Atual: '+fmt(currentReading[key]):'Opcional';
+  }
+  $('goalDeadline').value=validDate(plan.deadline)?plan.deadline:'';
+  $('goalPlanHeading').textContent=goalConfigured(plan)?'Vamos ajustar suas metas?':'Quais são suas metas?';
+  $('goalBaselineNote').textContent=goalDraftBaseline?'Sua partida será a pesagem de '+dateLabel(goalDraftBaseline.date)+'. Os dados das pesagens serão preservados.':'Sua primeira pesagem será o ponto de partida da comparação.';
+  $('goalFormStatus').textContent='';$('goalPlanModal').classList.remove('hidden');document.querySelector('input[name="goalObjective"]:checked')?.focus();
+  if(!plan.objective)$('goalObjectiveLose').focus();
+}
+function hideGoalPlan(){ $('goalPlanModal').classList.add('hidden');goalDraftBaseline=null;if(goalOpener?.isConnected)goalOpener.focus(); }
+function deferGoalPlan(){
+  const plan=readJSON(GOALS_KEY,{})||{};
+  if(!goalConfigured(plan))writeJSON(GOALS_KEY,{schema:2,dismissed:true,objective:null,targets:{},baseline:null,deadline:null,startedAt:localDate(),updatedAt:new Date().toISOString(),_pending:true,_revision:crypto.randomUUID()});
+  hideGoalPlan();void syncAccountGoals();
+}
+function setGoalWeeks(weeks){const d=new Date(localDate()+'T12:00:00');d.setDate(d.getDate()+weeks*7);$('goalDeadline').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function saveGoalPlan(event){
+  event.preventDefault();if(!$('goalPlanForm').reportValidity())return;
+  const objective=document.querySelector('input[name="goalObjective"]:checked')?.value;
+  if(!GOAL_OBJECTIVES[objective]){$('goalFormStatus').textContent='Escolha seu objetivo principal.';return;}
+  const targets={};for(const [key,id]of Object.entries({weight:'goalTargetWeight',fat:'goalTargetFat',muscle:'goalTargetMuscle',visceral:'goalTargetVisceral'}))targets[key]=$(id).value===''?null:number($(id).value);
+  if(!Object.values(targets).some(validNumber)){$('goalFormStatus').textContent='Defina pelo menos um alvo de peso, gordura, músculo ou gordura visceral.';return;}
+  if(validNumber(targets.fat)&&validNumber(targets.muscle)&&targets.fat+targets.muscle>100){$('goalFormStatus').textContent='A soma das metas de gordura e músculo não pode ultrapassar 100%.';return;}
+  const deadline=$('goalDeadline').value||null;
+  if(deadline&&(!validDate(deadline)||(goalDraftBaseline?.date&&deadline<goalDraftBaseline.date))){$('goalFormStatus').textContent='Escolha um prazo válido, a partir da pesagem de partida.';return;}
+  const old=readJSON(GOALS_KEY,{})||{},history=[...(Array.isArray(old.history)?old.history:[])];
+  if(goalConfigured(old)){const previous=goalPayload(old);delete previous.history;history.push(previous);}
+  const plan={schema:2,objective,targets,baseline:goalDraftBaseline,deadline,startedAt:old.startedAt||localDate(),updatedAt:new Date().toISOString(),history:history.slice(-20),dismissed:false,_pending:true,_revision:crypto.randomUUID()};
+  if(!writeJSON(GOALS_KEY,plan)){$('goalFormStatus').textContent='Não foi possível guardar suas metas. Os campos foram mantidos.';return;}
+  for(const [key,id]of Object.entries({fat:'gFatSlider',muscle:'gMuscSlider',visceral:'gViscSlider'}))if(validNumber(targets[key]))$(id).value=targets[key];
+  hideGoalPlan();updateGoalsBox();setSyncStatus();notify('Metas salvas. Você pode ajustá-las em Metas a qualquer momento.');void syncAccountGoals();
+}
+function anchorGoalBaseline(record){
+  const plan=readJSON(GOALS_KEY,{})||{};if(!goalConfigured(plan)||plan.baseline)return;
+  writeJSON(GOALS_KEY,{...plan,baseline:goalBaseline(record),_pending:true,_revision:crypto.randomUUID()});void syncAccountGoals();
+}
+async function syncAccountGoals(){
+  const user=currentUser,epoch=accountEpoch;if(!user||!db||!navigator.onLine||goalSyncEpoch===epoch)return;
+  const plan=readJSON(GOALS_KEY,{})||{};if(!plan._pending||plan.schema!==2)return;
+  goalSyncEpoch=epoch;
+  try{
+    await fire.setDoc(fire.doc(db,'users',user.uid,'goals','active'),goalPayload(plan));
+    if(epoch===accountEpoch&&readJSON(GOALS_KEY,{})._revision===plan._revision)writeJSON(GOALS_KEY,{...plan,_pending:false});
+  }catch{}finally{
+    if(goalSyncEpoch===epoch)goalSyncEpoch=null;
+    if(epoch===accountEpoch){setSyncStatus();const current=readJSON(GOALS_KEY,{});if(current._pending&&current._revision!==plan._revision)void syncAccountGoals();}
+  }
+}
+function subscribeAccountGoals(){
+  if(!currentUser||!db)return;const epoch=accountEpoch;
+  goalUnsubscribe=fire.onSnapshot(fire.doc(db,'users',currentUser.uid,'goals','active'),snapshot=>{
+    if(epoch!==accountEpoch||!snapshot.exists()||readJSON(GOALS_KEY,{})._pending)return;
+    const plan=snapshot.data();if(plan.schema!==2)return;
+    if(writeJSON(GOALS_KEY,{...plan,_pending:false})){for(const [key,id]of Object.entries({fat:'gFatSlider',muscle:'gMuscSlider',visceral:'gViscSlider'}))if(validNumber(goalTargets(plan)[key]))$(id).value=goalTargets(plan)[key];updateGoalsBox();}
+  },()=>{});
+  void syncAccountGoals();
+}
+
 function switchSubView(tab) {
   if (!['alerts','chart','goals','history'].includes(tab)) return;
   activeTab=tab;
@@ -1742,6 +1902,8 @@ async function saveWeighing(event) {
     if(!persist()){readings=before;$('saveStatus').textContent='A medição não foi salva. Os campos foram mantidos para você tentar novamente.';return;}
     profilePersonId=item.personId;$('profileNameInput').value=personName;$('heightCmInput').value=item.height;$('realAgeInput').value=item.age;$('sexSelect').value=item.sex;saveProfilePrefs();
     selectedReadingId=item.id;editingReadingId=null;recomputeAll();$('newWeighingModal').classList.add('hidden');
+    anchorGoalBaseline(item);
+    if(!old&&!goalConfigured()&&!readJSON(GOALS_KEY,{}).dismissed)openGoalPlan();
     notify(old?'Medição atualizada. A versão anterior foi preservada no backup.':'Medição salva para '+personName+'. Acompanhe a sincronização no topo.');void flushPending();
   }finally{saving=false;$('btnSaveWeighing').disabled=false;$('btnSaveWeighing').textContent='Salvar medição';}
 }
@@ -1766,7 +1928,7 @@ function shareWhatsApp() {
 async function flushPending() {
   const user=currentUser,epoch=accountEpoch;
   if (!user || !db || !navigator.onLine) {setSyncStatus();return;}
-  void syncAccountProfile();
+  void syncAccountProfile();void syncAccountGoals();
   for (const item of [...readings]) {
     if(epoch!==accountEpoch)return;
     const flightKey=user.uid+':'+item.id;
@@ -1794,7 +1956,7 @@ async function flushPending() {
   }
 }
 async function getFirebaseSDKs(){
-  if(!sdkPromise)sdkPromise=Promise.all([import('./vendor/firebase-app.js?v=50000.1'),import('./vendor/firebase-firestore.js?v=50000.1'),import('./vendor/firebase-auth.js?v=50000.1')]).then(([appSDK,fireSDK,identitySDK])=>{
+  if(!sdkPromise)sdkPromise=Promise.all([import('./vendor/firebase-app.js?v=50100.1'),import('./vendor/firebase-firestore.js?v=50100.1'),import('./vendor/firebase-auth.js?v=50100.1')]).then(([appSDK,fireSDK,identitySDK])=>{
     fire=fireSDK;authSDK=identitySDK;const app=appSDK.getApps().length?appSDK.getApp():appSDK.initializeApp(firebaseConfig);
     db=fire.getFirestore(app);void loadCloudKnowledge(fire,db);authSession=authSDK.getAuth(app);authSession.languageCode='pt-BR';
     authSDK.onAuthStateChanged(authSession,user=>{authReady=true;switchAccount(user);});
@@ -1819,6 +1981,7 @@ function subscribeAccount(){
     readings=[...merged.values()];if(!snapshot.metadata.fromCache)serverSeen=true;
     persist();recomputeAll();if(!snapshot.metadata.fromCache)void flushPending();
   },()=>{if(epoch!==accountEpoch)return;serverSeen=false;unsubscribe=null;setSyncStatus();notify('As pesagens estão salvas no aparelho. Não foi possível sincronizar sua conta.');});
+  subscribeAccountGoals();
   profileUnsubscribe=fire.onSnapshot(fire.doc(db,'users',user.uid,'profile','main'),snapshot=>{
     if(epoch!==accountEpoch||!snapshot.exists())return;
     const local=readJSON(PREFS_KEY,{});if(local._pending)return;
@@ -1879,7 +2042,7 @@ function buildCsv(list=visibleReadings()){
   const rows=list.map(r=>{const p=profile(r);return [recordPersonName(r),r.date,p.sex,p.age,p.height,r.weight,r.fat,r.muscle,r.visceral,r.bodyAge,readingBasal(r),r.rmMethod||'reported',r.waist,r.hip,Number.isFinite(calcBmiValue(r.weight,p.height))?Number(calcBmiValue(r.weight,p.height).toFixed(2)):null,r.waist>0&&r.hip>0?Number((r.waist/r.hip).toFixed(4)):null,r.equipment||'Omron HBF-514C',r.id];});
   return '\ufeff'+[headers,...rows].map(row=>row.map(v=>typeof v==='number'&&!Number.isFinite(v)?'':cell(v)).join(';')).join('\r\n');
 }
-function buildBackup(){return {format:'biovault-backup',schema:1,exportedAt:new Date().toISOString(),profile:readJSON(PREFS_KEY,{}),measurements:readings};}
+function buildBackup(){return {format:'biovault-backup',schema:1,exportedAt:new Date().toISOString(),profile:readJSON(PREFS_KEY,{}),goals:goalPayload(readJSON(GOALS_KEY,{})),measurements:readings};}
 function downloadFile(contents,type,name){
   if(window.BioVaultNative?.saveFile){const bytes=new TextEncoder().encode(contents);let binary='';for(const byte of bytes)binary+=String.fromCharCode(byte);window.BioVaultNative.saveFile(btoa(binary),name,type);return;}
   const url=URL.createObjectURL(new Blob([contents],{type}));const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -1958,6 +2121,7 @@ async function resetAccountPassword(){
 }
 function resetAccountView(){
   closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();
+  hideGoalPlan();
   readings=[];selectedReadingId=null;currentReading=null;serverSeen=false;profilePersonId=null;storageBlocked=false;
   $('profileNameInput').value='';$('sexSelect').value='F';$('realAgeInput').value='28';$('heightCmInput').value='165';
   $('gFatSlider').value='25';$('gMuscSlider').value='32';$('gViscSlider').value='9';
@@ -1965,7 +2129,7 @@ function resetAccountView(){
 function switchAccount(user){
   // A late auth-null event must not overwrite an explicitly selected local mode.
   if(!user&&guestMode)return;
-  accountEpoch++;unsubscribe?.();profileUnsubscribe?.();unsubscribe=null;profileUnsubscribe=null;inFlight.clear();
+  accountEpoch++;unsubscribe?.();profileUnsubscribe?.();goalUnsubscribe?.();unsubscribe=null;profileUnsubscribe=null;goalUnsubscribe=null;inFlight.clear();
   currentUser=user;guestMode=false;resetAccountView();
   if(user){
     CACHE_KEY='biovault_user_'+user.uid+'_readings';PREFS_KEY='biovault_user_'+user.uid+'_prefs';GOALS_KEY='biovault_user_'+user.uid+'_goals';
@@ -1982,7 +2146,7 @@ function switchAccount(user){
   }
 }
 function continueOnDevice(){
-  if(authBusy||currentUser)return;accountEpoch++;guestMode=true;unsubscribe?.();profileUnsubscribe?.();unsubscribe=null;profileUnsubscribe=null;resetAccountView();
+  if(authBusy||currentUser)return;accountEpoch++;guestMode=true;unsubscribe?.();profileUnsubscribe?.();goalUnsubscribe?.();unsubscribe=null;profileUnsubscribe=null;goalUnsubscribe=null;resetAccountView();
   CACHE_KEY='biovault_local_readings';PREFS_KEY='biovault_prefs';GOALS_KEY='biovault_goals';
   const cached=readJSON(CACHE_KEY,[]);if(Array.isArray(cached))readings=cached.map(r=>normalize(r)).filter(Boolean);else storageBlocked=true;
   loadProfilePrefs();migrateLegacyCache();recomputeAll();$('authScreen').hidden=true;$('appRoot').inert=false;$('accountEmail').textContent='Salvo somente neste aparelho';$('accountLoginButton').hidden=false;$('accountLogoutButton').hidden=true;
@@ -2018,7 +2182,7 @@ async function checkForAppUpdate(){
 function printReport(){if(window.BioVaultNative?.printReport)window.BioVaultNative.printReport();else window.print();}
 
 
-Object.assign(window,{setAuthMode,submitAccountForm,resetAccountPassword,continueOnDevice,showAccountLogin,logoutAccount,checkForAppUpdate,printReport,importDeviceHistory,renderPersonContext,editReading,exportCsv,exportBackup,previewBackupFile,closeImportBackup,confirmImportBackup,renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
+Object.assign(window,{openGoalPlan,saveGoalPlan,deferGoalPlan,setGoalWeeks,setAuthMode,submitAccountForm,resetAccountPassword,continueOnDevice,showAccountLogin,logoutAccount,checkForAppUpdate,printReport,importDeviceHistory,renderPersonContext,editReading,exportCsv,exportBackup,previewBackupFile,closeImportBackup,confirmImportBackup,renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
 document.addEventListener('click',event=>{
   if(event.target.closest('[data-metric-close]'))closeMetricDetail();
   if(event.target.closest('[data-metric-evolution]'))openMetricEvolution();
@@ -2036,6 +2200,7 @@ for (const id of ['gFatSlider','gMuscSlider','gViscSlider']) $(id).addEventListe
 window.addEventListener('online',()=>{void connectCloud();void flushPending();});
 window.addEventListener('offline',()=>{serverSeen=false;setSyncStatus();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){void connectCloud();void flushPending();}});
+$('goalPlanModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.stopPropagation();deferGoalPlan();}if(event.key==='Tab'){const items=[...$('goalPlanModal').querySelectorAll('input,button')].filter(el=>!el.disabled&&!el.closest('[hidden]'));const first=items[0],last=items.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
 $('backupFileInput').addEventListener('change',event=>void previewBackupFile(event.target.files[0]));
 initializeHoloControls();
 loadProfilePrefs();

@@ -2,8 +2,8 @@ const {JSDOM,VirtualConsole}=require('jsdom');
 const fs=require('fs');const assert=require('node:assert/strict');const crypto=require('crypto');
 const html=fs.readFileSync('public/index.html','utf8');
 let source=html.match(/<script type="module">([\s\S]*?)<\/script>/)[1];
-for(const name of ['app','firestore','auth'])source=source.replace(`import('./vendor/firebase-${name}.js?v=50000.1')`,`window.__sdk.${name}()`);
-source+='\nwindow.__state={get readings(){return readings},get user(){return currentUser},get key(){return CACHE_KEY},get prefsKey(){return PREFS_KEY},switchAccount,flushPending,cloudMeasurementPayload};';
+for(const name of ['app','firestore','auth'])source=source.replace(`import('./vendor/firebase-${name}.js?v=50100.1')`,`window.__sdk.${name}()`);
+source+='\nwindow.__state={get readings(){return readings},get user(){return currentUser},get key(){return CACHE_KEY},get goalKey(){return GOALS_KEY},goalMetricProgress,goalDays,goalConfigured,get prefsKey(){return PREFS_KEY},switchAccount,flushPending,cloudMeasurementPayload};';
 const tick=()=>new Promise(r=>setTimeout(r,20));
 const sample=(id,weight=65)=>({id,date:'2026-11-20',weight,height:165,age:28,sex:'F',personName:'Local',_sync:'synced'});
 const user=id=>({uid:id,email:id+'@example.invalid',displayName:id==='alice'?'Paloma':'Estefani'});
@@ -29,7 +29,8 @@ async function setup(options={}){
  return{w,dom,errors,writes,deletions,snapshots,credentials,emitAccount:(id,records)=>{const s=snapshots.filter(s=>s.path===`users/${id}/measurements`).at(-1);s.cb({metadata:{fromCache:false},docs:records.map(r=>({id:r.id,data:()=>r}))});},emitUser:id=>authCallback(id?user(id):null),close:()=>dom.window.close()};
 }
 let passed=0;async function run(name,fn){await fn();passed++;console.log('PASS',name);}
-(async()=>{
+module.exports={setup,user,key,sample,tick};
+if(require.main===module)(async()=>{
 await run('signed out never subscribes to shared medical data and local mode preserves old data',async()=>{
  const original=[sample('legacy')],s=await setup({storage:{biovault_local_readings:original,biovault_prefs:{name:'Paloma'}}});
  assert.equal(s.snapshots.length,0);assert.equal(s.w.__state.readings.length,0);assert.equal(s.w.document.getElementById('authScreen').hidden,false);

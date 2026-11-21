@@ -21,6 +21,24 @@ service cloud.firestore {
         && request.resource.data.name.size() <= 80
         && request.resource.data.personId == uid;
     }
+    function validGoalTarget(targets, key, low, high) {
+      let value = targets.get(key, null);
+      return value == null || (value is number && value >= low && value <= high);
+    }
+    match /users/{uid}/goals/active {
+      allow read, delete: if owns(uid);
+      allow create, update: if owns(uid)
+        && request.resource.data.keys().hasOnly(['schema','objective','targets','baseline','deadline','startedAt','updatedAt','history','dismissed'])
+        && request.resource.data.schema == 2
+        && (request.resource.data.get('dismissed', false) == true || request.resource.data.objective in ['lose_weight','gain_muscle','recomposition','maintain'])
+        && request.resource.data.targets is map
+        && request.resource.data.targets.keys().hasOnly(['weight','fat','muscle','visceral'])
+        && validGoalTarget(request.resource.data.targets, 'weight', 5, 150)
+        && validGoalTarget(request.resource.data.targets, 'fat', 5, 60)
+        && validGoalTarget(request.resource.data.targets, 'muscle', 5, 60)
+        && validGoalTarget(request.resource.data.targets, 'visceral', 1, 30)
+        && request.resource.data.get('history', []).size() <= 20;
+    }
     // Legacy records remain stored. No client may read the shared collection.
     match /measurements/{measurementId} { allow read, write: if false; }
     match /clinical_knowledge/biovault-v4-4 { allow read: if true; allow write: if false; }
