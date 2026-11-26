@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BIOSHAPE • Holographic HUD v5.2.2</title>
+  <title>BIOSHAPE • Holographic HUD v5.2.3</title>
   <link rel="stylesheet" href="vendor/tailwind.css" />
   <script src="vendor/chart.umd.js"></script>
   <link rel="stylesheet" href="vendor/fontawesome.css">
@@ -424,15 +424,19 @@ html {scrollbar-gutter:stable;}
 .chart-controls select {display:block;width:100%;margin-top:5px;border:1px solid #23566e;border-radius:9px;padding:10px;background:#071829;color:#bcebf6;font:11px 'Inter',sans-serif;}
 #chartPeriodNote {font-size:11px;line-height:1.6;color:#8daebe;margin:10px 0 14px;}
 #subView-chart,#quickPanelBody #subView-chart {height:auto!important;min-height:0;}
-.combined-chart {height:240px;position:relative;border:1px solid #1d4056;border-radius:12px;padding:12px;background:#03101f;}
+.combined-chart {height:300px;position:relative;border:1px solid #1d4056;border-radius:16px;padding:14px;background:#061524;}
 .combined-chart-heading {font-size:12px;color:#a9cddc;font-weight:600;margin:10px 0;}
 #metricChartGrid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px;}
-.metric-chart-card {min-width:0;padding:14px;border:1px solid #235064;border-radius:12px;background:#07182a;}
+.metric-chart-card {min-width:0;padding:18px;border:1px solid #235064;border-radius:16px;background:linear-gradient(155deg,#0a2032,#061421);}
 .metric-chart-card>header {display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.metric-chart-card h3 {font:600 12px 'Inter',sans-serif;color:#cae3ec;}
-.metric-chart-card>header>span {font:600 12px 'JetBrains Mono',monospace;white-space:nowrap;}
-.metric-chart-comparison {font:10px/1.7 'Inter',sans-serif;color:#8eacbd;margin:8px 0;}
-.metric-chart-canvas {height:175px;position:relative;}
+.metric-chart-card h3 {font:600 14px/1.5 'Inter',sans-serif;color:#dceef6;}
+.metric-chart-card>header>span {font:600 18px 'JetBrains Mono',monospace;white-space:nowrap;}
+.metric-chart-comparison {font:12px/1.7 'Inter',sans-serif;color:#a9c3d2;margin:10px 0;}
+.metric-chart-canvas {height:230px;position:relative;}
+.metric-chart-legend {display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin:12px 0 0;color:#bad1de;font:12px/1.6 'Inter',sans-serif;}
+.metric-chart-legend span {display:inline-flex;align-items:center;gap:7px;}
+.metric-chart-legend i {display:inline-block;width:20px;border-top:2px solid var(--metric-color);}
+.metric-chart-legend .chart-goal i {border-top:2px dashed #e2e8f0;}
 .metric-chart-empty {font-size:11px;color:#90aaba;}
 #compareChartsButton {min-height:34px;display:inline-flex;align-items:center;gap:6px;border:1px solid #21647a;border-radius:7px;padding:7px 10px;background:#0a293b;color:#a9e7f4;font-size:10px;}
 @media(max-width:600px) {
@@ -586,7 +590,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
           </div>
         </div>
         <button onclick="checkForAppUpdate()" id="updateAppButton" title="Buscar atualização" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v5.2.2
+          ↻ v5.2.3
         </button>
       </div>
 
@@ -945,7 +949,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.2.2</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.2.3</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Inicial</span></button>
@@ -1541,6 +1545,58 @@ function chartPeriodReadings(list) {
   return list.filter(r=>validDate(r.date)&&Date.parse(r.date+'T12:00:00Z')>=start);
 }
 function destroyMetricCharts() {for(const chart of metricCharts)chart.destroy();metricCharts=[];}
+function chartGoalValue(key,record) {
+  const plan=readJSON(GOALS_KEY,{})||{},target=goalTargets(plan)[key];
+  if(!validNumber(target)||number(target)<=0||!record)return null;
+  if(['muscle','visceral'].includes(key)&&!goalComparisonCompatible(plan.baseline,record,key,plan))return null;
+  return number(target);
+}
+// A minimum viewing range prevents small changes from filling the whole chart.
+// Goals affect presentation only; no measurement or saved target is rewritten.
+function metricChartRange(definition,values,targets=[]) {
+  const points=[...values,...targets].filter(validNumber).map(number);
+  if(!points.length)return {};
+  const low=Math.min(...points),high=Math.max(...points),center=(low+high)/2;
+  const spans={weight:Math.max(10,center*.12),fat:10,muscle:definition.unit==='kg'?5:10,
+    visceral:definition.unit==='cm²'?40:10,bmi:5,rm:400,bodyAge:10,whr:.2,waist:20,hip:20};
+  const span=Math.max(high-low,spans[definition.key]||10),padding=span*.15;
+  let min=Math.max(0,Math.min(low-padding,center-span/2)),max=Math.max(high+padding,center+span/2);
+  if(definition.unit==='%'&&high<=100)max=Math.min(100,max);
+  const rawStep=(max-min)/5,magnitude=10**Math.floor(Math.log10(rawStep));
+  const step=[1,2,2.5,5,10].map(n=>n*magnitude).find(n=>n>=rawStep&&(definition.digits!==0||Number.isInteger(n)));
+  min=Math.max(0,Math.floor(min/step)*step);max=Math.ceil(max/step)*step;
+  if(definition.unit==='%'&&high<=100)max=Math.min(100,max);
+  return {min:Number(min.toPrecision(12)),max:Number(max.toPrecision(12)),stepSize:step};
+}
+function chartNumber(value,digits=1) {
+  return Number(value).toLocaleString('pt-BR',{maximumFractionDigits:digits});
+}
+const chartGoalLine={
+  id:'bioshapeGoal',
+  afterDatasetsDraw(chart,args,options) {
+    for(const line of options.lines||[options]) {
+      const scale=chart.scales[line.axis||'y'],area=chart.chartArea;
+      if(!scale||!area||!Number.isFinite(line.value))continue;
+      const y=scale.getPixelForValue(line.value),ctx=chart.ctx;
+      if(y<area.top||y>area.bottom)continue;
+      ctx.save();ctx.beginPath();ctx.setLineDash([6,5]);ctx.lineWidth=1.5;ctx.strokeStyle=line.color||'#e2e8f0';
+      ctx.moveTo(area.left,y);ctx.lineTo(area.right,y);ctx.stroke();ctx.restore();
+    }
+  }
+};
+function metricChartOptions(definition,values,goal) {
+  const range=metricChartRange(definition,values,[goal]);
+  return {
+    responsive:true,maintainAspectRatio:false,animation:false,
+    interaction:{mode:'nearest',axis:'x',intersect:false},layout:{padding:{top:12,right:8,bottom:4}},
+    plugins:{legend:{display:false},bioshapeGoal:{value:goal},tooltip:{backgroundColor:'#0b2639',titleColor:'#f0f9ff',bodyColor:'#d9edf8',borderColor:'#356079',borderWidth:1,padding:12,cornerRadius:10,titleFont:{size:13},bodyFont:{size:12}}},
+    scales:{
+      x:{offset:true,border:{display:false},ticks:{color:'#a3bece',maxTicksLimit:4,maxRotation:0,font:{size:12}},grid:{display:false}},
+      y:{min:range.min,max:range.max,border:{display:false},title:{display:true,text:definition.unit,color:'#a3bece',align:'end',font:{size:12}},
+        ticks:{stepSize:range.stepSize,color:'#bad0df',maxTicksLimit:7,padding:8,font:{size:12},callback:value=>chartNumber(value,definition.digits??1)},grid:{color:'#29455766',drawTicks:false}}
+    }
+  };
+}
 function renderMetricGallery(list,allReadings) {
   destroyMetricCharts();
   const filter=$('chartMetricSelect').value;
@@ -1556,16 +1612,19 @@ function renderMetricGallery(list,allReadings) {
   $('metricChartGrid').innerHTML=definitions.map(d=>{
     const current=selected?d.value(selected):NaN,before=baseline?d.value(baseline):NaN;
     const diff=comparableMetric(selected,baseline,d.key)?current-before:NaN;
-    const value=Number.isFinite(current)?`${fmt(current,d.digits??1)} ${d.unit}`:'Sem dado';
-    const comparison=Number.isFinite(diff)?`Δ ${diff>0?'+':''}${fmt(diff,d.digits??1)} ${d.deltaUnit}`:'Comparação indisponível (dados, unidades ou equipamento)';
+    const value=Number.isFinite(current)?`${chartNumber(current,d.digits??1)} ${d.unit}`:'Sem dado';
+    const comparison=Number.isFinite(diff)?`Δ ${diff>0?'+':''}${chartNumber(diff,d.digits??1)} ${d.deltaUnit}`:'Comparação indisponível (dados, unidades ou equipamento)';
     const excluded=list.filter(r=>!comparableMetric(selected,r,d.key)).length;
-    return `<section class="metric-chart-card" aria-label="Gráfico de ${d.label}"><header><h3>${d.label}</h3><span style="color:${d.color}">${value}</span></header><p class="metric-chart-comparison">${comparison} • Referência ${baseline?dateLabel(baseline.date):'—'} / selecionada ${selected?dateLabel(selected.date):'—'}${excluded?` • ${excluded} registro(s) incompatível(is), preservado(s) no histórico.`:''}</p><div class="metric-chart-canvas"><canvas id="metricChart-${d.key}" role="img" aria-label="Evolução de ${d.label}, em ${d.unit}"></canvas></div><p class="metric-chart-empty" id="metricChartEmpty-${d.key}"></p></section>`;
+    const goal=chartGoalValue(d.key,selected),goalText=goal!==null?`Meta ${chartNumber(goal,d.digits??1)} ${d.unit}`:'';
+    return `<section class="metric-chart-card" style="--metric-color:${d.color}" aria-label="Gráfico de ${d.label}"><header><h3>${d.label}</h3><span style="color:${d.color}">${value}</span></header><p class="metric-chart-comparison">${comparison} • Referência ${baseline?dateLabel(baseline.date):'—'} / selecionada ${selected?dateLabel(selected.date):'—'}${excluded?` • ${excluded} registro(s) incompatível(is), preservado(s) no histórico.`:''}</p><div class="metric-chart-canvas"><canvas id="metricChart-${d.key}" role="img" aria-label="Evolução de ${d.label}, em ${d.unit}${goalText?'. '+goalText:''}"></canvas></div><div class="metric-chart-legend"><span><i aria-hidden="true"></i>Pesagens</span>${goalText?`<span class="chart-goal"><i aria-hidden="true"></i>${goalText}</span>`:''}</div><p class="metric-chart-empty" id="metricChartEmpty-${d.key}"></p></section>`;
   }).join('');
   for(const d of definitions) {
     const values=list.map(r=>{const value=comparableMetric(selected,r,d.key)?d.value(r):NaN;return Number.isFinite(value)?value:null;});
     if(!values.some(v=>v!==null)){$('metricChartEmpty-'+d.key).textContent='Sem valores comparáveis deste indicador nesta janela.';continue;}
     const deviceMetric=['fat','muscle','visceral','bodyAge'].includes(d.key);
-    metricCharts.push(new Chart($('metricChart-'+d.key),{type:'line',data:{labels:list.map(r=>dateLabel(r.date)),datasets:[{label:`${d.label} (${d.unit})`,data:values,borderColor:d.color,backgroundColor:d.color+'22',pointRadius:list.map(r=>r.id===selectedReadingId?4:3),pointHoverRadius:5,showLine:!deviceMetric||sourceChartLines(list),spanGaps:false,tension:.2}]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${d.label}: ${fmt(ctx.parsed.y,d.digits??1)} ${d.unit} • ${equipmentInfo(list[ctx.dataIndex]).label}`}}},scales:{x:{ticks:{color:'#7896a8',maxTicksLimit:4,font:{size:9}},grid:{color:'#17304455'}},y:{title:{display:true,text:d.unit,color:'#8cb1c2'},ticks:{color:'#a0bdcc',font:{size:10},precision:d.digits===0?0:undefined},grid:{color:'#17304477'}}}}}));
+    const goal=chartGoalValue(d.key,selected),options=metricChartOptions(d,values,goal);
+    options.plugins.tooltip.callbacks={label:ctx=>`${d.label}: ${chartNumber(ctx.parsed.y,d.digits??1)} ${d.unit} • ${equipmentInfo(list[ctx.dataIndex]).label}`};
+    metricCharts.push(new Chart($('metricChart-'+d.key),{type:'line',plugins:[chartGoalLine],data:{labels:list.map(r=>dateLabel(r.date)),datasets:[{label:`${d.label} (${d.unit})`,data:values,borderColor:d.color,backgroundColor:d.color+'12',borderWidth:2.5,fill:'origin',pointBackgroundColor:'#071827',pointBorderColor:d.color,pointBorderWidth:2,pointRadius:list.map(r=>r.id===selectedReadingId?5:3),pointHoverRadius:7,pointHitRadius:18,showLine:!deviceMetric||sourceChartLines(list),spanGaps:false,tension:0}]},options}));
   }
 }
 
@@ -1621,7 +1680,7 @@ let PREFS_KEY = 'biovault_prefs';
 let GOALS_KEY = 'biovault_goals';
 let authSDK=null,authSession=null,currentUser=null,authReady=false,sdkPromise=null,accountEpoch=0,profileUnsubscribe=null;
 let authMode='login',authBusy=false,pendingSignupName='',guestMode=false;
-const APP_VERSION='5.2.2';
+const APP_VERSION='5.2.3';
 const UPDATE_MANIFEST='https://palomagarcia38-create.github.io/biovault-pro/public/updates/latest.json';
 let readings = [], selectedReadingId = null, compareMode = false;
 let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
@@ -1909,11 +1968,28 @@ function renderEvolutionChart(list = visibleReadings()) {
   if (chartInst) { chartInst.destroy(); chartInst=null; }
   if (!list.length || typeof Chart === 'undefined') {destroyMetricCharts();$('metricChartGrid').replaceChildren();$('chartPeriodNote').textContent=''; $('chartStatus').textContent = list.length ? 'Gráfico indisponível. Os registros continuam disponíveis no histórico.' : 'Sem pesagens para exibir.'; return; }
   $('chartStatus').textContent=(list.some(r=>muscleUnit(r)==='kg'||muscleKind(r)==='total')?'O resumo conjunto usa somente músculo esquelético em %. Os outros registros aparecem no gráfico individual e no histórico. ':'')+(sourceNotice(list)?'Pontos de composição não são ligados quando a origem mudou ou não foi informada.':'');
-  chartInst = new Chart($('bioChart'),{type:'line',data:{labels:list.map(r=>dateLabel(r.date)),datasets:[
-    {label:'Peso (kg)',data:list.map(r=>r.weight),borderColor:'#00f0ff',tension:.3,yAxisID:'kg'},
-    {label:'Gordura (%)',showLine:sourceChartLines(list),spanGaps:false,data:list.map(r=>validNumber(r.fat)?r.fat:null),borderColor:'#f59e0b',tension:.3,yAxisID:'percent'},
-    {label:'Músculo esquelético (%)',showLine:sourceChartLines(list),spanGaps:false,data:list.map(r=>muscleUnit(r)==='percent'&&muscleKind(r)==='skeletal'&&validNumber(r.muscle)?r.muscle:null),borderColor:'#10b981',tension:.3,yAxisID:'percent'}
-  ]},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b',font:{size:10}},grid:{color:'#17253d'}},kg:{position:'left',title:{display:true,text:'kg',color:'#00f0ff'},ticks:{color:'#94a3b8'},grid:{color:'#17253d'}},percent:{position:'right',title:{display:true,text:'%',color:'#94a3b8'},ticks:{color:'#94a3b8'},grid:{drawOnChartArea:false}}}}});
+  const selected=currentReading||list.at(-1);
+  const weightValues=list.map(r=>validNumber(r.weight)?number(r.weight):null);
+  const fatValues=list.map(r=>validNumber(r.fat)?number(r.fat):null);
+  const muscleValues=list.map(r=>muscleUnit(r)==='percent'&&muscleKind(r)==='skeletal'&&validNumber(r.muscle)?number(r.muscle):null);
+  const weightGoal=chartGoalValue('weight',selected),fatGoal=chartGoalValue('fat',selected);
+  const muscleGoal=muscleUnit(selected)==='percent'&&muscleKind(selected)==='skeletal'?chartGoalValue('muscle',selected):null;
+  const options=metricChartOptions({key:'weight',unit:'kg'},weightValues,weightGoal);
+  const percentRange=metricChartRange({key:'fat',unit:'%'},[...fatValues,...muscleValues],[fatGoal,muscleGoal]);
+  options.scales.kg={...options.scales.y,position:'left'};delete options.scales.y;
+  options.scales.percent={...options.scales.kg,min:percentRange.min,max:percentRange.max,position:'right',
+    title:{display:true,text:'%',color:'#a3bece',font:{size:12}},
+    ticks:{...options.scales.kg.ticks,stepSize:percentRange.stepSize},grid:{drawOnChartArea:false}};
+  options.plugins.legend={display:true,position:'bottom',labels:{color:'#bad0df',usePointStyle:true,boxWidth:8,padding:16,font:{size:12}}};
+  options.plugins.bioshapeGoal={lines:[{value:weightGoal,axis:'kg',color:'#00f0ff'},{value:fatGoal,axis:'percent',color:'#f59e0b'},{value:muscleGoal,axis:'percent',color:'#10b981'}]};
+  const goalNotes=[weightGoal!==null?`peso ${chartNumber(weightGoal)} kg`:'',fatGoal!==null?`gordura ${chartNumber(fatGoal)}%`:'',muscleGoal!==null?`músculo ${chartNumber(muscleGoal)}%`:''].filter(Boolean);
+  if(goalNotes.length)$('chartStatus').textContent+=' Linhas tracejadas: metas de '+goalNotes.join('; ')+'.';
+  const lineStyle={tension:0,borderWidth:2.5,pointRadius:3,pointHoverRadius:6,pointHitRadius:16,pointBackgroundColor:'#071827'};
+  chartInst = new Chart($('bioChart'),{type:'line',plugins:[chartGoalLine],data:{labels:list.map(r=>dateLabel(r.date)),datasets:[
+    {...lineStyle,label:'Peso (kg)',data:weightValues,borderColor:'#00f0ff',yAxisID:'kg'},
+    {...lineStyle,label:'Gordura (%)',showLine:sourceChartLines(list),spanGaps:false,data:fatValues,borderColor:'#f59e0b',yAxisID:'percent'},
+    {...lineStyle,label:'Músculo esquelético (%)',showLine:sourceChartLines(list),spanGaps:false,data:muscleValues,borderColor:'#10b981',yAxisID:'percent'}
+  ]},options});
   renderMetricGallery(list,allReadings);
 }
 const GOAL_OBJECTIVES={lose_weight:'Perder peso',gain_muscle:'Ganhar massa muscular',recomposition:'Reduzir gordura e ganhar músculo',maintain:'Manter meus resultados'};
@@ -1975,7 +2051,7 @@ function saveGoals(){
   const old=readJSON(GOALS_KEY,{})||{};
   if(goalUnits(old).muscle!=='percent'||goalUnits(old).visceral!=='index'||goalUnits(old).muscleKind!=='skeletal'){openGoalPlan();notify('Ajuste as metas nas unidades do seu plano. Os controles rápidos usam % esquelético e nível.');return;}
   const plan={...old,schema:2,objective:old.objective||'recomposition',targets:{...goalTargets(old),fat:number($('gFatSlider').value),muscle:number($('gMuscSlider').value),visceral:number($('gViscSlider').value)},baseline:old.baseline||goalBaseline(currentReading),deadline:old.deadline||null,startedAt:old.startedAt||localDate(),updatedAt:new Date().toISOString(),_pending:true,_revision:crypto.randomUUID()};
-  if(writeJSON(GOALS_KEY,plan)){updateGoalsBox();void syncAccountGoals();}
+  if(writeJSON(GOALS_KEY,plan)){updateGoalsBox();renderEvolutionChart();void syncAccountGoals();}
 }
 function openGoalPlan(){
   closeMetricDetail();const plan=readJSON(GOALS_KEY,{})||{},targets=goalTargets(plan);
@@ -2014,7 +2090,7 @@ function saveGoalPlan(event){
   const plan={schema:2,objective,targets,units:{muscle:$('goalMuscleUnit').value,visceral:$('goalVisceralUnit').value},muscleKind:$('goalMuscleKind').value,baseline:goalDraftBaseline,deadline,startedAt:old.startedAt||localDate(),updatedAt:new Date().toISOString(),history:history.slice(-20),dismissed:false,_pending:true,_revision:crypto.randomUUID()};
   if(!writeJSON(GOALS_KEY,plan)){$('goalFormStatus').textContent='Não foi possível guardar suas metas. Os campos foram mantidos.';return;}
   for(const [key,id]of Object.entries({fat:'gFatSlider',muscle:'gMuscSlider',visceral:'gViscSlider'}))if(validNumber(targets[key]))$(id).value=targets[key];
-  hideGoalPlan();updateGoalsBox();setSyncStatus();notify('Metas salvas. Você pode ajustá-las em Metas a qualquer momento.');void syncAccountGoals();
+  hideGoalPlan();updateGoalsBox();renderEvolutionChart();setSyncStatus();notify('Metas salvas. Você pode ajustá-las em Metas a qualquer momento.');void syncAccountGoals();
 }
 function anchorGoalBaseline(record){
   const plan=readJSON(GOALS_KEY,{})||{};if(!goalConfigured(plan)||plan.baseline)return;
@@ -2037,7 +2113,7 @@ function subscribeAccountGoals(){
   goalUnsubscribe=fire.onSnapshot(fire.doc(db,'users',currentUser.uid,'goals','active'),snapshot=>{
     if(epoch!==accountEpoch||!snapshot.exists()||readJSON(GOALS_KEY,{})._pending)return;
     const plan=snapshot.data();if(plan.schema!==2)return;
-    if(writeJSON(GOALS_KEY,{...plan,_pending:false})){for(const [key,id]of Object.entries({fat:'gFatSlider',muscle:'gMuscSlider',visceral:'gViscSlider'}))if(validNumber(goalTargets(plan)[key]))$(id).value=goalTargets(plan)[key];updateGoalsBox();}
+    if(writeJSON(GOALS_KEY,{...plan,_pending:false})){for(const [key,id]of Object.entries({fat:'gFatSlider',muscle:'gMuscSlider',visceral:'gViscSlider'}))if(validNumber(goalTargets(plan)[key]))$(id).value=goalTargets(plan)[key];updateGoalsBox();renderEvolutionChart();}
   },()=>{});
   void syncAccountGoals();
 }
