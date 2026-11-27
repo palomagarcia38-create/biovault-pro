@@ -14,8 +14,8 @@ function logSeries(s,load='25',reps='10'){click(s,'exercise');field(s,'[data-log
 await run('opening the training tab creates no plan, session or cloud write',async()=>{
  const s=await setup({user:user('alice')});s.w.openTraining();assert.match(s.w.document.getElementById('trainingSummary').textContent,/Seu treino começa aqui/);assert.equal(records(s).length,0);assert.equal(s.writes.length,0);assert.deepEqual(s.errors,[]);s.close();
 });
-await run('all catalog demonstrations are bundled, use real images and have start/end positions',async()=>{
- const s=await setup();const list=s.w.BIOSHAPE_EXERCISES;assert.equal(list.length,20);for(const e of list){assert.equal(e.images.length,2);for(const image of e.images)assert(fs.statSync('public/'+image).size>500);assert(e.setup&&e.movement&&e.avoid);}s.close();
+await run('catalog has 40 unique exercises, detailed equipment and only valid bundled demonstrations',async()=>{
+ const s=await setup();const list=s.w.BIOSHAPE_EXERCISES;assert.equal(list.length,40);assert.equal(new Set(list.map(e=>e.id)).size,40);for(const e of list){assert([0,2].includes(e.images.length));for(const image of e.images)assert(fs.statSync('public/'+image).size>500);assert(e.setup&&e.movement&&e.avoid&&e.equipmentType&&e.equipment&&e.sources.length);}s.close();
 });
 await run('editable template requires explicit saving and retains prescribed values when reordered',async()=>{
  const s=await setup();s.w.continueOnDevice();s.w.openTraining();click(s,'explore');click(s,'template','0');assert.equal(records(s).length,0);field(s,'[data-editor-index="0"] [data-editor-field="sets"]','4');click(s,'move');submit(s,'trEditorForm');const p=records(s).find(r=>r.kind==='plan').value;assert.equal(p.items[0].sets,4);assert.equal(p.items.length,6);assert.equal(records(s).filter(r=>r.kind==='session').length,0);assert.deepEqual(s.errors,[]);s.close();
@@ -43,6 +43,18 @@ await run('coach uses the actual journal and does not fabricate progress or exer
 });
 await run('unsafe cloud document values are ignored and names are escaped as text',async()=>{
  const s=await setup({user:user('alice')});saveTemplate(s);const p=records(s).find(r=>r.kind==='plan'),observer=s.snapshots.find(x=>x.path==='users/alice/training');const bad={...p.value,items:[{...p.value.items[0],exerciseId:'<img onerror=alert(1)>'}]};observer.cb({docs:[{id:'bad',data:()=>({schema:1,kind:'plan',data:JSON.stringify(bad),updatedAt:Date.now()+1000,revision:'bad'})}]});assert.equal(records(s).length,1);assert.deepEqual(s.errors,[]);s.close();
+});
+await run('catalog combines group, muscle and equipment filters and searches without accents',async()=>{
+ const s=await setup();s.w.continueOnDevice();s.w.openTraining();click(s,'explore');click(s,'filter','Braços');field(s,'#trMuscle','Bíceps');field(s,'#trEquipment','Máquina');assert.equal(s.w.document.querySelectorAll('.tr-catalog-card').length,1);assert.match(s.w.document.getElementById('trCatalogList').textContent,/Scott/);field(s,'#trEquipment','Todos');const input=s.w.document.getElementById('trSearch');input.value='biceps';input.dispatchEvent(new s.w.Event('input',{bubbles:true}));assert(s.w.document.querySelectorAll('.tr-catalog-card').length>=4);assert.equal(records(s).length,0);assert.deepEqual(s.errors,[]);s.close();
+});
+await run('catalog creates a draft only after selection and saves a new selected exercise',async()=>{
+ const s=await setup();s.w.continueOnDevice();s.w.openTraining();click(s,'explore');click(s,'choose-exercise','rosca-scott');assert.equal(records(s).length,0);click(s,'catalog-new');assert.equal(records(s).length,0);field(s,'#trEditorForm [name="name"]','Meu treino de braços');submit(s,'trEditorForm');const p=records(s).find(r=>r.kind==='plan');assert.equal(p.value.items.length,1);assert.equal(p.value.items[0].exerciseId,'rosca-scott');assert.deepEqual(s.errors,[]);s.close();
+});
+await run('adding to an existing plan is reviewed before saving and preserves existing values',async()=>{
+ const s=await setup();s.w.continueOnDevice();saveTemplate(s);const p=records(s).find(r=>r.kind==='plan');s.w.openTraining();click(s,'tab','explore');click(s,'choose-exercise','adutora');click(s,'catalog-plan',p.value.id);assert.equal(records(s).find(r=>r.kind==='plan').value.items.length,6);submit(s,'trEditorForm');const saved=records(s).find(r=>r.kind==='plan').value;assert.equal(saved.items.length,7);assert.deepEqual(saved.items.slice(0,6),p.value.items);assert.equal(saved.items[6].exerciseId,'adutora');assert.deepEqual(s.errors,[]);s.close();
+});
+await run('exercise details in picker return to draft and missing photos never render broken images',async()=>{
+ const s=await setup();s.w.continueOnDevice();s.w.openTraining();click(s,'new');click(s,'picker');click(s,'inspect','adutora');assert.match(s.w.document.getElementById('trainingSummary').textContent,/ainda não disponível/);assert.equal(s.w.document.querySelectorAll('#trPage img').length,0);click(s,'add-exercise','adutora');assert.equal(s.w.document.querySelectorAll('.tr-editor-item').length,1);click(s,'picker');click(s,'add-exercise','adutora');assert.match(s.w.document.getElementById('trToast').textContent,/já está/);click(s,'back');assert.equal(s.w.document.querySelectorAll('.tr-editor-item').length,1);assert.deepEqual(s.errors,[]);s.close();
 });
 console.log(JSON.stringify({passed,productionWrites:0}));
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -126,3 +126,5 @@
 .tr-bottom{position:fixed;bottom:0;left:0;right:0;z-index:6;background:#0d151bf5;border-top:1px solid #294049;backdrop-filter:blur(16px);display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 12px max(12px,env(safe-area-inset-bottom,0px));}
 .tr-bottom button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:transparent;border:0;color:#849ba7;font-size:12px;min-height:52px;}
 .tr-bottom i{font-size:21px;}.tr-bottom button[aria-current=page]{color:#6aeadc;}
+
+.tr-catalog-card{display:flex;flex-direction:column;gap:8px;border:1px solid #263d52;border-radius:14px;padding:10px;min-width:0}.tr-catalog-card>button:first-child{border:0;text-align:left;width:100%}.tr-catalog-card>.tr-secondary{margin-top:auto;width:100%;font-size:14px}.tr-equipment-icon{display:grid;place-items:center;min-width:56px;height:70px;background:#0e2436;color:#52dced;border-radius:12px;font-size:28px}.tr-catalog .tr-equipment-icon{height:140px}.tr-catalog-card p{font-size:14px}.tr-editor-item .tr-equipment-icon,.tr-exercise-open .tr-equipment-icon{width:64px;height:64px;flex-shrink:0}

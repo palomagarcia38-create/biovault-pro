@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BIOSHAPE • Holographic HUD v5.3.0</title>
+  <title>BIOSHAPE • Holographic HUD v5.3.1</title>
   <link rel="stylesheet" href="vendor/tailwind.css" />
   <script src="vendor/chart.umd.js"></script>
   <link rel="stylesheet" href="vendor/fontawesome.css">
@@ -591,7 +591,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
           </div>
         </div>
         <button onclick="checkForAppUpdate()" id="updateAppButton" title="Buscar atualização" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v5.3.0
+          ↻ v5.3.1
         </button>
       </div>
 
@@ -950,7 +950,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.3.0</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.3.1</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Inicial</span></button>
@@ -1681,7 +1681,7 @@ let PREFS_KEY = 'biovault_prefs';
 let GOALS_KEY = 'biovault_goals';
 let authSDK=null,authSession=null,currentUser=null,authReady=false,sdkPromise=null,accountEpoch=0,profileUnsubscribe=null;
 let authMode='login',authBusy=false,pendingSignupName='',guestMode=false;
-const APP_VERSION='5.3.0';
+const APP_VERSION='5.3.1';
 const UPDATE_MANIFEST='https://palomagarcia38-create.github.io/biovault-pro/public/updates/latest.json';
 let readings = [], selectedReadingId = null, compareMode = false;
 let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
