@@ -78,7 +78,7 @@ public final class MainActivity extends Activity {
         if(!"https".equals(uri.getScheme())||path==null||!path.startsWith("/assets/www/")||path.contains(".."))return missing();
         try{
           String file=path.substring("/assets/".length());
-          String type=file.endsWith(".js")?"application/javascript":file.endsWith(".css")?"text/css":file.endsWith(".html")?"text/html":file.endsWith(".json")?"application/json":file.endsWith(".webp")?"image/webp":file.endsWith(".woff2")?"font/woff2":"application/octet-stream";
+          String type=file.endsWith(".js")?"application/javascript":file.endsWith(".css")?"text/css":file.endsWith(".html")?"text/html":file.endsWith(".json")?"application/json":file.endsWith(".webp")?"image/webp":file.endsWith(".jpg")?"image/jpeg":file.endsWith(".woff2")?"font/woff2":"application/octet-stream";
           Map<String,String> headers=new HashMap<>();headers.put("X-Content-Type-Options","nosniff");headers.put("Cache-Control","no-cache");
           return new WebResourceResponse(type,"UTF-8",200,"OK",headers,getAssets().open(file));
         }catch(Exception error){return missing();}
@@ -200,8 +200,8 @@ public final class MainActivity extends Activity {
     }
     if(request==UNKNOWN_SOURCES){if(getPackageManager().canRequestPackageInstalls())installUpdate();else updateStatus("Permissão não concedida. O aplicativo foi mantido.");}
   }
-  @Override public void onBackPressed(){web.evaluateJavascript("(() => {const ids=['goalPlanModal','newWeighingModal','reportModal','importBackupModal','metricDetailModal','quickPanelModal'];return ids.some(id=>!document.getElementById(id)?.classList.contains('hidden'));})()",visible->{
-    if("true".equals(visible))web.evaluateJavascript("if(!document.getElementById('goalPlanModal').classList.contains('hidden'))deferGoalPlan();else{closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();}",null);
+  @Override public void onBackPressed(){web.evaluateJavascript("(() => {const ids=['trainingModal','goalPlanModal','newWeighingModal','reportModal','importBackupModal','metricDetailModal','quickPanelModal'];return ids.some(id=>!document.getElementById(id)?.classList.contains('hidden'));})()",visible->{
+    if("true".equals(visible))web.evaluateJavascript("if(!document.getElementById('trainingModal').classList.contains('hidden'))window.BioshapeTraining?.back();else if(!document.getElementById('goalPlanModal').classList.contains('hidden'))deferGoalPlan();else{closeMetricDetail();closeQuickPanel();closeNewWeighingModal();closeReportModal();closeImportBackup();}",null);
     else new AlertDialog.Builder(this).setTitle("Sair do BIOSHAPE?").setMessage("Suas pesagens continuarão salvas.").setNegativeButton("Continuar",null).setPositiveButton("Sair",(dialog,which)->finish()).show();
   });}
   @Override protected void onDestroy(){if(fileCallback!=null)fileCallback.onReceiveValue(null);web.removeJavascriptInterface("BioVaultNative");web.destroy();worker.shutdownNow();super.onDestroy();}

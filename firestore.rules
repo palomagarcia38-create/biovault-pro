@@ -60,6 +60,21 @@ service cloud.firestore {
         && validGoalTarget(request.resource.data.targets, 'visceral', 0.1, 1000)
         && request.resource.data.get('history', []).size() <= 20;
     }
+    // Independent workout journal: each account owns its plans, sessions and profile.
+    // Serialized records are bounded here and fully validated by the client before use.
+    match /users/{uid}/training/{recordId} {
+      allow read: if owns(uid);
+      allow create, update: if owns(uid)
+        && request.resource.data.keys().hasOnly(['schema','kind','data','updatedAt','revision'])
+        && request.resource.data.schema == 1
+        && request.resource.data.kind in ['plan','session','profile']
+        && request.resource.data.data is string
+        && request.resource.data.data.size() <= 300000
+        && request.resource.data.updatedAt is number
+        && request.resource.data.updatedAt > 0
+        && request.resource.data.revision is string
+        && request.resource.data.revision.size() <= 80;
+    }
     // Legacy records remain stored. No client may read the shared collection.
     match /measurements/{measurementId} { allow read, write: if false; }
     match /clinical_knowledge/biovault-v4-4 { allow read: if true; allow write: if false; }

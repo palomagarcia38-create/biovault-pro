@@ -1,0 +1,5 @@
+Exercise photographs: yuhonas/free-exercise-db, Unlicense / public domain.
+https://github.com/yuhonas/free-exercise-db
+Original exercise identifiers are retained in training-catalog.js.
+Portuguese educational descriptions adapted for BIOSHAPE.
+Two photographs illustrate start/end positions; these are not videos.

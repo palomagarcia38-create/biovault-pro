@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#020611" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>BIOSHAPE • Holographic HUD v5.2.3</title>
+  <title>BIOSHAPE • Holographic HUD v5.3.0</title>
   <link rel="stylesheet" href="vendor/tailwind.css" />
   <script src="vendor/chart.umd.js"></script>
   <link rel="stylesheet" href="vendor/fontawesome.css">
@@ -547,6 +547,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
 @media(max-width:440px){#homeSummary{padding:14px;}#homeSummary #homePersonName{font-size:21px;}.home-actions button{font-size:11px;}.home-measures .home-current strong{font-size:25px;}}
 
 </style>
+  <link rel="stylesheet" href="training.css">
 </head>
 <body class="pb-20">
 <section id="authScreen" aria-label="Acessar BIOSHAPE">
@@ -590,7 +591,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
           </div>
         </div>
         <button onclick="checkForAppUpdate()" id="updateAppButton" title="Buscar atualização" class="brand-refresh px-2.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700 text-slate-300 text-[11px] font-semibold">
-          ↻ v5.2.3
+          ↻ v5.3.0
         </button>
       </div>
 
@@ -949,7 +950,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
       <div class="quick-panel-footer"><button type="button" onclick="closeQuickPanel()" class="hud-quick-button">Fechar</button></div>
     </section>
   </div>
-  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.2.3</span><span>Histórico local e sincronização Firebase</span></footer>
+  <footer id="appFooter" class="no-print"><span>BIOSHAPE • Bioimpedância multimarca • v5.3.0</span><span>Histórico local e sincronização Firebase</span></footer>
 
   <nav id="bottomNav" class="no-print" aria-label="Navegação principal">
     <button type="button" data-app-nav="home" aria-current="page"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Inicial</span></button>
@@ -958,7 +959,7 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
     <button type="button" data-app-nav="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i><span>Configuração</span></button>
   </nav>
 
-<div id="trainingModal" class="hidden goal-modal no-print" role="dialog" aria-modal="true" aria-labelledby="trainingTitle"><div class="goal-modal-card" style="min-height:210px"><div class="goal-modal-top"><span>BIOSHAPE</span><button type="button" onclick="closeTraining()" aria-label="Fechar treino">✕</button></div><h2 id="trainingTitle">Treino</h2><div id="trainingSummary"></div></div></div>
+<div id="trainingModal" class="hidden training-screen no-print" role="dialog" aria-modal="true" aria-label="Treinos BIOSHAPE"><div id="trainingSummary"></div></div>
 <div id="importBackupModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 no-print" role="dialog" aria-modal="true" aria-labelledby="importBackupTitle"><div class="panel-dark cyber-panel rounded-2xl p-5 w-full max-w-lg space-y-4"><div class="flex justify-between gap-4"><h2 id="importBackupTitle">Revisar restauração do backup</h2><button id="closeImportButton" type="button" onclick="closeImportBackup()" aria-label="Fechar restauração">✕</button></div><p id="importBackupSummary" role="status"></p><button id="confirmImportButton" type="button" class="neon-btn rounded-xl p-3 w-full" onclick="confirmImportBackup()" disabled>Adicionar registros revisados</button></div></div>
 <div id="goalPlanModal" class="hidden goal-modal no-print" role="dialog" aria-modal="true" aria-labelledby="goalPlanHeading">
   <div class="goal-modal-card">
@@ -992,6 +993,8 @@ body.pb-20{padding-bottom:calc(var(--bottom-nav-height,calc(88px + env(safe-area
 </div>
 
 </div>
+  <script src="training-catalog.js"></script>
+  <script src="training.js"></script>
   <script type="module">
     const firebaseConfig = {
       apiKey: "AIzaSyBUJkLOV2b-P_Pq8dsp7rCGLV5bb-Jxgkg",
@@ -1161,13 +1164,11 @@ function validSourceFields(record){
   if(muscleUnit(record)==='percent'&&validNumber(record.fat)&&validNumber(record.muscle)&&number(record.fat)+number(record.muscle)>100)return false;
   return true;
 }
-function closeTraining(){ $('trainingModal').classList.add('hidden');trainingOpener?.focus?.(); }
+function closeTraining(){ window.BioshapeTraining?.close();$('trainingModal').classList.add('hidden');trainingOpener?.focus?.(); }
 let trainingOpener=null;
 function openTraining(){
   closeMetricDetail();closeQuickPanel();trainingOpener=document.activeElement;
-  // Reserved for the future workout feature. Opening this view never creates a plan.
-  $('trainingSummary').replaceChildren();
-  $('trainingModal').classList.remove('hidden');$('trainingModal').querySelector('button').focus();
+  $('trainingModal').classList.remove('hidden');window.BioshapeTraining?.open();document.body.style.overflow='hidden';$('trainingModal').querySelector('button')?.focus();
 }
 
 function metricReferenceBar(key,record,info) {
@@ -1680,7 +1681,7 @@ let PREFS_KEY = 'biovault_prefs';
 let GOALS_KEY = 'biovault_goals';
 let authSDK=null,authSession=null,currentUser=null,authReady=false,sdkPromise=null,accountEpoch=0,profileUnsubscribe=null;
 let authMode='login',authBusy=false,pendingSignupName='',guestMode=false;
-const APP_VERSION='5.2.3';
+const APP_VERSION='5.3.0';
 const UPDATE_MANIFEST='https://palomagarcia38-create.github.io/biovault-pro/public/updates/latest.json';
 let readings = [], selectedReadingId = null, compareMode = false;
 let selectedMetricKey = 'bmi', selectedProto = 'Em jejum', activeTab = 'alerts';
@@ -2247,6 +2248,7 @@ function subscribeAccount(){
     persist();recomputeAll();if(!snapshot.metadata.fromCache)void flushPending();
   },()=>{if(epoch!==accountEpoch)return;serverSeen=false;unsubscribe=null;setSyncStatus();notify('As pesagens estão salvas no aparelho. Não foi possível sincronizar sua conta.');});
   subscribeAccountGoals();
+  window.BioshapeTraining?.connect({subscribe:(next,error)=>fire.onSnapshot(fire.collection(db,'users',user.uid,'training'),snapshot=>next(snapshot.docs),error),put:(id,payload)=>fire.setDoc(fire.doc(db,'users',user.uid,'training',id),payload)});
   profileUnsubscribe=fire.onSnapshot(fire.doc(db,'users',user.uid,'profile','main'),snapshot=>{
     if(epoch!==accountEpoch||!snapshot.exists())return;
     const local=readJSON(PREFS_KEY,{});if(local._pending)return;
@@ -2406,7 +2408,7 @@ function switchAccount(user){
   // A late auth-null event must not overwrite an explicitly selected local mode.
   if(!user&&guestMode)return;
   accountEpoch++;unsubscribe?.();profileUnsubscribe?.();goalUnsubscribe?.();unsubscribe=null;profileUnsubscribe=null;goalUnsubscribe=null;inFlight.clear();
-  currentUser=user;guestMode=false;resetAccountView();
+  currentUser=user;guestMode=false;resetAccountView();window.BioshapeTraining?.configure({uid:user?.uid});
   if(user){
     CACHE_KEY='biovault_user_'+user.uid+'_readings';PREFS_KEY='biovault_user_'+user.uid+'_prefs';GOALS_KEY='biovault_user_'+user.uid+'_goals';
     const cached=readJSON(CACHE_KEY,[]);if(Array.isArray(cached))readings=cached.map(r=>normalize(r)).filter(Boolean);else storageBlocked=true;
@@ -2423,11 +2425,12 @@ function switchAccount(user){
 }
 function continueOnDevice(){
   if(authBusy||currentUser)return;accountEpoch++;guestMode=true;unsubscribe?.();profileUnsubscribe?.();goalUnsubscribe?.();unsubscribe=null;profileUnsubscribe=null;goalUnsubscribe=null;resetAccountView();
+  window.BioshapeTraining?.configure({local:true});
   CACHE_KEY='biovault_local_readings';PREFS_KEY='biovault_prefs';GOALS_KEY='biovault_goals';
   const cached=readJSON(CACHE_KEY,[]);if(Array.isArray(cached))readings=cached.map(r=>normalize(r)).filter(Boolean);else storageBlocked=true;
   loadProfilePrefs();migrateLegacyCache();recomputeAll();$('authScreen').hidden=true;$('appRoot').inert=false;$('accountEmail').textContent='Salvo somente neste aparelho';$('accountLoginButton').hidden=false;$('accountLogoutButton').hidden=true;
 }
-function showAccountLogin(){if(currentUser)return;guestMode=false;$('authScreen').hidden=false;$('appRoot').inert=true;setAuthMode('login');$('accountEmailInput').focus();}
+function showAccountLogin(){if(currentUser)return;closeTraining();window.BioshapeTraining?.configure({});guestMode=false;$('authScreen').hidden=false;$('appRoot').inert=true;setAuthMode('login');$('accountEmailInput').focus();}
 async function logoutAccount(){
   if(authBusy||saving)return;
   if(pendingCount()&&!confirm('Existem medições aguardando envio. Elas continuarão guardadas neste aparelho para esta conta. Deseja sair?'))return;
@@ -2458,6 +2461,7 @@ async function checkForAppUpdate(){
 function printReport(){if(window.BioVaultNative?.printReport)window.BioVaultNative.printReport();else window.print();}
 
 
+window.downloadTrainingBackup=(contents,name)=>downloadFile(contents,'application/json',name);
 Object.assign(window,{updateGoalUnits,updateMeasurementSourceForm,openTraining,closeTraining,openGoalPlan,saveGoalPlan,deferGoalPlan,setGoalWeeks,setAuthMode,submitAccountForm,resetAccountPassword,continueOnDevice,showAccountLogin,logoutAccount,checkForAppUpdate,printReport,importDeviceHistory,renderPersonContext,editReading,exportCsv,exportBackup,previewBackupFile,closeImportBackup,confirmImportBackup,renderEvolutionChart,closeMetricDetail,openMetricEvolution,inspectCurrentReading,navigateApp,openQuickPanel,closeQuickPanel,toggleHoloScan,saveProfilePrefs,recomputeAll,toggleCompareMode,selectMetricDetail,selectHistoryReading,deleteReading,updateGoalsBox,switchSubView,autoCalcModalBmi,openNewWeighingModal,closeNewWeighingModal,pickProto,saveWeighing,openReportModal,closeReportModal,shareWhatsApp});
 document.addEventListener('click',event=>{
   if(event.target.closest('[data-metric-close]'))closeMetricDetail();
@@ -2478,7 +2482,7 @@ window.addEventListener('online',()=>{void connectCloud();void flushPending();})
 window.addEventListener('offline',()=>{serverSeen=false;setSyncStatus();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){void connectCloud();void flushPending();}});
 $('goalPlanModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.stopPropagation();deferGoalPlan();}if(event.key==='Tab'){const items=[...$('goalPlanModal').querySelectorAll('input,select,button')].filter(el=>!el.disabled&&!el.closest('[hidden]'));const first=items[0],last=items.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
-$('trainingModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.stopPropagation();closeTraining();}if(event.key==='Tab'){const nodes=[...$('trainingModal').querySelectorAll('button')],first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
+$('trainingModal').addEventListener('keydown',event=>{if(event.key==='Escape'){event.stopPropagation();window.BioshapeTraining?.back();}if(event.key==='Tab'){const nodes=[...$('trainingModal').querySelectorAll('button,input,select,textarea,a')].filter(el=>!el.disabled&&el.getClientRects().length>0),first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
 $('backupFileInput').addEventListener('change',event=>void previewBackupFile(event.target.files[0]));
 initializeBottomNavigation();
 initializeHoloControls();

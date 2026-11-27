@@ -25,8 +25,9 @@ async function setup(options={}){
   signInWithEmailAndPassword:async(a,email,password)=>{credentials.push({email,password});if(options.signInError)throw Object.assign(Error(),{code:options.signInError});authCallback(user('alice'));return{user:user('alice')};},
   createUserWithEmailAndPassword:async(a,email,password)=>{credentials.push({email,password});authCallback(user('alice'));return{user:user('alice')};},updateProfile:async()=>{},sendPasswordResetEmail:async()=>{}};
  w.__sdk={app:async()=>({getApps:()=>[],initializeApp:()=>({})}),firestore:async()=>fire,auth:async()=>auth};
+ for(const file of ['training-catalog.js','training.js'])w.eval(fs.readFileSync('public/'+file,'utf8'));
  w.eval(source);await tick();await tick();
- return{w,dom,errors,writes,deletions,snapshots,credentials,emitAccount:(id,records)=>{const s=snapshots.filter(s=>s.path===`users/${id}/measurements`).at(-1);s.cb({metadata:{fromCache:false},docs:records.map(r=>({id:r.id,data:()=>r}))});},emitUser:id=>authCallback(id?user(id):null),close:()=>dom.window.close()};
+ return{w,dom,errors,writes,deletions,snapshots,credentials,emitAccount:(id,records)=>{const s=snapshots.filter(s=>s.path===`users/${id}/measurements`).at(-1);s.cb({metadata:{fromCache:false},docs:records.map(r=>({id:r.id,data:()=>r}))});},emitUser:id=>authCallback(id?user(id):null),close:()=>{w.BioshapeTraining?.configure({});dom.window.close();}};
 }
 let passed=0;async function run(name,fn){await fn();passed++;console.log('PASS',name);}
 module.exports={setup,user,key,sample,tick};

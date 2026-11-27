@@ -49,6 +49,17 @@ const assert=require('node:assert/strict');
     await assertFails(setDoc(doc(bob,'users/alice/goals/active'),unitGoal));passed++;
     await assertFails(setDoc(doc(alice,'users/alice/goals/active'),{...unitGoal,units:{muscle:'lb'}}));passed++;
     await assertFails(setDoc(doc(alice,'users/alice/goals/active'),{...unitGoal,units:'kg'}));passed++;
+    const training={schema:1,kind:'session',data:JSON.stringify({id:'example'}),updatedAt:Date.now(),revision:'example'};
+    await assertSucceeds(setDoc(doc(alice,'users/alice/training/session_example'),training));passed++;
+    await assertSucceeds(getDoc(doc(alice,'users/alice/training/session_example')));passed++;
+    await assertFails(getDoc(doc(bob,'users/alice/training/session_example')));passed++;
+    await assertFails(getDocs(collection(bob,'users/alice/training')));passed++;
+    await assertFails(setDoc(doc(bob,'users/alice/training/session_example'),training));passed++;
+    await assertFails(setDoc(doc(anon,'users/alice/training/session_example'),training));passed++;
+    await assertFails(setDoc(doc(alice,'users/alice/training/invalid'),{...training,admin:true}));passed++;
+    await assertFails(setDoc(doc(alice,'users/alice/training/invalid'),{...training,data:'x'.repeat(300001)}));passed++;
+    await assertFails(setDoc(doc(alice,'users/alice/training/invalid'),{...training,kind:'admin'}));passed++;
+    await assertFails(deleteDoc(doc(bob,'users/alice/training/session_example')));passed++;
     assert.equal((await getDoc(doc(alice,'users/alice/measurements/a'))).data().weight,65);passed++;
     console.log(JSON.stringify({passed,project:'demo-biovault',productionWrites:0}));
   }finally{await env.cleanup();}

@@ -36,7 +36,7 @@ with zipfile.ZipFile(unsigned,'a',compression=zipfile.ZIP_DEFLATED) as archive:
     for file in dex.glob('*.dex'):
         archive.write(file,file.name)
 run(tools/'zipalign','-f','-p','4',unsigned,build/'aligned.apk')
-result=root/'build/BIOSHAPE_5.2.3.apk'
+result=root/'build/BIOSHAPE_5.3.0.apk'
 run(tools/'apksigner','sign','--ks',os.environ['BIOVAULT_KEYSTORE'],'--ks-type','PKCS12','--ks-key-alias',os.environ['BIOVAULT_KEY_ALIAS'],'--ks-pass','env:BIOVAULT_STORE_PASSWORD','--key-pass','env:BIOVAULT_STORE_PASSWORD','--out',result,build/'aligned.apk')
 run(tools/'apksigner','verify','--verbose',result)
 print(result)

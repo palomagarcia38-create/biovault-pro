@@ -26,7 +26,7 @@ const {chromium}=require('playwright');const http=require('node:http');const fs=
  assert.equal(await page.locator('#bottomNav').evaluate(e=>getComputedStyle(e).position),'fixed');
  assert.deepEqual(await page.locator('#bottomNav button span').allTextContents(),['Inicial','Comparações gráficas','Treino','Configuração']);
  for(const width of [360,393,768]){await page.setViewportSize({width,height:852});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.screenshot({path:`build/dashboard-${width}.png`,fullPage:true});}
- await page.locator('#bottomNav [data-app-nav="training"]').click();await page.locator('#trainingModal:not(.hidden)').waitFor();assert.equal(await page.locator('#trainingSummary').textContent(),'');await page.getByRole('button',{name:'Fechar treino',exact:true}).click();
+ await page.locator('#bottomNav [data-app-nav="training"]').click();await page.locator('#trainingModal:not(.hidden)').waitFor();assert.match(await page.locator('#trainingSummary').textContent(),/Seu treino começa aqui/);await page.getByRole('button',{name:'Fechar treino',exact:true}).click();
  await page.locator('#bottomNav [data-app-nav="chart"]').click();await page.locator('#quickPanelBody #subView-chart').waitFor();await page.keyboard.press('Escape');
  await page.reload();await page.getByRole('button',{name:'Continuar somente neste aparelho'}).click();assert.equal(await page.locator('#personContextName').textContent(),'Oi, Pessoa!');
  await page.getByRole('button',{name:'Entrar',exact:true}).click();assert(await page.locator('#appRoot').evaluate(e=>e.inert));
